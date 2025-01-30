@@ -3,8 +3,15 @@
 MusicPlayer::MusicPlayer()
 	: m_volume(10.f)
 {
-	m_filenames[MusicThemes::kMenuTheme] = "Media/Music/MenuTheme.ogg";
-	m_filenames[MusicThemes::kMissionTheme] = "Media/Music/MissionTheme.ogg";
+	/*All music pieces have been self - composed / produced by Albert.Made using Bosca Ceoil Blue.
+	The chosen file extension is .wav, an industry standard for editing and playing music files*/
+
+	m_filenames[MusicThemes::kMenuTheme] = "Media/Music/MenuTheme.wav"; /*Reasoning for music choice -
+	a dark soundtrack that introduces an unsettling atmosphere since the game takes place during a zombie apocalypse. Additionally,
+	you can hear wind gusts in the background, which indicate lack of other human beings in the vicinity.
+	The agents can only count on each other.*/
+
+	m_filenames[MusicThemes::kGameplayTheme] = "Media/Music/GameplayTheme.wav";
 }
 
 void MusicPlayer::Play(MusicThemes theme)
