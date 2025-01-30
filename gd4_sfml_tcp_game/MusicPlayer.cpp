@@ -1,9 +1,12 @@
+/*Albert Skalinski - D00248346
+  Dylan Fennelly - D00248176*/
+
 #include "MusicPlayer.hpp"
 
 MusicPlayer::MusicPlayer()
 	: m_volume(10.f)
 {
-	/*All music pieces have been self-composed/produced by Albert. Made using Bosca Ceoil Blue.
+	/*The first three music pieces have been self-composed/produced by Albert. Made using Bosca Ceoil Blue.
 	The chosen file extension is .wav, an industry standard for editing and playing music files*/
 
 	m_filenames[MusicThemes::kMenuTheme] = "Media/Music/MenuTheme.wav"; /*Reasoning for music choice -
@@ -19,9 +22,11 @@ MusicPlayer::MusicPlayer()
 
 	m_filenames[MusicThemes::kGameOverTheme] = "Media/Music/GameOverTheme.wav";
 
+	/*This music piece has been outsourced from the following links:
+	https://pixabay.com/sound-effects/horn-stabs-entrance-14741/
+	https://pixabay.com/sound-effects/victorymale-version-230553/ */
 	m_filenames[MusicThemes::kGameWonTheme] = "Media/Music/GameWonTheme.wav";
-	//https://pixabay.com/sound-effects/horn-stabs-entrance-14741/
-	//https://pixabay.com/sound-effects/victorymale-version-230553/
+	
 }
 
 void MusicPlayer::Play(MusicThemes theme)

@@ -1,3 +1,6 @@
+/*Albert Skalinski - D00248346
+  Dylan Fennelly - D00248176*/
+
 #include "DataTables.hpp"
 #include "AircraftType.hpp"
 #include "ProjectileType.hpp"

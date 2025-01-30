@@ -1,3 +1,6 @@
+/*Albert Skalinski - D00248346
+  Dylan Fennelly - D00248176*/
+
 #include "Aircraft.hpp"
 #include "TextureID.hpp"
 #include "ResourceHolder.hpp"

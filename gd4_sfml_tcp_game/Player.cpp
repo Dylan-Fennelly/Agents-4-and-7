@@ -1,3 +1,6 @@
+/*Albert Skalinski - D00248346
+  Dylan Fennelly - D00248176*/
+
 #include "Player.hpp"
 #include "ReceiverCategories.hpp"
 #include "Aircraft.hpp"
