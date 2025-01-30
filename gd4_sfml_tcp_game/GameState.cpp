@@ -42,5 +42,14 @@ bool GameState::HandleEvent(const sf::Event& event)
 	{
 		RequestStackPush(StateID::kPause);
 	}
+	//Handle controler input for this
+	if (event.type == sf::Event::JoystickButtonPressed)
+	{
+		if (event.joystickButton.button == 9) // KnockOff ps4 gamepad
+
+		{
+			RequestStackPush(StateID::kPause);
+		}
+	}
 	return true;
 }

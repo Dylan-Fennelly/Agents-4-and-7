@@ -26,5 +26,8 @@ private:
 	gui::Container m_gui_container;
 	std::array<gui::Button::Ptr, static_cast<int>(Action::kActionCount)> m_binding_buttons;
 	std::array<gui::Label::Ptr, static_cast<int>(Action::kActionCount)> m_binding_labels;
+
+	std::array<std::shared_ptr<gui::Label>, static_cast<int>(Action::kActionCount)> m_gamepad_labels;
+
 };
 

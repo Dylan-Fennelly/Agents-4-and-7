@@ -48,21 +48,34 @@ bool PauseState::Update(sf::Time dt)
 
 bool PauseState::HandleEvent(const sf::Event& event)
 {
-    if (event.type != sf::Event::KeyPressed)
+    // Handle keyboard input
+    if (event.type == sf::Event::KeyPressed)
     {
-        return false;
+        if (event.key.code == sf::Keyboard::Escape)
+        {
+            RequestStackPop();
+        }
+        else if (event.key.code == sf::Keyboard::BackSpace)
+        {
+            RequestStackClear();
+            RequestStackPush(StateID::kMenu);
+        }
     }
 
-    if (event.key.code == sf::Keyboard::Escape)
+    // Handle joystick button input
+    else if (event.type == sf::Event::JoystickButtonPressed)
     {
-        RequestStackPop();
+        if (event.joystickButton.button == 2) // Button 2 (e.g., "B" on Xbox, "Circle" on PlayStation)
+        {
+            RequestStackPop();
+        }
+        else if (event.joystickButton.button == 1) // Button 1 (e.g., "A" on Xbox, "X" on PlayStation)
+        {
+            RequestStackClear();
+            RequestStackPush(StateID::kMenu);
+        }
     }
 
-    if (event.key.code == sf::Keyboard::BackSpace)
-    {
-        RequestStackClear();
-        RequestStackPush(StateID::kMenu);
-    }
     return false;
 }
 

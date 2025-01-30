@@ -52,6 +52,12 @@ bool SettingsState::HandleEvent(const sf::Event& event)
 				GetContext().player->AssignKey(static_cast<Action>(action), event.key.code);
 				m_binding_buttons[action]->Deactivate();
 			}
+			// Handle gamepad button input
+			else if (event.type == sf::Event::JoystickButtonPressed)
+			{
+				GetContext().player->AssignGamepadButton(static_cast<Action>(action), event.joystickButton.button);
+				m_binding_buttons[action]->Deactivate();
+			}
 			break;
 		}
 	}
@@ -85,9 +91,15 @@ void SettingsState::AddButtonLabel(Action action, float y, const std::string& te
 	m_binding_buttons[static_cast<int>(action)]->SetText(text);
 	m_binding_buttons[static_cast<int>(action)]->SetToggle(true);
 
+	//KeyBoardMapping
 	m_binding_labels[static_cast<int>(action)] = std::make_shared<gui::Label>("", *context.fonts);
 	m_binding_labels[static_cast<int>(action)]->setPosition(300.f, y + 15.f);
 
+	//Gamepad Mapping
+	m_gamepad_labels[static_cast<int>(action)] = std::make_shared<gui::Label>("", *context.fonts);
+	m_gamepad_labels[static_cast<int>(action)] ->setPosition(500.f, y + 15.f); // Position it to the right of keyboard mappings
+
 	m_gui_container.Pack(m_binding_buttons[static_cast<int>(action)]);
 	m_gui_container.Pack(m_binding_labels[static_cast<int>(action)]);
+	m_gui_container.Pack(m_gamepad_labels[static_cast<int>(action)]);
 }

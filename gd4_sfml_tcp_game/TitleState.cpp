@@ -37,7 +37,7 @@ bool TitleState::Update(sf::Time dt)
 
 bool TitleState::HandleEvent(const sf::Event& event)
 {
-    if (event.type == sf::Event::KeyPressed)
+    if (event.type == sf::Event::KeyPressed || event.type == sf::Event::JoystickButtonPressed)
     {
         RequestStackPop();
         RequestStackPush(StateID::kMenu);

@@ -1,7 +1,7 @@
 #include "Container.hpp"
 
 gui::Container::Container()
-    :m_selected_child(-1)
+    : m_selected_child(-1), m_last_joystick_move_time(sf::Time::Zero)
 {
 }
 
@@ -21,11 +21,14 @@ bool gui::Container::IsSelectable() const
 
 void gui::Container::HandleEvent(const sf::Event& event)
 {
+    // If a child is active, forward the event
     if (HasSelection() && m_children[m_selected_child]->IsActive())
     {
         m_children[m_selected_child]->HandleEvent(event);
+        return;
     }
-    else if (event.type == sf::Event::KeyReleased)
+
+    if (event.type == sf::Event::KeyReleased)
     {
         if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::Up)
         {
@@ -41,6 +44,44 @@ void gui::Container::HandleEvent(const sf::Event& event)
             {
                 m_children[m_selected_child]->Activate();
             }
+        }
+    }
+    else if (event.type == sf::Event::JoystickMoved)
+    {
+        HandleJoystickNavigation(event);
+    }
+    else if (event.type == sf::Event::JoystickButtonPressed)
+    {
+        if (event.joystickButton.button == 1) // A Button (Common select button)
+        {
+            if (HasSelection())
+            {
+                m_children[m_selected_child]->Activate();
+            }
+        }
+    }
+}
+
+void gui::Container::HandleJoystickNavigation(const sf::Event& event)
+{
+    constexpr float threshold = 50.f; // Deadzone threshold to prevent accidental movement
+    sf::Time delay = sf::milliseconds(200); // Delay between navigation changes
+
+    if (event.joystickMove.axis == sf::Joystick::PovY || event.joystickMove.axis == sf::Joystick::Y)
+    {
+        sf::Time now = m_clock.getElapsedTime();
+        if (now - m_last_joystick_move_time < delay)
+            return; // Prevent rapid switching
+
+        if (event.joystickMove.position < -threshold) // Up
+        {
+            SelectPrevious();
+            m_last_joystick_move_time = now;
+        }
+        else if (event.joystickMove.position > threshold) // Down
+        {
+            SelectNext();
+            m_last_joystick_move_time = now;
         }
     }
 }
@@ -78,7 +119,6 @@ void gui::Container::SelectNext()
     {
         return;
     }
-    //Search for the next selectable component
     int next = m_selected_child;
     do
     {
