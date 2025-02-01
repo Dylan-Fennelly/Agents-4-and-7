@@ -17,24 +17,16 @@ struct AircraftMover
 
 Player::Player(unsigned int player_id, unsigned int joystick_id)
     : m_player_id(player_id) // Assign player ID
-    , m_joystick_id(joystick_id) // Assign joystick ID
     , m_current_mission_status(MissionStatus::kMissionRunning)
+	, m_gamepad(joystick_id) // Create gamepad object
 {
-    //Set initial key bindings
-    m_key_binding[sf::Keyboard::A] = Action::kMoveLeft;
-    m_key_binding[sf::Keyboard::D] = Action::kMoveRight;
-    m_key_binding[sf::Keyboard::W] = Action::kMoveUp;
-    m_key_binding[sf::Keyboard::S] = Action::kMoveDown;
-    m_key_binding[sf::Keyboard::M] = Action::kMissileFire;
-    m_key_binding[sf::Keyboard::Space] = Action::kBulletFire;
-
-
     // Set gamepad button bindings (assuming PLaystation layout)
-	m_gamepad_binding[1] = Action::kBulletFire;  // X Button
-	m_gamepad_binding[2] = Action::kMissileFire; // Circle Button
-    //m_gamepad_binding[0] = Action::kBulletFire;  // A Button
-    //m_gamepad_binding[1] = Action::kMissileFire; // B Button
-
+	m_gamepad_binding[m_gamepad.getButton(ButtonFunction::kConfirm)] = Action::kBulletFire;
+	m_gamepad.addActionMap(Action::kBulletFire, ButtonFunction::kConfirm);
+	m_gamepad_binding[m_gamepad.getButton(ButtonFunction::kCancel)] = Action::kMissileFire; // Circle Button
+	m_gamepad.addActionMap(Action::kMissileFire, ButtonFunction::kCancel);
+	m_gamepad_binding[m_gamepad.getButton(ButtonFunction::kPause)] = Action::kMoveUp; // Options Button
+	m_gamepad.addActionMap(Action::kMoveUp, ButtonFunction::kPause);
     // Set joystick axis bindings
     m_gamepad_axes[sf::Joystick::X] = Action::kMoveRight;
     m_gamepad_axes[sf::Joystick::Y] = Action::kMoveUp;
@@ -51,20 +43,22 @@ Player::Player(unsigned int player_id, unsigned int joystick_id)
 
 void Player::HandleEvent(const sf::Event& event, CommandQueue& command_queue)
 {
-    if (event.type == sf::Event::KeyPressed)
-    {
-        auto found = m_key_binding.find(event.key.code);
-        if (found != m_key_binding.end() && !IsRealTimeAction(found->second))
-        {
-            command_queue.Push(m_action_binding[found->second]);
-        }
-    }
+    //We are moving to controller only but we might need this again for an escape button or something
+    //if (event.type == sf::Event::KeyPressed)
+    //{
+    //    auto found = m_key_binding.find(event.key.code);
+    //    if (found != m_key_binding.end() && !IsRealTimeAction(found->second))
+    //    {
+    //        command_queue.Push(m_action_binding[found->second]);
+    //    }
+    //}
 
     // Handle gamepad button presses
     if (event.type == sf::Event::JoystickButtonPressed)
     {
         auto found = m_gamepad_binding.find(event.joystickButton.button);
-		std::cout << "Button pressed: " << event.joystickButton.button << std::endl;
+        
+		std::cout << "Button pressed: " << event.joystickButton.button << std::endl;//TODO:remove me i do debug and stuff
         if (found != m_gamepad_binding.end() && !IsRealTimeAction(found->second))
         {
             command_queue.Push(m_action_binding[found->second]);
@@ -74,20 +68,20 @@ void Player::HandleEvent(const sf::Event& event, CommandQueue& command_queue)
 
 void Player::HandleRealTimeInput(CommandQueue& command_queue)
 {
-    //Check if any of the key bindings are pressed
-    for (auto pair : m_key_binding)
-    {
-        if (sf::Keyboard::isKeyPressed(pair.first) && IsRealTimeAction(pair.second))
-        {
-            command_queue.Push(m_action_binding[pair.second]);
-        }
-    }
+    ////Check if any of the key bindings are pressed
+    //for (auto pair : m_key_binding)
+    //{
+    //    if (sf::Keyboard::isKeyPressed(pair.first) && IsRealTimeAction(pair.second))
+    //    {
+    //        command_queue.Push(m_action_binding[pair.second]);
+    //    }
+    //}
 
 
     // Check gamepad button input
     for (auto pair : m_gamepad_binding)
     {
-        if (sf::Joystick::isButtonPressed(m_joystick_id, pair.first) && IsRealTimeAction(pair.second))
+        if (sf::Joystick::isButtonPressed(m_gamepad.getJoystickId(), pair.first) && IsRealTimeAction(pair.second))
         {
             command_queue.Push(m_action_binding[pair.second]);
         }
@@ -98,7 +92,7 @@ void Player::HandleRealTimeInput(CommandQueue& command_queue)
 
     for (auto pair : m_gamepad_axes)
     {
-        float axis_position = sf::Joystick::getAxisPosition(m_joystick_id, pair.first);
+        float axis_position = sf::Joystick::getAxisPosition(m_gamepad.getJoystickId(), pair.first);
 
         if (std::abs(axis_position) > deadZone) // Ignore small movements
         {
@@ -114,22 +108,22 @@ void Player::HandleRealTimeInput(CommandQueue& command_queue)
     }
 }
 
-void Player::AssignKey(Action action, sf::Keyboard::Key key)
-{
-    //Remove keys that are currently bound to the action
-    for (auto itr = m_key_binding.begin(); itr != m_key_binding.end();)
-    {
-        if (itr->second == action)
-        {
-            m_key_binding.erase(itr++);
-        }
-        else
-        {
-            ++itr;
-        }
-    }
-    m_key_binding[key] = action;
-}
+//void Player::AssignKey(Action action, sf::Keyboard::Key key)
+//{
+//    //Remove keys that are currently bound to the action
+//    for (auto itr = m_key_binding.begin(); itr != m_key_binding.end();)
+//    {
+//        if (itr->second == action)
+//        {
+//            m_key_binding.erase(itr++);
+//        }
+//        else
+//        {
+//            ++itr;
+//        }
+//    }
+//    m_key_binding[key] = action;
+//}
 
 void Player::AssignGamepadButton(Action action, unsigned int button)
 {
@@ -144,17 +138,17 @@ void Player::AssignGamepadButton(Action action, unsigned int button)
     m_gamepad_binding[button] = action;
 }
 
-sf::Keyboard::Key Player::GetAssignedKey(Action action) const
-{
-    for (auto pair : m_key_binding)
-    {
-        if (pair.second == action)
-        {
-            return pair.first;
-        }
-    }
-    return sf::Keyboard::Unknown;
-}
+//sf::Keyboard::Key Player::GetAssignedKey(Action action) const
+//{
+//    for (auto pair : m_key_binding)
+//    {
+//        if (pair.second == action)
+//        {
+//            return pair.first;
+//        }
+//    }
+//    return sf::Keyboard::Unknown;
+//}
 
 unsigned int Player::GetAssignedGamepadButton(Action action) const
 {
@@ -167,6 +161,16 @@ unsigned int Player::GetAssignedGamepadButton(Action action) const
 }
 
 
+Action Player::GetAssignedAction(unsigned int button) const
+{
+    auto found = m_gamepad_binding.find(button);
+    if (found != m_gamepad_binding.end())
+    {
+        return found->second;
+    }
+    return Action::kActionCount; // or any default action
+}
+
 void Player::SetMissionStatus(MissionStatus status)
 {
     m_current_mission_status = status;
@@ -175,6 +179,16 @@ void Player::SetMissionStatus(MissionStatus status)
 MissionStatus Player::GetMissionStatus() const
 {
     return m_current_mission_status;
+}
+
+Gamepad Player::GetGamepad()
+{
+	return m_gamepad;
+}
+
+void Player::SetGamepad(Gamepad gamepad)
+{
+	m_gamepad = gamepad;
 }
 
 void Player::InitialiseActions()

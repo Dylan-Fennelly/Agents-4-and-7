@@ -5,6 +5,7 @@
 
 MenuState::MenuState(StateStack& stack, Context context)
     :State(stack, context)
+	, m_gui_container(context)
 {
     sf::Texture& texture = context.textures->Get(TextureID::kTitleScreen);
 

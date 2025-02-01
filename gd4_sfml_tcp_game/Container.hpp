@@ -1,6 +1,7 @@
 #pragma once
 #include "Component.hpp"
 #include <SFML/System/Clock.hpp> // Add this for timing
+#include "State.hpp"
 
 namespace gui
 {
@@ -10,11 +11,11 @@ namespace gui
 		typedef std::shared_ptr<Container> Ptr;
 
 	public:
-		Container();
+		Container(State::Context context); //Ok so basically to make this work 
 		void Pack(Component::Ptr component);
 		virtual bool IsSelectable() const override;
 		virtual void HandleEvent(const sf::Event& event) override;
-
+		State::Context GetContext() const;
 		void HandleJoystickNavigation(const sf::Event& event);
 
 	private:
@@ -31,5 +32,6 @@ namespace gui
 		// Added for controller support
 		sf::Clock m_clock;                // Tracks time for joystick movement
 		sf::Time m_last_joystick_move_time; // Last movement time to prevent rapid selection
+		State::Context m_context;
 	};
 }

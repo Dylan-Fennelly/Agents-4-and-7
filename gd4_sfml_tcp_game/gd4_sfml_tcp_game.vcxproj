@@ -105,6 +105,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)/SFML-2.6.1/include</AdditionalIncludeDirectories>
+      <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -144,8 +145,10 @@
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameOverState.cpp" />
+    <ClCompile Include="Gamepad.cpp" />
     <ClCompile Include="GameState.cpp" />
     <ClCompile Include="Label.cpp" />
+    <ClCompile Include="LobbyState.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MenuState.cpp" />
     <ClCompile Include="MusicPlayer.cpp" />
@@ -176,20 +179,24 @@
     <ClInclude Include="Application.hpp" />
     <ClInclude Include="BloomEffect.hpp" />
     <ClInclude Include="Button.hpp" />
+    <ClInclude Include="ButtonFunction.hpp" />
     <ClInclude Include="ButtonType.hpp" />
     <ClInclude Include="Command.hpp" />
     <ClInclude Include="CommandQueue.hpp" />
     <ClInclude Include="Component.hpp" />
     <ClInclude Include="Constants.hpp" />
     <ClInclude Include="Container.hpp" />
+    <ClInclude Include="ControllerType.hpp" />
     <ClInclude Include="DataTables.hpp" />
     <ClInclude Include="EmitterNode.hpp" />
     <ClInclude Include="Entity.hpp" />
     <ClInclude Include="Font.hpp" />
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="GameOverState.hpp" />
+    <ClInclude Include="Gamepad.hpp" />
     <ClInclude Include="GameState.hpp" />
     <ClInclude Include="Label.hpp" />
+    <ClInclude Include="LobbyState.hpp" />
     <ClInclude Include="MenuOptions.hpp" />
     <ClInclude Include="MenuState.hpp" />
     <ClInclude Include="MissionStatus.hpp" />

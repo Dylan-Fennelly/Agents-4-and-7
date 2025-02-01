@@ -1,7 +1,14 @@
 #include "Container.hpp"
+#include "Player.hpp"
+#include "ButtonFunction.hpp"
+//Because we dont have access to the player class we are not able to access the gamepad class - this makes it impossible to get the joystick id from the player class
+//We need to add a context to the container class so that we can get the joystick id from the context
 
-gui::Container::Container()
-    : m_selected_child(-1), m_last_joystick_move_time(sf::Time::Zero)
+
+gui::Container::Container(State::Context context)
+    : m_selected_child(-1), 
+    m_last_joystick_move_time(sf::Time::Zero)
+	, m_context(context)
 {
 }
 
@@ -9,7 +16,7 @@ void gui::Container::Pack(Component::Ptr component)
 {
     m_children.emplace_back(component);
     if (!HasSelection() && component->IsSelectable())
-    {
+    { 
         Select(m_children.size() - 1);
     }
 }
@@ -52,7 +59,7 @@ void gui::Container::HandleEvent(const sf::Event& event)
     }
     else if (event.type == sf::Event::JoystickButtonPressed)
     {
-        if (event.joystickButton.button == 1) // A Button (Common select button)
+		if (event.joystickButton.button == GetContext().player->GetGamepad().getButton(ButtonFunction::kConfirm))
         {
             if (HasSelection())
             {
@@ -60,6 +67,11 @@ void gui::Container::HandleEvent(const sf::Event& event)
             }
         }
     }
+}
+
+State::Context gui::Container::GetContext() const
+{
+	return m_context;
 }
 
 void gui::Container::HandleJoystickNavigation(const sf::Event& event)
