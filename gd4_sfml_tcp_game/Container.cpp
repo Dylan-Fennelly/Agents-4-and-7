@@ -59,7 +59,7 @@ void gui::Container::HandleEvent(const sf::Event& event)
     }
     else if (event.type == sf::Event::JoystickButtonPressed)
     {
-		if (event.joystickButton.button == GetContext().player->GetGamepad().getButton(ButtonFunction::kConfirm))
+		if (event.joystickButton.button == GetContext().player->GetGamepad().GetButton(ButtonFunction::kConfirm))
         {
             if (HasSelection())
             {

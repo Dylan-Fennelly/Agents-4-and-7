@@ -66,11 +66,11 @@ bool PauseState::HandleEvent(const sf::Event& event)
     else if (event.type == sf::Event::JoystickButtonPressed)
     {
         auto gamepad = GetContext().player->GetGamepad();
-        if (event.joystickButton.button == gamepad.getButton(ButtonFunction::kConfirm) || event.joystickButton.button == gamepad.getButton(ButtonFunction::kPause))
+        if (event.joystickButton.button == gamepad.GetButton(ButtonFunction::kConfirm) || event.joystickButton.button == gamepad.GetButton(ButtonFunction::kPause))
         {
             RequestStackPop();
         }
-        else if (event.joystickButton.button == gamepad.getButton(ButtonFunction::kCancel))
+        else if (event.joystickButton.button == gamepad.GetButton(ButtonFunction::kCancel))
         {
             RequestStackClear();
             RequestStackPush(StateID::kMenu);

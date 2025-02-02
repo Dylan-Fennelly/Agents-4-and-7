@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <random>
 #include "Animation.hpp"
+#include "Action.hpp"
 
 class Utility
 {
@@ -15,5 +16,7 @@ class Utility
 		static double ToDegrees(double angle);
 		static int RandomInt(int exclusive_max);
 		static int Length(sf::Vector2f vector);
+		static bool IsRealTimeAction(Action action);
+		
 };
 

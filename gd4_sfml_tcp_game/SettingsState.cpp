@@ -9,8 +9,8 @@ SettingsState::SettingsState(StateStack& stack, Context context)
 	m_background_sprite.setTexture(context.textures->Get(TextureID::kTitleScreen));
 
 	//Build key binding buttons and labels
-	AddButtonLabel(ButtonFunction::kConfirm, 150.f, "Fire", context);
-	AddButtonLabel(ButtonFunction::kCancel, 200.f, "Missile Fire", context);
+	AddButtonLabel(ButtonFunction::kConfirm, 150.f, "Fire/Confirm", context);
+	AddButtonLabel(ButtonFunction::kCancel, 200.f, "Missile Fire/Cancel", context);
 	AddButtonLabel(ButtonFunction::kPause, 250.f, "Pause Button", context);
 
 
@@ -39,7 +39,8 @@ bool SettingsState::HandleEvent(const sf::Event& event)
 {
 	bool is_key_binding = false;
 
-	//Iterate through all of the key binding buttons to see if they are being presssed, waiting for the user to enter a key
+	//Iterate through all of the key binding buttons to see if they are being presssed, waiting for the user to press the button
+	//make sure this uses kButtonCount : kButtonCount is not the last in the enum but it is where we draw the limit for controls 
 	for (std::size_t button = 0; button < static_cast<int>(ButtonFunction::kButtonCount); ++button)
 	{
 		if (m_binding_buttons[button]->IsActive())
@@ -49,8 +50,18 @@ bool SettingsState::HandleEvent(const sf::Event& event)
 			// Handle gamepad button input
 			if (event.type == sf::Event::JoystickButtonPressed)
 			{
-				Action actionToBind = GetContext().player->GetAssignedAction(GetContext().player->GetGamepad().getButton(static_cast<ButtonFunction>(button)));
-				GetContext().player->AssignGamepadButton(actionToBind, event.joystickButton.button);
+				//We use the index of the loop to get the button function
+				//We then get the gamepad, and use this to get the action assicatied with that buttonfunction
+				//Finally we take the button that was pressed and assign it to the action and 
+				//then update the labels
+               
+                Gamepad& gamepad = GetContext().player->GetGamepad();
+                ButtonFunction function = static_cast<ButtonFunction>(button);
+
+				Action action = gamepad.GetAction(function);
+				gamepad.AssignButtonFunction(function, event.joystickButton.button);
+				gamepad.AssignAction(action, function);
+				//deselct the button
 				m_binding_buttons[button]->Deactivate();
 			}
 			break;
@@ -71,16 +82,30 @@ bool SettingsState::HandleEvent(const sf::Event& event)
 
 void SettingsState::UpdateLabels()
 {
-	Player& player = *GetContext().player;
-	for (std::size_t i = 0; i < static_cast<int>(ButtonFunction::kButtonCount); ++i)
-	{
-		//sf::Keyboard::Key key = player.GetAssignedKey(static_cast<Action>(i));
-		//m_binding_labels[i]->SetText(Utility::toString(key));
-		std::string str = std::to_string(GetContext().player->GetAssignedGamepadButton(GetContext().player->GetAssignedAction(GetContext().player->GetGamepad().getButton(static_cast<ButtonFunction>(i)))));
-		m_binding_labels[i]->SetText(str);
-	}
+    // Get the active player from the context.
+    Player& player = *GetContext().player;
+    
+    // For each button function, update its label text.
+    for (std::size_t i = 0; i < static_cast<int>(ButtonFunction::kButtonCount); ++i)
+    {
+        // Get the corresponding ButtonFunction
+        ButtonFunction function = static_cast<ButtonFunction>(i);
+        // Get the mapped joystick button number from the gamepad
+        unsigned int buttonNumber = player.GetGamepad().GetButton(function);
+        // Convert that to a string (you might have a helper to convert numbers to a nicer string)
+        std::string buttonString = std::to_string(buttonNumber);
+        // Update the label text accordingly
+        m_binding_labels[i]->SetText(buttonString);
+    }
 }
 
+/// <summary>
+/// Adds a button and label to the settings screen it uses the index of the button to add the label to the correct button 
+/// </summary>
+/// <param name="buttonFunction"></param>
+/// <param name="y">The y position of the button</param>
+/// <param name="text">The text that will be displayed on the button</param>
+/// <param name="context"> The context of the game</param>
 void SettingsState::AddButtonLabel(ButtonFunction buttonFunction, float y, const std::string& text, Context context)
 {
 	m_binding_buttons[static_cast<int>(buttonFunction)] = std::make_shared<gui::Button>(context);

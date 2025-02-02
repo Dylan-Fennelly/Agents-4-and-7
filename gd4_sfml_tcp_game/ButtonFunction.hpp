@@ -19,5 +19,9 @@ enum class ButtonFunction
 	/// <summary>
 	/// The number of buttons we have assigned a gamepad function to
 	/// </summary>
-	kButtonCount
+	kButtonCount,
+	/// <summary>
+	/// Invalid button - Used if the button is not found for some reason
+	/// </summary>
+	kButtonInvalid
 };
