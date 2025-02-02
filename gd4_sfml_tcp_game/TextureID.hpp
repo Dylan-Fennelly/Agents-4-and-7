@@ -5,9 +5,9 @@
 enum class TextureID
 {
 	kLandscape,
-	kEagle,
-	kRaptor,
-	kAvenger,
+	kAgentFour,
+	kZombie,
+	kZombie2,
 	kMissile,
 	kTitleScreen,
 	kButtonNormal,
@@ -20,7 +20,7 @@ enum class TextureID
 	kFireRate,
 	kFinishLine,
 	kEntities,
-	kJungle,
+	kBackground,
 	kButtons,
 	kExplosion,
 	kParticle,
@@ -28,5 +28,4 @@ enum class TextureID
 	kInvincibility,
 	//Added by Albert
 	kMinigun
-
 };

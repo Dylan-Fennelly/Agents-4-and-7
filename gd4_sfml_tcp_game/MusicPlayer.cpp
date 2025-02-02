@@ -20,9 +20,9 @@ MusicPlayer::MusicPlayer()
 	In the intro, there are noises in the background, which are supposed to immitate zombie sounds.
 	This track has been slightly inspired by Plants vs Zombies.*/
 
-	m_filenames[MusicThemes::kGameOverTheme] = "Media/Music/GameOverTheme.wav";
+	m_filenames[MusicThemes::kGameOverTheme] = "Media/Music/GameOverTheme.wav"; /*Reasoning for music choice - just a couple of sad bells indicating that the game has been lost*/
 
-	/*This music piece has been outsourced from the following links:
+	/*The music piece below has been put together by me, but outsourced from the following links:
 	https://pixabay.com/sound-effects/horn-stabs-entrance-14741/
 	https://pixabay.com/sound-effects/victorymale-version-230553/ */
 	m_filenames[MusicThemes::kGameWonTheme] = "Media/Music/GameWonTheme.wav";
