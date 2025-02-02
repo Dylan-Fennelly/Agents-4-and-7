@@ -19,7 +19,6 @@ public:
 	unsigned int GetCategory() const override;
 
 	void IncreaseFireRate();
-	void IncreaseFireSpread();
 	void CollectMissile(unsigned int count);
 	
 	//Added by Albert
@@ -27,7 +26,7 @@ public:
 	//Added by Albert
 	void Damage(int points) override;
 	//Added by Albert
-	void ActivateMinigun();
+	void ActivateMinigun(sf::Time duration);
 
 	void UpdateTexts();
 	void UpdateMovementPattern(sf::Time dt);
@@ -87,5 +86,7 @@ private:
 	sf::Time m_invincibility_timer;
 	//Added by Albert
 	sf::Shader m_invincibilityShader;
+	//Added by Albert
+	sf::Time m_minigun_timer;
 };
 

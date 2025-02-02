@@ -31,7 +31,7 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 void World::Update(sf::Time dt)
 {
 	//Scroll the world
-	//m_camera.move(0, m_scrollspeed * dt.asSeconds());
+	m_camera.move(0, m_scrollspeed * dt.asSeconds());
 	
 	//m_player_aircraft->SetVelocity(0.f, 0.f);
 	m_enemySpawnTimer += dt;

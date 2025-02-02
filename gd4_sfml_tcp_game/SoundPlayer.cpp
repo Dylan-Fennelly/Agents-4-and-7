@@ -22,11 +22,11 @@ namespace
 
 SoundPlayer::SoundPlayer()
 {
-	m_sound_buffers.Load(SoundEffect::kAlliedGunfire, "Media/Sound/AlliedGunfire.wav");
-	m_sound_buffers.Load(SoundEffect::kEnemyGunfire, "Media/Sound/EnemyGunfire.wav");
-	m_sound_buffers.Load(SoundEffect::kExplosion1, "Media/Sound/Explosion1.wav");
-	m_sound_buffers.Load(SoundEffect::kExplosion2, "Media/Sound/Explosion2.wav");
-	m_sound_buffers.Load(SoundEffect::kLaunchMissile, "Media/Sound/LaunchMissile.wav");
+	m_sound_buffers.Load(SoundEffect::kPistolShot, "Media/Sound/PistolShot.wav");
+	m_sound_buffers.Load(SoundEffect::kEnemyGunfire, "Media/Sound/PistolShot.wav");
+	m_sound_buffers.Load(SoundEffect::kDyingZombie, "Media/Sound/DyingZombie.wav");
+	m_sound_buffers.Load(SoundEffect::kExplosion2, "Media/Sound/DyingZombie.wav");
+	m_sound_buffers.Load(SoundEffect::kLaunchRocket, "Media/Sound/LaunchRocket.wav");
 	m_sound_buffers.Load(SoundEffect::kCollectPickup, "Media/Sound/CollectPickup.wav");
 	m_sound_buffers.Load(SoundEffect::kButton, "Media/Sound/Button.wav");
 
