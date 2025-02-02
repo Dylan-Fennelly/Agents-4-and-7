@@ -1,3 +1,6 @@
+/*Albert Skalinski - D00248346
+  Dylan Fennelly - D00248176*/
+
 #pragma once
 #include "ParticleType.hpp"
 #include <SFML/System/Vector2.hpp>

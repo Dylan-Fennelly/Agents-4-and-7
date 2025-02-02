@@ -1,3 +1,6 @@
+/*Albert Skalinski - D00248346
+  Dylan Fennelly - D00248176*/
+
 #include "World.hpp"
 #include "Pickup.hpp"
 #include "Projectile.hpp"
@@ -101,6 +104,11 @@ void World::LoadTextures()
 	m_textures.Load(TextureID::kJungle, "Media/Textures/Jungle.png");
 	m_textures.Load(TextureID::kExplosion, "Media/Textures/Explosion.png");
 	m_textures.Load(TextureID::kParticle, "Media/Textures/Particle.png");
+
+	//Added by Albert
+	m_textures.Load(TextureID::kInvincibility, "Media/Textures/Invincibility.png");
+	//Added by Albert
+	m_textures.Load(TextureID::kMinigun, "Media/Textures/Minigun.png");
 
 
 }

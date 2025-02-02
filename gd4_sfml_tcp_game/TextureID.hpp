@@ -1,3 +1,6 @@
+/*Albert Skalinski - D00248346
+  Dylan Fennelly - D00248176*/
+
 #pragma once
 enum class TextureID
 {
@@ -20,6 +23,10 @@ enum class TextureID
 	kJungle,
 	kButtons,
 	kExplosion,
-	kParticle
+	kParticle,
+	//Added by Albert
+	kInvincibility,
+	//Added by Albert
+	kMinigun
 
 };
