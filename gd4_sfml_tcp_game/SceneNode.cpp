@@ -75,7 +75,7 @@ void SceneNode::DrawBoundingRect(sf::RenderTarget& target, sf::RenderStates stat
     shape.setPosition(sf::Vector2f(rect.left, rect.top));
     shape.setSize(sf::Vector2f(rect.width, rect.height));
     shape.setFillColor(sf::Color::Transparent);
-    shape.setOutlineColor(sf::Color::Green);
+    shape.setOutlineColor(sf::Color::Transparent);
     shape.setOutlineThickness(1.f);
     target.draw(shape);
 }
@@ -141,6 +141,11 @@ void SceneNode::DrawChildren(sf::RenderTarget& target, sf::RenderStates states) 
 unsigned int SceneNode::GetCategory() const
 {
     return static_cast<unsigned int>(m_default_category);
+}
+
+void SceneNode::SetCategory(ReceiverCategories category)
+{
+	m_default_category = category;
 }
 
 void SceneNode::CheckNodeCollision(SceneNode& node, std::set<Pair>& collision_pairs)

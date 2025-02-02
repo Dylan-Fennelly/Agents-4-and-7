@@ -26,7 +26,9 @@ public:
 	CommandQueue& GetCommandQueue();
 
 	bool HasAlivePlayer() const;
-	bool HasPlayerReachedEnd() const;
+	bool HasPlayerReachedEnd(sf::Time dt);
+	//bool HasPlayerReachedEnd(sf::Time dt);
+
 
 private:
 	void LoadTextures();
@@ -74,8 +76,8 @@ private:
 	sf::FloatRect m_world_bounds;
 	sf::Vector2f m_spawn_position;
 	float m_scrollspeed;
-	Aircraft* m_player_aircraft;
-
+	std::vector<Aircraft*> m_player_aircrafts;
+	/*Aircraft* m_player_aircraft;*/
 	CommandQueue m_command_queue;
 
 	std::vector<SpawnPoint> m_enemy_spawn_points;
@@ -84,7 +86,7 @@ private:
 	// New member variables for enemy spawning
 	sf::Time m_enemySpawnTimer;     // Accumulated time since the last enemy spawn
 	sf::Time m_enemySpawnInterval;  // Randomized interval between spawns
-
+	sf::Clock m_totalElapsed;// Total time elapsed since the game started
 
 	BloomEffect m_bloom_effect;
 };

@@ -13,7 +13,7 @@ SettingsState::SettingsState(StateStack& stack, Context context)
 
 	//Build key binding buttons and labels
 	AddButtonLabel(ButtonFunction::kConfirm, 150.f, "Fire/Confirm", context);
-	AddButtonLabel(ButtonFunction::kCancel, 200.f, "Missile Fire/Cancel", context);
+	AddButtonLabel(ButtonFunction::kCancel, 200.f, "Cancel", context);
 	AddButtonLabel(ButtonFunction::kPause, 250.f, "Pause Button", context);
 
 
@@ -57,15 +57,27 @@ bool SettingsState::HandleEvent(const sf::Event& event)
 				//We then get the gamepad, and use this to get the action assicatied with that buttonfunction
 				//Finally we take the button that was pressed and assign it to the action and 
 				//then update the labels
-               
-                Gamepad& gamepad = GetContext().player->GetGamepad();
-                ButtonFunction function = static_cast<ButtonFunction>(button);
+				if (event.joystickButton.joystickId == GetContext().player->GetGamepad().GetJoystickId())
+				{
+					Gamepad& gamepad = GetContext().player->GetGamepad();
+					ButtonFunction function = static_cast<ButtonFunction>(button);
 
-				Action action = gamepad.GetAction(function);
-				gamepad.AssignButtonFunction(function, event.joystickButton.button);
-				gamepad.AssignAction(action, function);
-				//deselct the button
-				m_binding_buttons[button]->Deactivate();
+					Action action = gamepad.GetAction(function);
+					gamepad.AssignButtonFunction(function, event.joystickButton.button);
+					gamepad.AssignAction(action, function);
+					//deselct the button
+					m_binding_buttons[button]->Deactivate();
+				}
+				else if (event.joystickButton.joystickId == GetContext().player2->GetGamepad().GetJoystickId())
+				{
+					Gamepad& gamepad = GetContext().player2->GetGamepad();
+					ButtonFunction function = static_cast<ButtonFunction>(button);
+					Action action = gamepad.GetAction(function);
+					gamepad.AssignButtonFunction(function, event.joystickButton.button);
+					gamepad.AssignAction(action, function);
+					//deselct the button
+					m_binding_buttons[button]->Deactivate();
+				}
 			}
 			break;
 		}
@@ -87,6 +99,7 @@ void SettingsState::UpdateLabels()
 {
     // Get the active player from the context.
     Player& player = *GetContext().player;
+	Player& player2 = *GetContext().player2;
     
     // For each button function, update its label text.
     for (std::size_t i = 0; i < static_cast<int>(ButtonFunction::kButtonCount); ++i)
@@ -94,9 +107,10 @@ void SettingsState::UpdateLabels()
         // Get the corresponding ButtonFunction
         ButtonFunction function = static_cast<ButtonFunction>(i);
         // Get the mapped joystick button number from the gamepad
-        unsigned int buttonNumber = player.GetGamepad().GetButton(function);
+        unsigned int buttonNumber1 = player.GetGamepad().GetButton(function);
+		unsigned int buttonNumber2 = player2.GetGamepad().GetButton(function);
         // Convert that to a string (you might have a helper to convert numbers to a nicer string)
-        std::string buttonString = std::to_string(buttonNumber);
+        std::string buttonString = "P1:"+std::to_string(buttonNumber1) +"\tP2:" +std::to_string(buttonNumber2);
         // Update the label text accordingly
         m_binding_labels[i]->SetText(buttonString);
     }

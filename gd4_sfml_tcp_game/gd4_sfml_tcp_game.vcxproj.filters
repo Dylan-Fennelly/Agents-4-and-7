@@ -126,14 +126,11 @@
     <ClCompile Include="Gamepad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LobbyState.cpp">
+    <ClCompile Include="ControllerSelectState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Game.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Constants.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -311,7 +308,7 @@
     <ClInclude Include="ButtonFunction.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LobbyState.hpp">
+    <ClInclude Include="ControllerSelectState.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

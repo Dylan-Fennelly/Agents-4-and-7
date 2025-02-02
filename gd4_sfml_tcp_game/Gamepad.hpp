@@ -14,7 +14,7 @@ class Gamepad
 {
 public :
 
-	explicit Gamepad(unsigned int joystick_id);
+	explicit Gamepad(unsigned int joystick_id, unsigned int player_id);
 
 	void Update(CommandQueue& command_queue);
 	void HandleEvent(const sf::Event& event, CommandQueue& command_queue);
@@ -38,6 +38,7 @@ private:
 	unsigned int m_joystick_id;
 	float m_dead_zone;
 	ControllerType m_controller_type;
+	unsigned int m_player_id;
 
 	std::unordered_map<ButtonFunction, unsigned int> m_button_bindings;
 	std::unordered_map<Action, ButtonFunction> m_action_function_bindings;

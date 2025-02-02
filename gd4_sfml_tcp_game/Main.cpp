@@ -2,7 +2,6 @@
   Dylan Fennelly - D00248176*/
 
 #include <SFML/Graphics.hpp>
-#include "Game.hpp"
 #include "ResourceIdentifiers.hpp"
 #include <iostream>
 #include "Application.hpp"

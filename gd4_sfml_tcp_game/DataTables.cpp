@@ -25,8 +25,8 @@ std::vector<AircraftData> InitializeAircraftData()
     //Modified by Albert
     //Changed the texture for the enemy
     //Source - https://kenney.nl/assets/top-down-shooter
-    data[static_cast<int>(AircraftType::kZombie)].m_hitpoints = 20;
-    data[static_cast<int>(AircraftType::kZombie)].m_speed = 80.f;
+    data[static_cast<int>(AircraftType::kZombie)].m_hitpoints = 10;
+    data[static_cast<int>(AircraftType::kZombie)].m_speed = 90.f;
     data[static_cast<int>(AircraftType::kZombie)].m_fire_interval = sf::Time::Zero;
     data[static_cast<int>(AircraftType::kZombie)].m_texture = TextureID::kZombie;
     data[static_cast<int>(AircraftType::kZombie)].m_texture_rect = sf::IntRect(0, 0, 43, 35);
@@ -35,8 +35,8 @@ std::vector<AircraftData> InitializeAircraftData()
     //Modified by Albert
 	//Temporarily changed the texture for the other enemy to add more enemies on-screen
     data[static_cast<int>(AircraftType::kAvenger)].m_hitpoints = 40;
-    data[static_cast<int>(AircraftType::kAvenger)].m_speed = 50.f;
-    data[static_cast<int>(AircraftType::kAvenger)].m_fire_interval = sf::seconds(2);
+    data[static_cast<int>(AircraftType::kAvenger)].m_speed = 40.f;
+    data[static_cast<int>(AircraftType::kAvenger)].m_fire_interval = sf::Time::Zero;
     data[static_cast<int>(AircraftType::kAvenger)].m_texture = TextureID::kZombie;
     data[static_cast<int>(AircraftType::kAvenger)].m_texture_rect = sf::IntRect(0, 0, 43, 35);
     data[static_cast<int>(AircraftType::kAvenger)].m_has_roll_animation = false;

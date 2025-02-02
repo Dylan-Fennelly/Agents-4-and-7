@@ -14,20 +14,22 @@ class Command;
 class Player
 {
 public:
-	Player(unsigned int player_id,unsigned int joystick_id);
+	Player();
 	void HandleEvent(const sf::Event& event, CommandQueue& command_queue);
 	void HandleRealTimeInput(CommandQueue& command_queue);
 	void SetMissionStatus(MissionStatus status);
 	MissionStatus GetMissionStatus() const;
 	Gamepad& GetGamepad();
 	void SetGamepad(Gamepad gamepad);
+	unsigned int GetPlayerID() const;
+	unsigned int GetPlayerCount() const;
 
-	
 
 private:
 	void InitialiseActions();
-
+	
 private:
+	static unsigned int m_player_count; // Static member to count players
 	unsigned int m_player_id = 0; // Unique player identifier
 	MissionStatus m_current_mission_status;
 	Gamepad m_gamepad;

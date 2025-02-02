@@ -16,6 +16,7 @@ enum class ReceiverCategories
 	kSoundEffect = 1 << 8,
 
 	kAircraft = kPlayerAircraft | kAlliedAircraft | kEnemyAircraft,
+	kPlayers = kPlayerAircraft | kAlliedAircraft,
 	kProjectile = kAlliedProjectile | kEnemyProjectile
 };
 

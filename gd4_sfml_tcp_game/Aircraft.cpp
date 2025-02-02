@@ -55,8 +55,8 @@ Aircraft::Aircraft(AircraftType type, const TextureHolder& textures, const FontH
 
 
 {
-	m_explosion.SetFrameSize(sf::Vector2i(256, 256));
-	m_explosion.SetNumFrames(16);
+	m_explosion.SetFrameSize(sf::Vector2i(100, 100));
+	m_explosion.SetNumFrames(60);
 	m_explosion.SetDuration(sf::seconds(1));
 	Utility::CentreOrigin(m_sprite);
 	Utility::CentreOrigin(m_explosion);
@@ -108,7 +108,7 @@ unsigned int Aircraft::GetCategory() const
 {
 	if (IsAllied())
 	{
-		return static_cast<unsigned int>(ReceiverCategories::kPlayerAircraft);
+		return static_cast<unsigned int>(SceneNode::GetCategory());
 	}
 	return static_cast<unsigned int>(ReceiverCategories::kEnemyAircraft);
 
@@ -381,7 +381,7 @@ void Aircraft::CreatePickup(SceneNode& node, const TextureHolder& textures) cons
 void Aircraft::CheckPickupDrop(CommandQueue& commands)
 {
 	//TODO Get rid of the magic number 3 here 
-	if (!IsAllied() && Utility::RandomInt(1) == 0 && !m_spawned_pickup)
+	if (!IsAllied() && Utility::RandomInt(3) == 0 && !m_spawned_pickup)
 	{
 		commands.Push(m_drop_pickup_command);
 	}
