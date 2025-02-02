@@ -4,6 +4,7 @@
 #define _USE_MATH_DEFINES
 #include "Utility.hpp"
 #include <math.h>
+#include "Action.hpp"
 
 
 namespace
@@ -182,3 +183,18 @@ int Utility::Length(sf::Vector2f vector)
 {
 	return sqrtf(powf(vector.x, 2) + powf(vector.y, 2));
 }
+bool Utility::IsRealTimeAction(Action action)
+{
+	switch (action)
+	{
+	case Action::kMoveLeft:
+	case Action::kMoveRight:
+	case Action::kMoveUp:
+	case Action::kMoveDown:
+	case Action::kBulletFire:
+		return true;
+	default:
+		return false;
+	}
+}
+

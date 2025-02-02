@@ -10,6 +10,7 @@
 #include "PickupType.hpp"
 #include "Pickup.hpp"
 #include "SoundNode.hpp"
+#include "AimingRectangle.hpp"
 
 namespace
 {
@@ -52,6 +53,7 @@ Aircraft::Aircraft(AircraftType type, const TextureHolder& textures, const FontH
 	, m_show_explosion(true)
 	, m_spawned_pickup(false)
 	, m_played_explosion_sound(false)
+
 
 {
 	m_explosion.SetFrameSize(sf::Vector2i(256, 256));
@@ -100,6 +102,7 @@ Aircraft::Aircraft(AircraftType type, const TextureHolder& textures, const FontH
 
 	UpdateTexts();
 }
+
 
 unsigned int Aircraft::GetCategory() const
 {
@@ -231,17 +234,40 @@ void Aircraft::CreateBullet(SceneNode& node, const TextureHolder& textures) cons
 	}
 	
 }
-
 void Aircraft::CreateProjectile(SceneNode& node, ProjectileType type, float x_offset, float y_offset, const TextureHolder& textures) const
 {
 	std::unique_ptr<Projectile> projectile(new Projectile(type, textures));
-	sf::Vector2f offset(x_offset * m_sprite.getGlobalBounds().width, y_offset * m_sprite.getGlobalBounds().height);
-	sf::Vector2f velocity(0, projectile->GetMaxSpeed());
+
+	// Get aircraft rotation (in degrees) and convert to radians
+	float rotation = getRotation();
+	float radians = Utility::ToRadians(rotation);
+
+	// Calculate rotated offset to align with aircraft's rotation
+	sf::Vector2f offset(
+		x_offset * m_sprite.getGlobalBounds().width * std::cos(radians) - y_offset * m_sprite.getGlobalBounds().height * std::sin(radians),
+		x_offset * m_sprite.getGlobalBounds().width * std::sin(radians) + y_offset * m_sprite.getGlobalBounds().height * std::cos(radians)
+	);
+
+	// Corrected bullet velocity so it moves forward
+	sf::Vector2f velocity(
+		-std::sin(radians),  // Inverted X for correct forward movement
+		std::cos(radians)    // Inverted Y for correct forward movement
+	);
 
 	float sign = IsAllied() ? -1.f : 1.f;
 	projectile->setPosition(GetWorldPosition() + offset * sign);
-	projectile->SetVelocity(velocity* sign);
+	projectile->SetVelocity(velocity * projectile->GetMaxSpeed() * sign);
+	projectile->rotate(rotation);
+
 	node.AttachChild(std::move(projectile));
+}
+
+
+
+void Aircraft::SetRotation(float angle)
+{
+	setRotation(angle);
+	m_sprite.setRotation(0);
 }
 
 sf::FloatRect Aircraft::GetBoundingRect() const
@@ -273,6 +299,7 @@ void Aircraft::DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) co
 	}
 }
 
+
 void Aircraft::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 {
 	//Added by Albert
@@ -295,12 +322,10 @@ void Aircraft::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 	{
 		CheckPickupDrop(commands);
 		m_explosion.Update(dt);
-		// Play explosion sound only once
 		if (!m_played_explosion_sound)
 		{
 			SoundEffect soundEffect = (Utility::RandomInt(2) == 0) ? SoundEffect::kExplosion1 : SoundEffect::kExplosion2;
 			PlayLocalSound(commands, soundEffect);
-
 			m_played_explosion_sound = true;
 		}
 		return;
@@ -309,11 +334,9 @@ void Aircraft::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 	Entity::UpdateCurrent(dt, commands);
 	UpdateTexts();
 	UpdateMovementPattern(dt);
-
 	UpdateRollAnimation();
-
-	//Check if bullets or misiles are fired
 	CheckProjectileLaunch(dt, commands);
+
 }
 
 void Aircraft::CheckProjectileLaunch(sf::Time dt, CommandQueue& commands)
@@ -404,3 +427,4 @@ void Aircraft::PlayLocalSound(CommandQueue& commands, SoundEffect effect)
 
 	commands.Push(command);
 }
+

@@ -37,6 +37,7 @@ public:
 	void LaunchMissile();
 	void CreateBullet(SceneNode& node, const TextureHolder& textures) const;
 	void CreateProjectile(SceneNode& node, ProjectileType type, float x_float, float y_offset, const TextureHolder& textures) const;
+	void SetRotation(float angle);
 
 	sf::FloatRect GetBoundingRect() const override;
 	bool IsMarkedForRemoval() const override;
@@ -55,6 +56,8 @@ private:
 	AircraftType m_type;
 	sf::Sprite m_sprite;
 	Animation m_explosion;
+
+
 
 	TextNode* m_health_display;
 	TextNode* m_missile_display;

@@ -4,6 +4,8 @@
 #include "Player.hpp"
 #include "ReceiverCategories.hpp"
 #include "Aircraft.hpp"
+#include <iostream>
+#include "Constants.hpp"
 
 struct AircraftMover
 {
@@ -16,79 +18,39 @@ struct AircraftMover
 
     sf::Vector2f velocity;
 };
-
-Player::Player(): m_current_mission_status(MissionStatus::kMissionRunning)
+struct AircraftRotator
 {
-    //Set initial key bindings
-    m_key_binding[sf::Keyboard::A] = Action::kMoveLeft;
-    m_key_binding[sf::Keyboard::D] = Action::kMoveRight;
-    m_key_binding[sf::Keyboard::W] = Action::kMoveUp;
-    m_key_binding[sf::Keyboard::S] = Action::kMoveDown;
-    m_key_binding[sf::Keyboard::M] = Action::kMissileFire;
-    m_key_binding[sf::Keyboard::Space] = Action::kBulletFire;
+    AircraftRotator(float angle) : rotation_angle(angle) {}
 
+    void operator()(Aircraft& aircraft, sf::Time) const
+    {
+        aircraft.setRotation(rotation_angle);
+    }
+
+    float rotation_angle;
+};
+
+
+Player::Player(unsigned int player_id, unsigned int joystick_id)
+    : m_player_id(player_id) // Assign player ID
+    , m_current_mission_status(MissionStatus::kMissionRunning)
+	, m_gamepad(joystick_id) // Create gamepad object
+{
     //Set initial action bindings
     InitialiseActions();
-
-    //Assign all categories to a player's aircraft
-    for (auto& pair : m_action_binding)
-    {
-        pair.second.category = static_cast<unsigned int>(ReceiverCategories::kPlayerAircraft);
-    }
 }
 
 void Player::HandleEvent(const sf::Event& event, CommandQueue& command_queue)
 {
-    if (event.type == sf::Event::KeyPressed)
-    {
-        auto found = m_key_binding.find(event.key.code);
-        if (found != m_key_binding.end() && !IsRealTimeAction(found->second))
-        {
-            command_queue.Push(m_action_binding[found->second]);
-        }
-    }
+    m_gamepad.HandleEvent(event, command_queue);
 }
 
 void Player::HandleRealTimeInput(CommandQueue& command_queue)
 {
-    //Check if any of the key bindings are pressed
-    for (auto pair : m_key_binding)
-    {
-        if (sf::Keyboard::isKeyPressed(pair.first) && IsRealTimeAction(pair.second))
-        {
-            command_queue.Push(m_action_binding[pair.second]);
-        }
-    }
+    m_gamepad.Update(command_queue);
 }
 
-void Player::AssignKey(Action action, sf::Keyboard::Key key)
-{
-    //Remove keys that are currently bound to the action
-    for (auto itr = m_key_binding.begin(); itr != m_key_binding.end();)
-    {
-        if (itr->second == action)
-        {
-            m_key_binding.erase(itr++);
-        }
-        else
-        {
-            ++itr;
-        }
-    }
-    m_key_binding[key] = action;
-}
 
-sf::Keyboard::Key Player::GetAssignedKey(Action action) const
-{
-    for (auto pair : m_key_binding)
-    {
-        if (pair.second == action)
-        {
-            return pair.first;
-        }
-    }
-    return sf::Keyboard::Unknown;
-}
 
 void Player::SetMissionStatus(MissionStatus status)
 {
@@ -100,38 +62,60 @@ MissionStatus Player::GetMissionStatus() const
     return m_current_mission_status;
 }
 
-void Player::InitialiseActions()
+Gamepad& Player::GetGamepad()
 {
-    const float kPlayerSpeed = 200.f;
-    m_action_binding[Action::kMoveLeft].action = DerivedAction<Aircraft>(AircraftMover(-kPlayerSpeed, 0.f));
-    m_action_binding[Action::kMoveRight].action = DerivedAction<Aircraft>(AircraftMover(kPlayerSpeed, 0.f));
-    m_action_binding[Action::kMoveUp].action = DerivedAction<Aircraft>(AircraftMover(0.f, -kPlayerSpeed));
-    m_action_binding[Action::kMoveDown].action = DerivedAction<Aircraft>(AircraftMover(0.f, kPlayerSpeed));
-    m_action_binding[Action::kBulletFire].action = DerivedAction<Aircraft>([](Aircraft& a, sf::Time dt)
-        {
-            a.Fire();
-        }
-    );
-
-    m_action_binding[Action::kMissileFire].action = DerivedAction<Aircraft>([](Aircraft& a, sf::Time dt)
-        {
-            a.LaunchMissile();
-        }
-    );
-
+	return m_gamepad;
 }
 
-bool Player::IsRealTimeAction(Action action)
+void Player::SetGamepad(Gamepad gamepad)
 {
-    switch (action)
-    {
-    case Action::kMoveLeft:
-    case Action::kMoveRight:
-    case Action::kMoveDown:
-    case Action::kMoveUp:
-    case Action::kBulletFire:
-        return true;
-    default:
-        return false;
-    }
+	m_gamepad = gamepad;
+    InitialiseActions();
+}
+
+void Player::InitialiseActions()
+{
+    const float kPlayerSpeed = PLAYER_SPEED;
+
+    // Move Left
+    Command moveLeft;
+    moveLeft.action = DerivedAction<Aircraft>(AircraftMover(-kPlayerSpeed, 0.f));
+    moveLeft.category = static_cast<unsigned int>(ReceiverCategories::kPlayerAircraft);
+    m_gamepad.AssignCommand(Action::kMoveLeft, moveLeft);
+
+    // Move Right
+    Command moveRight;
+    moveRight.action = DerivedAction<Aircraft>(AircraftMover(kPlayerSpeed, 0.f));
+    moveRight.category = static_cast<unsigned int>(ReceiverCategories::kPlayerAircraft);
+    m_gamepad.AssignCommand(Action::kMoveRight, moveRight);
+
+    // Move Up
+    Command moveUp;
+    moveUp.action = DerivedAction<Aircraft>(AircraftMover(0.f, -kPlayerSpeed));
+    moveUp.category = static_cast<unsigned int>(ReceiverCategories::kPlayerAircraft);
+    m_gamepad.AssignCommand(Action::kMoveUp, moveUp);
+
+    // Move Down
+    Command moveDown;
+    moveDown.action = DerivedAction<Aircraft>(AircraftMover(0.f, kPlayerSpeed));
+    moveDown.category = static_cast<unsigned int>(ReceiverCategories::kPlayerAircraft);
+    m_gamepad.AssignCommand(Action::kMoveDown, moveDown);
+
+    // Bullet Fire
+    Command fireBullet;
+    fireBullet.action = DerivedAction<Aircraft>([](Aircraft& a, sf::Time) { a.Fire(); });
+    fireBullet.category = static_cast<unsigned int>(ReceiverCategories::kPlayerAircraft);
+    m_gamepad.AssignCommand(Action::kBulletFire, fireBullet);
+    m_gamepad.AssignAction(Action::kBulletFire, ButtonFunction::kConfirm);
+
+    // Missile Fire
+    Command fireMissile;
+    fireMissile.action = DerivedAction<Aircraft>([](Aircraft& a, sf::Time) { a.LaunchMissile(); });
+    fireMissile.category = static_cast<unsigned int>(ReceiverCategories::kPlayerAircraft);
+    m_gamepad.AssignCommand(Action::kMissileFire, fireMissile);
+    m_gamepad.AssignAction(Action::kMissileFire, ButtonFunction::kCancel);
+
+	//Assigning pause to prevent an issue where pause will take a random button if there is no match
+	m_gamepad.AssignAction(Action::kPause, ButtonFunction::kPause);
+	m_gamepad.AssignCommand(Action::kPause, Command());
 }

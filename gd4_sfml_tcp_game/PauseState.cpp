@@ -5,7 +5,7 @@
 #include "ResourceHolder.hpp"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include "Utility.hpp"
-
+#include "Player.hpp"
 PauseState::PauseState(StateStack& stack, Context context)
     :State(stack, context)
     , m_background_sprite()
@@ -22,7 +22,7 @@ PauseState::PauseState(StateStack& stack, Context context)
     m_paused_text.setPosition(0.5f * view_size.x, 0.4f * view_size.y);
 
     m_instruction_text.setFont(font);
-    m_instruction_text.setString("Press backspace to return to main menu, esc to game");
+    m_instruction_text.setString("Press Cancel to return to main menu, Confirm to continue game");
     Utility::CentreOrigin(m_instruction_text);
     m_instruction_text.setPosition(0.5f * view_size.x, 0.6f * view_size.y);
 
@@ -51,21 +51,35 @@ bool PauseState::Update(sf::Time dt)
 
 bool PauseState::HandleEvent(const sf::Event& event)
 {
-    if (event.type != sf::Event::KeyPressed)
+    // Handle keyboard input
+    if (event.type == sf::Event::KeyPressed)
     {
-        return false;
+        if (event.key.code == sf::Keyboard::Escape)
+        {
+            RequestStackPop();
+        }
+        else if (event.key.code == sf::Keyboard::BackSpace)
+        {
+            RequestStackClear();
+            RequestStackPush(StateID::kMenu);
+        }
     }
 
-    if (event.key.code == sf::Keyboard::Escape)
+    // Handle joystick button input
+    else if (event.type == sf::Event::JoystickButtonPressed)
     {
-        RequestStackPop();
+        auto gamepad = GetContext().player->GetGamepad();
+        if (event.joystickButton.button == gamepad.GetButton(ButtonFunction::kConfirm) || event.joystickButton.button == gamepad.GetButton(ButtonFunction::kPause))
+        {
+            RequestStackPop();
+        }
+        else if (event.joystickButton.button == gamepad.GetButton(ButtonFunction::kCancel))
+        {
+            RequestStackClear();
+            RequestStackPush(StateID::kMenu);
+        }
     }
 
-    if (event.key.code == sf::Keyboard::BackSpace)
-    {
-        RequestStackClear();
-        RequestStackPush(StateID::kMenu);
-    }
     return false;
 }
 

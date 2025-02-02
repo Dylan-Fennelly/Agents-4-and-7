@@ -45,5 +45,14 @@ bool GameState::HandleEvent(const sf::Event& event)
 	{
 		RequestStackPush(StateID::kPause);
 	}
+	//Handle controler input for this
+	if (event.type == sf::Event::JoystickButtonPressed)
+	{
+		if (event.joystickButton.button == this->GetContext().player->GetGamepad().GetButton(ButtonFunction::kPause))
+
+		{
+			RequestStackPush(StateID::kPause);
+		}
+	}
 	return true;
 }

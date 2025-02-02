@@ -29,9 +29,9 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 void World::Update(sf::Time dt)
 {
 	//Scroll the world
-	m_camera.move(0, m_scrollspeed * dt.asSeconds());
+	//m_camera.move(0, m_scrollspeed * dt.asSeconds());
 	
-	m_player_aircraft->SetVelocity(0.f, 0.f);
+	//m_player_aircraft->SetVelocity(0.f, 0.f);
 
 	DestroyEntitiesOutsideView();
 	GuideMissiles();
@@ -193,7 +193,7 @@ void World::AdaptPlayerVelocity()
 		m_player_aircraft->SetVelocity(velocity / std::sqrt(2.f));
 	}
 	//Add scrolling velocity
-	m_player_aircraft->Accelerate(0.f, m_scrollspeed);
+//	m_player_aircraft->Accelerate(0.f, m_scrollspeed);
 }
 
 void World::SpawnEnemies()

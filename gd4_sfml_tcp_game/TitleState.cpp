@@ -5,6 +5,8 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include "ResourceHolder.hpp"
 #include "Utility.hpp"
+#include "Gamepad.hpp"
+#include "Player.hpp"
 
 TitleState::TitleState(StateStack& stack, Context context) : State(stack, context), m_show_text(true), m_text_effect_time(sf::Time::Zero)
 {
@@ -40,8 +42,9 @@ bool TitleState::Update(sf::Time dt)
 
 bool TitleState::HandleEvent(const sf::Event& event)
 {
-    if (event.type == sf::Event::KeyPressed)
+    if (event.type == sf::Event::JoystickButtonPressed)
     {
+        GetContext().player->SetGamepad(Gamepad(event.joystickButton.joystickId));
         RequestStackPop();
         RequestStackPush(StateID::kMenu);
     }
