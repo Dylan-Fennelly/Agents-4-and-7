@@ -5,8 +5,6 @@
 enum class PickupType
 {
 	kHealth,
-	//kMissileRefill, 
-	//kFireSpread,
 	//Added by Albert
 	kInvincibility,
 	//Added by Albert

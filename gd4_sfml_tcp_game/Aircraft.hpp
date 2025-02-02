@@ -26,6 +26,8 @@ public:
 	void ActivateInvincibility(sf::Time duration);
 	//Added by Albert
 	void Damage(int points) override;
+	//Added by Albert
+	void ActivateMinigun();
 
 	void UpdateTexts();
 	void UpdateMovementPattern(sf::Time dt);

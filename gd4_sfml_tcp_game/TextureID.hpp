@@ -25,6 +25,8 @@ enum class TextureID
 	kExplosion,
 	kParticle,
 	//Added by Albert
-	kInvincibility
+	kInvincibility,
+	//Added by Albert
+	kMinigun
 
 };

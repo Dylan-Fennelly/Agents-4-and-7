@@ -107,6 +107,8 @@ void World::LoadTextures()
 
 	//Added by Albert
 	m_textures.Load(TextureID::kInvincibility, "Media/Textures/Invincibility.png");
+	//Added by Albert
+	m_textures.Load(TextureID::kMinigun, "Media/Textures/Minigun.png");
 
 
 }

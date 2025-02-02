@@ -113,18 +113,7 @@ unsigned int Aircraft::GetCategory() const
 
 void Aircraft::IncreaseFireRate()
 {
-	if (m_fire_rate < 5)
-	{
-		++m_fire_rate * 2;
-	}
-}
-
-void Aircraft::IncreaseFireSpread()
-{
-	if (m_spread_level < 3)
-	{
-		++m_spread_level;
-	}
+		m_fire_rate *= 10;
 }
 
 void Aircraft::CollectMissile(unsigned int count)
@@ -137,6 +126,12 @@ void Aircraft::ActivateInvincibility(sf::Time duration)
 {
 	m_is_invincible = true;
 	m_invincibility_timer = duration;
+}
+
+//Added by Albert
+void Aircraft::ActivateMinigun()
+{
+	IncreaseFireRate();
 }
 
 //Added by Albert
@@ -368,7 +363,7 @@ void Aircraft::CreatePickup(SceneNode& node, const TextureHolder& textures) cons
 void Aircraft::CheckPickupDrop(CommandQueue& commands)
 {
 	//TODO Get rid of the magic number 3 here 
-	if (!IsAllied() && Utility::RandomInt(3) == 0 && !m_spawned_pickup)
+	if (!IsAllied() && Utility::RandomInt(1) == 0 && !m_spawned_pickup)
 	{
 		commands.Push(m_drop_pickup_command);
 	}
