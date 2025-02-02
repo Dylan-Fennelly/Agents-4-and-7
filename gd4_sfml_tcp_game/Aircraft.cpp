@@ -27,7 +27,7 @@ TextureID ToTextureID(AircraftType type)
 		return TextureID::kZombie;
 		break;
 	case AircraftType::kAvenger:
-		return TextureID::kAvenger;
+		return TextureID::kZombie2;
 		break;
 	}
 	return TextureID::kAgentFour;
@@ -94,6 +94,7 @@ Aircraft::Aircraft(AircraftType type, const TextureHolder& textures, const FontH
 
 	//Added by Albert
 	//I added the shader here instead of the provided shader classes, because I struggled to get them to work in BloomEffect.cpp etc., plus I wanted the shader to be applied to the invincible mode only
+	//The shader below has been written with the aid of ChatGPT
 	if (!m_invincibilityShader.loadFromFile("Media/Shaders/Fullpass.vert", "Media/Shaders/GoldenEffectPulse.frag"))
 	{
 		throw std::runtime_error("Shader failed to load");
@@ -116,11 +117,11 @@ unsigned int Aircraft::GetCategory() const
 void Aircraft::IncreaseFireRate()
 {
 	//Modified by Albert
+	//I multiply the rate by 10, because I felt like this was the best way to represent the minigun effect
 	if (m_fire_rate < 10)
 	{
 		m_fire_rate *= 10;
 	}
-	
 }
 
 void Aircraft::CollectMissile(unsigned int count)
@@ -129,6 +130,7 @@ void Aircraft::CollectMissile(unsigned int count)
 }
 
 //Added by Albert
+//This function activates the Invincibility powerup that makes the player a god-like floating orb that is immortal for five seconds
 void Aircraft::ActivateInvincibility(sf::Time duration)
 {
 	m_is_invincible = true;
@@ -136,13 +138,15 @@ void Aircraft::ActivateInvincibility(sf::Time duration)
 }
 
 //Added by Albert
+//This function activates the Invincibility powerup that increases the fire rate of the default weapon and imitates a minigun
 void Aircraft::ActivateMinigun(sf::Time duration)
 {
 	IncreaseFireRate();
 	m_minigun_timer = duration;
 }
 
-//Added by Albert
+//Added by Albert]
+//I inherited this function from Entity to check if the player is invincible, if they are, they take no damage
 void Aircraft::Damage(int points)
 {
 	if (!m_is_invincible)
@@ -171,31 +175,6 @@ void Aircraft::UpdateTexts()
 	}
 }
 
-//void Aircraft::UpdateMovementPattern(sf::Time dt)
-//{
-//	//Enemy AI
-//	const std::vector<Direction>& directions = Table[static_cast<int>(m_type)].m_directions;
-//	if (!directions.empty())
-//	{
-//		//Move along the current direction, then change direction
-//		if (m_distance_travelled > directions[m_directions_index].m_distance)
-//		{
-//			m_directions_index = (m_directions_index + 1) % directions.size();
-//			m_distance_travelled = 0.f;
-//		}
-//
-//		//Compute velocity
-//		//Add 90 to move down the screen, 0 is right
-//
-//		double radians = Utility::ToRadians(directions[m_directions_index].m_angle + 90.f);
-//		float vx = GetMaxSpeed() * std::cos(radians);
-//		float vy = GetMaxSpeed() * std::sin(radians);
-//
-//		SetVelocity(vx, vy);
-//		m_distance_travelled += GetMaxSpeed() * dt.asSeconds();
-//	}
-//}
-
 float Aircraft::GetMaxSpeed() const
 {
 	return Table[static_cast<int>(m_type)].m_speed;
@@ -209,7 +188,6 @@ void Aircraft::Fire()
 	}
 	
 }
-
 
 void Aircraft::LaunchMissile()
 {
@@ -268,8 +246,6 @@ void Aircraft::CreateProjectile(SceneNode& node, ProjectileType type, float x_of
 	node.AttachChild(std::move(projectile));
 }
 
-
-
 void Aircraft::SetRotation(float angle)
 {
 	setRotation(angle);
@@ -288,8 +264,9 @@ bool Aircraft::IsMarkedForRemoval() const
 
 void Aircraft::DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) const
 {
-
 	//Added by Albert
+	//I set the shader here that imitates a glowing orb for the invincibility powerup
+	//ChatGPT helped me write this shader
 	if (IsAllied() && m_is_invincible)
 	{
 		states.shader = &m_invincibilityShader;
@@ -309,6 +286,7 @@ void Aircraft::DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) co
 void Aircraft::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 {
 	//Added by Albert
+	//A timer for both the powerup and the shader (5 seconds)
 	if (m_is_invincible)
 	{
 		m_invincibility_timer -= dt;
@@ -317,6 +295,7 @@ void Aircraft::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 			m_is_invincible = false;
 		}
 
+		//Again, ChatGPT helped me write this shader
 		m_invincibilityShader.setUniform("time", m_invincibility_timer.asSeconds());
 	}
 	else
@@ -325,6 +304,7 @@ void Aircraft::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 	}
 
 	//Added by Albert
+	//A timer for the minigun powerup (5 seconds also)
 	if (m_minigun_timer > sf::Time::Zero)
 	{
 		m_minigun_timer -= dt;
@@ -340,7 +320,7 @@ void Aircraft::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 		m_explosion.Update(dt);
 		if (!m_played_explosion_sound)
 		{
-			SoundEffect soundEffect = (Utility::RandomInt(2) == 0) ? SoundEffect::kDyingZombie : SoundEffect::kExplosion2;
+			SoundEffect soundEffect = (Utility::RandomInt(2) == 0) ? SoundEffect::kDyingZombie : SoundEffect::kDyingZombie2;
 			PlayLocalSound(commands, soundEffect);
 			m_played_explosion_sound = true;
 		}
@@ -349,7 +329,6 @@ void Aircraft::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 
 	Entity::UpdateCurrent(dt, commands);
 	UpdateTexts();
-//	UpdateMovementPattern(dt);
 	UpdateRollAnimation();
 	CheckProjectileLaunch(dt, commands);
 

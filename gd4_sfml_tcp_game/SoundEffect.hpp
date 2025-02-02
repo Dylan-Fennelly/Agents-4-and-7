@@ -7,7 +7,7 @@ enum class SoundEffect
 	kPistolShot,
 	kEnemyGunfire,
 	kDyingZombie,
-	kExplosion2,
+	kDyingZombie2,
 	kLaunchRocket,
 	kCollectPickup,
 	kButton

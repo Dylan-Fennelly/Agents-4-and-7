@@ -20,13 +20,21 @@ namespace
 	const float MinDistance3D = std::sqrt(MinDistance2D * MinDistance2D + ListenerZ * ListenerZ);
 }
 
+//Modified by Albert
 SoundPlayer::SoundPlayer()
 {
+	//All sounds have been added by Albert, except for the kButton, which I did not change. All sounds were chosen on the basis of two facts: royalty-free and fitting the game's theme
+	//Source - https://pixabay.com/sound-effects/pistol-shot-233473/
 	m_sound_buffers.Load(SoundEffect::kPistolShot, "Media/Sound/PistolShot.wav");
+	//Source - https://pixabay.com/sound-effects/pistol-shot-233473/
 	m_sound_buffers.Load(SoundEffect::kEnemyGunfire, "Media/Sound/PistolShot.wav");
+	//Source - https://pixabay.com/sound-effects/zombie-6851/
 	m_sound_buffers.Load(SoundEffect::kDyingZombie, "Media/Sound/DyingZombie.wav");
-	m_sound_buffers.Load(SoundEffect::kExplosion2, "Media/Sound/DyingZombie.wav");
+	//Source - https://pixabay.com/sound-effects/zombie-6851/
+	m_sound_buffers.Load(SoundEffect::kDyingZombie2, "Media/Sound/DyingZombie.wav");
+	//Source - https://pixabay.com/sound-effects/rpg-7-sound-effect-267739/
 	m_sound_buffers.Load(SoundEffect::kLaunchRocket, "Media/Sound/LaunchRocket.wav");
+	//Source - https://pixabay.com/sound-effects/item-pickup-37089/
 	m_sound_buffers.Load(SoundEffect::kCollectPickup, "Media/Sound/CollectPickup.wav");
 	m_sound_buffers.Load(SoundEffect::kButton, "Media/Sound/Button.wav");
 

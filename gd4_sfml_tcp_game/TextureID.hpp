@@ -7,7 +7,7 @@ enum class TextureID
 	kLandscape,
 	kAgentFour,
 	kZombie,
-	kAvenger,
+	kZombie2,
 	kMissile,
 	kTitleScreen,
 	kButtonNormal,

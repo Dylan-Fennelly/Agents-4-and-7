@@ -96,11 +96,13 @@ bool World::HasPlayerReachedEnd() const
 	return !m_world_bounds.contains(m_player_aircraft->getPosition());
 }
 
+//Modified by Albert
 void World::LoadTextures()
 {
+	//Most textures have been sourced in DataTables.cpp, unless stated otherwise
 	m_textures.Load(TextureID::kAgentFour, "Media/Textures/AgentFour.png");
 	m_textures.Load(TextureID::kZombie, "Media/Textures/Zombie.png");
-	m_textures.Load(TextureID::kAvenger, "Media/Textures/Zombie.png");
+	m_textures.Load(TextureID::kZombie2, "Media/Textures/Zombie.png");
 	m_textures.Load(TextureID::kLandscape, "Media/Textures/Desert.png");
 	m_textures.Load(TextureID::kBullet, "Media/Textures/Bullet.png");
 	m_textures.Load(TextureID::kMissile, "Media/Textures/Missile.png");
@@ -112,13 +114,13 @@ void World::LoadTextures()
 	m_textures.Load(TextureID::kFinishLine, "Media/Textures/FinishLine.png");
 
 	m_textures.Load(TextureID::kEntities, "Media/Textures/Entities.png");
+	//Source - https://opengameart.org/content/grass-pixel-art
 	m_textures.Load(TextureID::kBackground, "Media/Textures/Background.png");
 	m_textures.Load(TextureID::kExplosion, "Media/Textures/Explosion.png");
 	m_textures.Load(TextureID::kParticle, "Media/Textures/Particle.png");
 
 	//Added by Albert
 	m_textures.Load(TextureID::kInvincibility, "Media/Textures/Invincibility.png");
-	//Added by Albert
 	m_textures.Load(TextureID::kMinigun, "Media/Textures/Minigun.png");
 
 
@@ -168,16 +170,6 @@ void World::BuildScene()
 	// Add sound effect node
 	std::unique_ptr<SoundNode> soundNode(new SoundNode(m_sounds));
 	m_scenegraph.AttachChild(std::move(soundNode));
-
-	//AddEnemies();
-
-	/*std::unique_ptr<Aircraft> left_escort(new Aircraft(AircraftType::kRaptor, m_textures, m_fonts));
-	left_escort->setPosition(-80.f, 50.f);
-	m_player_aircraft->AttachChild(std::move(left_escort));
-
-	std::unique_ptr<Aircraft> right_escort(new Aircraft(AircraftType::kRaptor, m_textures, m_fonts));
-	right_escort->setPosition(80.f, 50.f);
-	m_player_aircraft->AttachChild(std::move(right_escort));*/
 }
 
 void World::AdaptPlayerPosition()
@@ -207,43 +199,6 @@ void World::AdaptPlayerVelocity()
 //	m_player_aircraft->Accelerate(0.f, m_scrollspeed);
 }
 
-//void World::SpawnEnemies()
-//{
-//	//Spawn an enemy when it is relevant i.e when it is in the Battlefieldboudns
-//	while (!m_enemy_spawn_points.empty() && m_enemy_spawn_points.back().m_y > GetBattleFieldBounds().top)
-//	{
-//		SpawnPoint spawn = m_enemy_spawn_points.back();
-//		std::unique_ptr<Aircraft> enemy(new Aircraft(spawn.m_type, m_textures, m_fonts));
-//		enemy->setPosition(spawn.m_x, spawn.m_y);
-//		enemy->setRotation(180.f);
-//		m_scene_layers[static_cast<int>(SceneLayers::kUpperAir)]->AttachChild(std::move(enemy));
-//		m_enemy_spawn_points.pop_back();
-//	}
-//}
-//
-//void World::AddEnemies()
-//{
-//	AddEnemy(AircraftType::kRaptor, 0.f, 500.f);
-//	AddEnemy(AircraftType::kRaptor, 0.f, 1000.f);
-//	AddEnemy(AircraftType::kRaptor, 100.f, 1100.f);
-//	AddEnemy(AircraftType::kRaptor, -100.f, 1100.f);
-//	AddEnemy(AircraftType::kAvenger, -70.f, 1400.f);
-//	AddEnemy(AircraftType::kAvenger, 70.f, 1400.f);
-//	AddEnemy(AircraftType::kAvenger, 70.f, 1600.f);
-//
-//	//Sort the enemies according to y-value so that enemies are checked first
-//	std::sort(m_enemy_spawn_points.begin(), m_enemy_spawn_points.end(), [](SpawnPoint lhs, SpawnPoint rhs)
-//	{
-//		return lhs.m_y < rhs.m_y;
-//	});
-//
-//}
-//
-//void World::AddEnemy(AircraftType type, float relx, float rely)
-//{
-//	SpawnPoint spawn(type, m_spawn_position.x + relx, m_spawn_position.y - rely);
-//	m_enemy_spawn_points.emplace_back(spawn);
-//}
 void World::SpawnEnemy()
 {
 	// Choose an enemy type at random.
@@ -443,14 +398,11 @@ void World::GuideEnemies(sf::Time dt)
 			angleDegrees += 90.f;
 
 			enemy.SetRotation(angleDegrees);
-
 		});
 
 	// Push the command so it gets executed on enemy aircraft.
 	m_command_queue.Push(enemyGuideCommand);
 }
-
-
 
 bool MatchesCategories(SceneNode::Pair& colliders, ReceiverCategories type1, ReceiverCategories type2)
 {
