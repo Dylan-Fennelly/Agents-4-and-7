@@ -13,7 +13,7 @@ SettingsState::SettingsState(StateStack& stack, Context context)
 
 	//Build key binding buttons and labels
 	AddButtonLabel(ButtonFunction::kConfirm, 150.f, "Fire/Confirm", context);
-	AddButtonLabel(ButtonFunction::kCancel, 200.f, "Missile Fire/Cancel", context);
+	AddButtonLabel(ButtonFunction::kCancel, 200.f, "Cancel", context);
 	AddButtonLabel(ButtonFunction::kPause, 250.f, "Pause Button", context);
 
 

@@ -381,7 +381,7 @@ void Aircraft::CreatePickup(SceneNode& node, const TextureHolder& textures) cons
 void Aircraft::CheckPickupDrop(CommandQueue& commands)
 {
 	//TODO Get rid of the magic number 3 here 
-	if (!IsAllied() && Utility::RandomInt(1) == 0 && !m_spawned_pickup)
+	if (!IsAllied() && Utility::RandomInt(3) == 0 && !m_spawned_pickup)
 	{
 		commands.Push(m_drop_pickup_command);
 	}

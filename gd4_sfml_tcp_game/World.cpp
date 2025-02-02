@@ -9,15 +9,15 @@
 
 World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sounds)
 	:m_target(output_target)
-	,m_camera(output_target.getDefaultView())
-	,m_textures()
-	,m_fonts(font)
-	,m_sounds(sounds)
-	,m_scenegraph(ReceiverCategories::kNone)
-	,m_scene_layers()
-	,m_world_bounds(0.f,0.f, m_camera.getSize().x, 3000.f)
-	,m_spawn_position(m_camera.getSize().x/2.f, m_world_bounds.height - m_camera.getSize().y/2.f)
-	,m_scrollspeed(0.f)
+	, m_camera(output_target.getDefaultView())
+	, m_textures()
+	, m_fonts(font)
+	, m_sounds(sounds)
+	, m_scenegraph(ReceiverCategories::kNone)
+	, m_scene_layers()
+	, m_world_bounds(0.f, 0.f, m_camera.getSize().x, 3000.f)
+	, m_spawn_position(m_camera.getSize().x / 2.f, m_world_bounds.height - m_camera.getSize().y / 2.f)
+	, m_scrollspeed(0.f)
 	, m_enemySpawnTimer(sf::Time::Zero)
 	, m_enemySpawnInterval(sf::seconds(2.f)) // Initial spawn interval; will be randomized after each spawn.
 {
@@ -44,16 +44,20 @@ void World::Update(sf::Time dt)
 {
 	//Scroll the world
 	m_camera.move(0, m_scrollspeed * dt.asSeconds());
-	
+
 	//m_player_aircraft->SetVelocity(0.f, 0.f);
 	m_enemySpawnTimer += dt;
 	if (m_enemySpawnTimer >= m_enemySpawnInterval)
 	{
-		SpawnEnemy();
-		m_enemySpawnTimer = sf::Time::Zero;
-		// Randomize the next spawn interval (for example, between 1.5 and 3 seconds):
-		float nextInterval = 1.5f + static_cast<float>(Utility::RandomInt(1500)) / 1000.f; // 1.5 to 3.0 seconds
-		m_enemySpawnInterval = sf::seconds(nextInterval);
+		if ((m_totalElapsed.getElapsedTime() < sf::seconds(15)))
+		{
+			SpawnEnemy();
+			m_enemySpawnTimer = sf::Time::Zero;
+			// Randomize the next spawn interval (for example, between 1.5 and 3 seconds):
+			float nextInterval = 0.75f + static_cast<float>(Utility::RandomInt(1250)) / 1000.f; // 0.75 to 2.0 seconds
+			m_enemySpawnInterval = sf::seconds(nextInterval);
+		}
+		
 	}
 
 	DestroyEntitiesOutsideView();
@@ -116,10 +120,34 @@ bool World::HasAlivePlayer() const
 
 }
 
-//bool World::HasPlayerReachedEnd() const
-//{
-//	return !m_world_bounds.contains(m_player_aircraft->getPosition());
-//}
+
+bool World::HasPlayerReachedEnd(sf::Time dt)
+{
+	if (sf::seconds(10)< m_totalElapsed.getElapsedTime())
+	{
+		Command enemyCollector;
+		enemyCollector.category = static_cast<int>(ReceiverCategories::kEnemyAircraft);
+		enemyCollector.action = DerivedAction<Aircraft>([this](Aircraft& enemy, sf::Time)
+			{
+				if (!enemy.IsDestroyed())
+				{
+					m_active_enemies.emplace_back(&enemy);
+				}
+			});
+		if (m_active_enemies.empty())
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+
+	}
+
+
+
+}
 
 void World::LoadTextures()
 {
@@ -339,7 +367,7 @@ void World::SpawnEnemy()
 
 sf::FloatRect World::GetViewBounds() const
 {
-	return sf::FloatRect(m_camera.getCenter() - m_camera.getSize()/2.f, m_camera.getSize());
+	return sf::FloatRect(m_camera.getCenter() - m_camera.getSize() / 2.f, m_camera.getSize());
 }
 
 sf::FloatRect World::GetBattleFieldBounds() const
@@ -433,7 +461,7 @@ void World::GuideEnemies(sf::Time dt)
 
 			for (auto* player : m_player_aircrafts)
 			{
-				if(player == nullptr)
+				if (player == nullptr)
 				{
 					continue;
 				}
@@ -492,7 +520,7 @@ bool MatchesCategories(SceneNode::Pair& colliders, ReceiverCategories type1, Rec
 		return true;
 	}
 	else if (static_cast<int>(type1) & category2 && static_cast<int>(type2) & category1)
-	{ 
+	{
 		std::swap(colliders.first, colliders.second);
 	}
 	else
@@ -543,7 +571,7 @@ void World::UpdateSounds()
 	/*m_sounds.SetListenerPosition(m_player_aircraft->GetWorldPosition());*/
 	//We need to adapt this for the player vector
 	//But because there can only be one listener we will set it to the first player in the vector
-	
+
 	m_sounds.SetListenerPosition(m_player_aircrafts[0]->GetWorldPosition());
 	// Remove unused sounds
 	m_sounds.RemoveStoppedSounds();
