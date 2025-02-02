@@ -23,6 +23,8 @@ enum class TextureID
 	kJungle,
 	kButtons,
 	kExplosion,
-	kParticle
+	kParticle,
+	//Added by Albert
+	kInvincibility
 
 };

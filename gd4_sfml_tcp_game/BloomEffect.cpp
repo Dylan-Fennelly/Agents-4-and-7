@@ -3,6 +3,7 @@
 
 #include "BloomEffect.hpp"
 #include "ShaderTypes.hpp"
+#include <SFML/System/Time.hpp>
 
 BloomEffect::BloomEffect()
 {

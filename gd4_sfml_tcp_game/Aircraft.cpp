@@ -91,6 +91,13 @@ Aircraft::Aircraft(AircraftType type, const TextureHolder& textures, const FontH
 		AttachChild(std::move(missile_display));
 	}
 
+	//Added by Albert
+	//I added the shader here instead of the provided shader classes, because I struggled to get them to work in BloomEffect.cpp etc., plus I wanted the shader to be applied to the invincible mode only
+	if (!m_invincibilityShader.loadFromFile("Media/Shaders/Fullpass.vert", "Media/Shaders/GoldenEffectPulse.frag"))
+	{
+		throw std::runtime_error("Shader failed to load");
+	}
+
 	UpdateTexts();
 }
 
@@ -108,7 +115,7 @@ void Aircraft::IncreaseFireRate()
 {
 	if (m_fire_rate < 5)
 	{
-		++m_fire_rate;
+		++m_fire_rate * 2;
 	}
 }
 
@@ -123,6 +130,22 @@ void Aircraft::IncreaseFireSpread()
 void Aircraft::CollectMissile(unsigned int count)
 {
 	m_missile_ammo += count;
+}
+
+//Added by Albert
+void Aircraft::ActivateInvincibility(sf::Time duration)
+{
+	m_is_invincible = true;
+	m_invincibility_timer = duration;
+}
+
+//Added by Albert
+void Aircraft::Damage(int points)
+{
+	if (!m_is_invincible)
+	{
+		Entity::Damage(points);
+	}
 }
 
 void Aircraft::UpdateTexts()
@@ -238,6 +261,13 @@ bool Aircraft::IsMarkedForRemoval() const
 
 void Aircraft::DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) const
 {
+
+	//Added by Albert
+	if (IsAllied() && m_is_invincible)
+	{
+		states.shader = &m_invincibilityShader;
+	}
+
 	if (IsDestroyed() && m_show_explosion)
 	{
 		target.draw(m_explosion, states);
@@ -250,6 +280,22 @@ void Aircraft::DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) co
 
 void Aircraft::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 {
+	//Added by Albert
+	if (m_is_invincible)
+	{
+		m_invincibility_timer -= dt;
+		if (m_invincibility_timer <= sf::Time::Zero)
+		{
+			m_is_invincible = false;
+		}
+
+		m_invincibilityShader.setUniform("time", m_invincibility_timer.asSeconds());
+	}
+	else
+	{
+		m_invincibilityShader.setUniform("time", 0.f);
+	}
+
 	if (IsDestroyed())
 	{
 		CheckPickupDrop(commands);

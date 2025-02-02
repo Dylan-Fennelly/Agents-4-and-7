@@ -33,7 +33,6 @@ private:
 	void Downsample(const sf::RenderTexture& input, sf::RenderTexture& output);
 	void Add(const sf::RenderTexture& source, const sf::RenderTexture& bloom, sf::RenderTarget& target);
 
-
 private:
 	ShaderHolder		m_shaders;
 

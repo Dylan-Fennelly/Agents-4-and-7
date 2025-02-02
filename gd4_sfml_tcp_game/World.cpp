@@ -105,6 +105,9 @@ void World::LoadTextures()
 	m_textures.Load(TextureID::kExplosion, "Media/Textures/Explosion.png");
 	m_textures.Load(TextureID::kParticle, "Media/Textures/Particle.png");
 
+	//Added by Albert
+	m_textures.Load(TextureID::kInvincibility, "Media/Textures/Invincibility.png");
+
 
 }
 

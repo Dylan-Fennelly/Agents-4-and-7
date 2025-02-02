@@ -4,13 +4,12 @@
 #pragma once
 enum class PickupType
 {
-	kHealthRefill,
-	kMissileRefill, 
-	kFireSpread,
-	kFireRate,
+	kHealth,
+	//kMissileRefill, 
+	//kFireSpread,
+	//Added by Albert
+	kInvincibility,
+	//Added by Albert
+	kMinigun,
 	kPickupCount
-
-	//kHealth
-	//kInvincibility
-	//kMinigun
 };
