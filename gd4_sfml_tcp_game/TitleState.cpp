@@ -44,7 +44,8 @@ bool TitleState::HandleEvent(const sf::Event& event)
 {
     if (event.type == sf::Event::JoystickButtonPressed)
     {
-        GetContext().player->SetGamepad(Gamepad(event.joystickButton.joystickId));
+        //set player one
+        GetContext().player->SetGamepad(Gamepad(event.joystickButton.joystickId,GetContext().player->GetPlayerID()));
         RequestStackPop();
         RequestStackPush(StateID::kMenu);
     }

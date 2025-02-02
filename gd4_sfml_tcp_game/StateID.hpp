@@ -11,4 +11,5 @@ enum class StateID
 	kPause,
 	kSettings,
 	kGameOver,
+	kControllerSelect,
 };

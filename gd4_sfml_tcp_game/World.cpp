@@ -18,7 +18,6 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 	,m_world_bounds(0.f,0.f, m_camera.getSize().x, 3000.f)
 	,m_spawn_position(m_camera.getSize().x/2.f, m_world_bounds.height - m_camera.getSize().y/2.f)
 	,m_scrollspeed(0.f)
-	,m_player_aircraft(nullptr)
 	, m_enemySpawnTimer(sf::Time::Zero)
 	, m_enemySpawnInterval(sf::seconds(2.f)) // Initial spawn interval; will be randomized after each spawn.
 {
@@ -26,6 +25,19 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 	LoadTextures();
 	BuildScene();
 	m_camera.setCenter(m_spawn_position);
+	// === Create Player 1 ===
+	auto player1 = std::make_unique<Aircraft>(AircraftType::kEagle, m_textures, m_fonts);
+	player1->SetCategory(ReceiverCategories::kPlayerAircraft);
+	player1->setPosition(m_spawn_position.x - 50.f, m_spawn_position.y); // Offset left
+	m_player_aircrafts.push_back(player1.get());
+	m_scene_layers[static_cast<int>(SceneLayers::kUpperAir)]->AttachChild(std::move(player1));
+
+	// === Create Player 2 ===
+	auto player2 = std::make_unique<Aircraft>(AircraftType::kEagle, m_textures, m_fonts);
+	player2->SetCategory(ReceiverCategories::kAlliedAircraft);
+	player2->setPosition(m_spawn_position.x + 50.f, m_spawn_position.y); // Offset right
+	m_player_aircrafts.push_back(player2.get());
+	m_scene_layers[static_cast<int>(SceneLayers::kUpperAir)]->AttachChild(std::move(player2));
 }
 
 void World::Update(sf::Time dt)
@@ -56,6 +68,11 @@ void World::Update(sf::Time dt)
 	AdaptPlayerVelocity();
 
 	HandleCollisions();
+	// Remove dead players from m_player_aircrafts
+	m_player_aircrafts.erase(
+		std::remove_if(m_player_aircrafts.begin(), m_player_aircrafts.end(),
+			[](Aircraft* player) { return player->IsMarkedForRemoval(); }),
+		m_player_aircrafts.end());
 
 	m_scenegraph.RemoveWrecks();
 
@@ -88,13 +105,21 @@ CommandQueue& World::GetCommandQueue()
 
 bool World::HasAlivePlayer() const
 {
-	return !m_player_aircraft->IsMarkedForRemoval();
+	if (!m_player_aircrafts.empty())
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+
 }
 
-bool World::HasPlayerReachedEnd() const
-{
-	return !m_world_bounds.contains(m_player_aircraft->getPosition());
-}
+//bool World::HasPlayerReachedEnd() const
+//{
+//	return !m_world_bounds.contains(m_player_aircraft->getPosition());
+//}
 
 void World::LoadTextures()
 {
@@ -151,12 +176,12 @@ void World::BuildScene()
 	finish_sprite->setPosition(0.f, -76.f);
 	m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(finish_sprite));
 
-	//Add the player's aircraft
-	std::unique_ptr<Aircraft> leader(new Aircraft(AircraftType::kEagle, m_textures, m_fonts));
-	m_player_aircraft = leader.get();
-	m_player_aircraft->setPosition(m_spawn_position);
-	m_player_aircraft->SetVelocity(40.f, m_scrollspeed);
-	m_scene_layers[static_cast<int>(SceneLayers::kUpperAir)]->AttachChild(std::move(leader));
+	////Add the player's aircraft
+	//std::unique_ptr<Aircraft> leader(new Aircraft(AircraftType::kEagle, m_textures, m_fonts));
+	//m_player_aircraft = leader.get();
+	//m_player_aircraft->setPosition(m_spawn_position);
+	//m_player_aircraft->SetVelocity(40.f, m_scrollspeed);
+	//m_scene_layers[static_cast<int>(SceneLayers::kUpperAir)]->AttachChild(std::move(leader));
 
 	//Add the particle nodes to the scene
 	std::unique_ptr<ParticleNode> smokeNode(new ParticleNode(ParticleType::kSmoke, m_textures));
@@ -182,27 +207,51 @@ void World::BuildScene()
 
 void World::AdaptPlayerPosition()
 {
-	//keep the player on the screen
-	sf::FloatRect view_bounds(m_camera.getCenter() - m_camera.getSize() / 2.f, m_camera.getSize());
-	const float border_distance = 40.f;
+	////keep the player on the screen
+	//sf::FloatRect view_bounds(m_camera.getCenter() - m_camera.getSize() / 2.f, m_camera.getSize());
+	//const float border_distance = 40.f;
 
-	sf::Vector2f position = m_player_aircraft->getPosition();
-	position.x = std::max(position.x, view_bounds.left + border_distance);
-	position.x = std::min(position.x, view_bounds.left + view_bounds.width - border_distance);
-	position.y = std::max(position.y, view_bounds.top + border_distance);
-	position.y = std::min(position.y, view_bounds.top + view_bounds.height -border_distance);
-	m_player_aircraft->setPosition(position);
+	//sf::Vector2f position = m_player_aircraft->getPosition();
+	//position.x = std::max(position.x, view_bounds.left + border_distance);
+	//position.x = std::min(position.x, view_bounds.left + view_bounds.width - border_distance);
+	//position.y = std::max(position.y, view_bounds.top + border_distance);
+	//position.y = std::min(position.y, view_bounds.top + view_bounds.height -border_distance);
+	//m_player_aircraft->setPosition(position);
+
+	//we need to adapt this for the player vector
+	for (auto& player : m_player_aircrafts)
+	{
+		sf::FloatRect view_bounds(m_camera.getCenter() - m_camera.getSize() / 2.f, m_camera.getSize());
+		const float border_distance = 40.f;
+		sf::Vector2f position = player->getPosition();
+		position.x = std::max(position.x, view_bounds.left + border_distance);
+		position.x = std::min(position.x, view_bounds.left + view_bounds.width - border_distance);
+		position.y = std::max(position.y, view_bounds.top + border_distance);
+		position.y = std::min(position.y, view_bounds.top + view_bounds.height - border_distance);
+		player->setPosition(position);
+	}
 }
 
 void World::AdaptPlayerVelocity()
 {
-	sf::Vector2f velocity = m_player_aircraft->GetVelocity();
+	//sf::Vector2f velocity = m_player_aircraft->GetVelocity();
 
-	//If they are moving diagonally divide by sqrt 2
-	if (velocity.x != 0.f && velocity.y != 0.f)
+	////If they are moving diagonally divide by sqrt 2
+	//if (velocity.x != 0.f && velocity.y != 0.f)
+	//{
+	//	m_player_aircraft->SetVelocity(velocity / std::sqrt(2.f));
+	//}
+	//We need to adapt this for the player vector
+	for (auto& player : m_player_aircrafts)
 	{
-		m_player_aircraft->SetVelocity(velocity / std::sqrt(2.f));
+		sf::Vector2f velocity = player->GetVelocity();
+		//If they are moving diagonally divide by sqrt 2
+		if (velocity.x != 0.f && velocity.y != 0.f)
+		{
+			player->SetVelocity(velocity / std::sqrt(2.f));
+		}
 	}
+
 	//Add scrolling velocity
 //	m_player_aircraft->Accelerate(0.f, m_scrollspeed);
 }
@@ -421,32 +470,61 @@ void World::GuideEnemies(sf::Time dt)
 			if (enemy.IsDestroyed())
 				return;
 
-			// Get current positions.
+			// Get the current position of the enemy
 			sf::Vector2f enemyPos = enemy.GetWorldPosition();
-			sf::Vector2f playerPos = m_player_aircraft->GetWorldPosition();
 
-			// Compute direction vector from enemy to player.
-			sf::Vector2f direction = playerPos - enemyPos;
-			float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
-			if (length != 0.f)
+			// Find the closest player
+			float closestDistance = std::numeric_limits<float>::max();
+			sf::Vector2f closestPlayerPos;
+
+			for (auto* player : m_player_aircrafts)
 			{
-				direction /= length;
+				if(player == nullptr)
+				{
+					continue;
+				}
+				if (player->IsDestroyed())
+					continue;
+
+				// Get player position
+				sf::Vector2f playerPos = player->GetWorldPosition();
+
+				// Compute the distance between the enemy and this player
+				float distance = std::sqrt(std::pow(playerPos.x - enemyPos.x, 2) + std::pow(playerPos.y - enemyPos.y, 2));
+				if (distance < closestDistance)
+				{
+					closestDistance = distance;
+					closestPlayerPos = playerPos;
+				}
 			}
 
-			// Set enemy velocity toward the player.
-			enemy.SetVelocity(direction * enemy.GetMaxSpeed());
-			float angleRadians = std::atan2(direction.y, direction.x);
-			float angleDegrees = static_cast<float>(Utility::ToDegrees(angleRadians));
+			// If there's a closest player, adjust the enemy velocity toward that player
+			if (closestDistance < std::numeric_limits<float>::max())  // A player was found
+			{
+				// Compute direction vector from enemy to closest player
+				sf::Vector2f direction = closestPlayerPos - enemyPos;
+				float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
+				if (length != 0.f)
+				{
+					direction /= length;  // Normalize the direction
+				}
 
-			// Adjust angle if your sprite's default orientation requires it.
-			// For example, if your enemy sprite faces upward by default, add 90 degrees.
-			angleDegrees += 90.f;
+				// Set the enemy velocity towards the player
+				enemy.SetVelocity(direction * enemy.GetMaxSpeed());
 
-			enemy.SetRotation(angleDegrees);
+				// Calculate angle for rotation
+				float angleRadians = std::atan2(direction.y, direction.x);
+				float angleDegrees = static_cast<float>(Utility::ToDegrees(angleRadians));
+
+				// Adjust angle if necessary (e.g., sprite default orientation)
+				angleDegrees += 90.f;
+
+				enemy.SetRotation(angleDegrees);
+			}
 
 		});
 
-	// Push the command so it gets executed on enemy aircraft.
+	// Push the command so it gets executed on enemy aircraft
 	m_command_queue.Push(enemyGuideCommand);
 }
 
@@ -478,7 +556,7 @@ void World::HandleCollisions()
 	m_scenegraph.CheckSceneCollision(m_scenegraph, collision_pairs);
 	for (SceneNode::Pair pair : collision_pairs)
 	{
-		if (MatchesCategories(pair, ReceiverCategories::kPlayerAircraft, ReceiverCategories::kEnemyAircraft))
+		if (MatchesCategories(pair, ReceiverCategories::kPlayers, ReceiverCategories::kEnemyAircraft))
 		{
 			auto& player = static_cast<Aircraft&>(*pair.first);
 			auto& enemy = static_cast<Aircraft&>(*pair.second);
@@ -487,7 +565,7 @@ void World::HandleCollisions()
 			enemy.Destroy();
 		}
 
-		else if (MatchesCategories(pair, ReceiverCategories::kPlayerAircraft, ReceiverCategories::kPickup))
+		else if (MatchesCategories(pair, ReceiverCategories::kPlayers, ReceiverCategories::kPickup))
 		{
 			auto& player = static_cast<Aircraft&>(*pair.first);
 			auto& pickup = static_cast<Pickup&>(*pair.second);
@@ -496,7 +574,7 @@ void World::HandleCollisions()
 			pickup.Destroy();
 			player.PlayLocalSound(m_command_queue, SoundEffect::kCollectPickup);
 		}
-		else if (MatchesCategories(pair, ReceiverCategories::kPlayerAircraft, ReceiverCategories::kEnemyProjectile) || MatchesCategories(pair, ReceiverCategories::kEnemyAircraft, ReceiverCategories::kAlliedProjectile))
+		else if (MatchesCategories(pair, ReceiverCategories::kPlayers, ReceiverCategories::kEnemyProjectile) || MatchesCategories(pair, ReceiverCategories::kEnemyAircraft, ReceiverCategories::kAlliedProjectile))
 		{
 			auto& aircraft = static_cast<Aircraft&>(*pair.first);
 			auto& projectile = static_cast<Projectile&>(*pair.second);
@@ -510,8 +588,11 @@ void World::HandleCollisions()
 void World::UpdateSounds()
 {
 	// Set listener's position to player position
-	m_sounds.SetListenerPosition(m_player_aircraft->GetWorldPosition());
-
+	/*m_sounds.SetListenerPosition(m_player_aircraft->GetWorldPosition());*/
+	//We need to adapt this for the player vector
+	//But because there can only be one listener we will set it to the first player in the vector
+	
+	m_sounds.SetListenerPosition(m_player_aircrafts[0]->GetWorldPosition());
 	// Remove unused sounds
 	m_sounds.RemoveStoppedSounds();
 }

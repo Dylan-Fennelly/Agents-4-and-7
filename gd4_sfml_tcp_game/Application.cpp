@@ -8,13 +8,13 @@
 #include "PauseState.hpp"
 #include "SettingsState.hpp"
 #include "GameOverState.hpp"
+#include "ControllerSelectState.hpp"
 
 const sf::Time Application::kTimePerFrame = sf::seconds(1.f/60.f);
 
 Application::Application()
-	: m_window(sf::VideoMode(1024, 768), "States", sf::Style::Close)
-	, m_player(1, 0)
-	, m_stack(State::Context(m_window, m_textures, m_fonts, m_player, m_music, m_sound))
+	: m_window(sf::VideoMode(1024, 768), "Agents 4 & 7", sf::Style::Close)
+	, m_stack(State::Context(m_window, m_textures, m_fonts, m_player, m_player2, m_music, m_sound))
 {
 	m_window.setKeyRepeatEnabled(false);
 	m_fonts.Load(Font::kMain, "Media/Fonts/Sansation.ttf");
@@ -25,7 +25,7 @@ Application::Application()
 	m_textures.Load(TextureID::kButtons, "Media/Textures/Buttons.png");
 
 	RegisterStates();
-	m_stack.PushState(StateID::kTitle);
+	m_stack.PushState(StateID::kControllerSelect);
 }
 
 void Application::Run()
@@ -79,6 +79,7 @@ void Application::Render()
 
 void Application::RegisterStates()
 {
+	m_stack.RegisterState<ControllerSelectState>(StateID::kControllerSelect);
 	m_stack.RegisterState<TitleState>(StateID::kTitle);
 	m_stack.RegisterState<MenuState>(StateID::kMenu);
 	m_stack.RegisterState<GameState>(StateID::kGame);

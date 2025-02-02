@@ -5,8 +5,9 @@
 #include "StateStack.hpp"
 #include "Utility.hpp"
 #include "Aircraft.hpp"
-Gamepad::Gamepad(unsigned int joystick_id)
+Gamepad::Gamepad(unsigned int joystick_id,unsigned int player_id)
 	: m_joystick_id(joystick_id)
+	, m_player_id(player_id)
 	, m_dead_zone(15.f)
 {
 	//we have a big problem here as we are assuming that a com
@@ -33,6 +34,16 @@ Gamepad::Gamepad(unsigned int joystick_id)
 			{ ButtonFunction::kPause, 9 }
 		};
 	}
+	else if (name.find("DS4 Wired Controller") != std::string::npos)
+	{
+		m_controller_type = ControllerType::kPs4;
+		m_button_bindings =
+		{
+			{ ButtonFunction::kConfirm, 1 },
+			{ ButtonFunction::kCancel, 2 },
+			{ ButtonFunction::kPause, 9 }
+		};
+	}
 	else
 	{
 		m_controller_type = ControllerType::kUnknown; 
@@ -40,7 +51,7 @@ Gamepad::Gamepad(unsigned int joystick_id)
 		{
 			{ ButtonFunction::kConfirm, 0 },
 			{ ButtonFunction::kCancel, 1 },
-			{ ButtonFunction::kPause, 7 }
+			{ ButtonFunction::kPause, 7}
 		};
 	}
 
@@ -131,8 +142,7 @@ void Gamepad::Update(CommandQueue& command_queue)
 			{
 				aircraft.SetRotation(angle); // Assuming you have a SetRotation method in Aircraft
 			});
-		rotateCommand.category = static_cast<unsigned int>(ReceiverCategories::kPlayerAircraft);
-
+		rotateCommand.category = static_cast<unsigned int>((m_player_id == 1) ? ReceiverCategories::kPlayerAircraft : ReceiverCategories::kAlliedAircraft);
 		command_queue.Push(rotateCommand);
 	}
 

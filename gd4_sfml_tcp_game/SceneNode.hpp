@@ -37,6 +37,7 @@ public:
 	void CheckSceneCollision(SceneNode& scene_graph, std::set<Pair>& collison_pairs);
 	void RemoveWrecks();
 	virtual unsigned int GetCategory() const;
+	void SetCategory(ReceiverCategories category);
 
 private:
 	virtual void UpdateCurrent(sf::Time dt, CommandQueue& commands);

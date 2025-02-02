@@ -143,6 +143,11 @@ unsigned int SceneNode::GetCategory() const
     return static_cast<unsigned int>(m_default_category);
 }
 
+void SceneNode::SetCategory(ReceiverCategories category)
+{
+	m_default_category = category;
+}
+
 void SceneNode::CheckNodeCollision(SceneNode& node, std::set<Pair>& collision_pairs)
 {
     if (this != &node && Collision(*this, node) && !IsDestroyed() && !node.IsDestroyed())

@@ -140,6 +140,7 @@
     <ClCompile Include="CommandQueue.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Container.cpp" />
+    <ClCompile Include="ControllerSelectState.cpp" />
     <ClCompile Include="DataTables.cpp" />
     <ClCompile Include="EmitterNode.cpp" />
     <ClCompile Include="Entity.cpp" />
@@ -147,7 +148,6 @@
     <ClCompile Include="Gamepad.cpp" />
     <ClCompile Include="GameState.cpp" />
     <ClCompile Include="Label.cpp" />
-    <ClCompile Include="LobbyState.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MenuState.cpp" />
     <ClCompile Include="MusicPlayer.cpp" />
@@ -185,17 +185,16 @@
     <ClInclude Include="Component.hpp" />
     <ClInclude Include="Constants.hpp" />
     <ClInclude Include="Container.hpp" />
+    <ClInclude Include="ControllerSelectState.hpp" />
     <ClInclude Include="ControllerType.hpp" />
     <ClInclude Include="DataTables.hpp" />
     <ClInclude Include="EmitterNode.hpp" />
     <ClInclude Include="Entity.hpp" />
     <ClInclude Include="Font.hpp" />
-    <ClInclude Include="Game.hpp" />
     <ClInclude Include="GameOverState.hpp" />
     <ClInclude Include="Gamepad.hpp" />
     <ClInclude Include="GameState.hpp" />
     <ClInclude Include="Label.hpp" />
-    <ClInclude Include="LobbyState.hpp" />
     <ClInclude Include="MenuOptions.hpp" />
     <ClInclude Include="MenuState.hpp" />
     <ClInclude Include="MissionStatus.hpp" />
