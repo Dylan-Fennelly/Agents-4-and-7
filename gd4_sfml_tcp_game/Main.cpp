@@ -4,8 +4,7 @@
 #include <iostream>
 #include "Application.hpp"
 
-//we need to change this because we actually dont know which joystick the player is using on the menu
-//So we need to
+//We dont need this anymore as the title state handles assigning a joystick to the player class, it will oc
  unsigned int DetectJoystick()
 {
 	 sf::Joystick::update();//Because we dont have a window at this statge we need to manually update to get the default id for the joystick
@@ -26,11 +25,11 @@
 }
 int main()
 {
-	int joystick_id = DetectJoystick();
+	//int joystick_id = DetectJoystick();
 	//TextureHolder game_textures;
 	try
 	{
-		Application app(joystick_id);
+		Application app;
 		app.Run();
 	}
 	catch (std::runtime_error& e)

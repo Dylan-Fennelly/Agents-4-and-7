@@ -10,7 +10,7 @@
 class Application
 {
 public:
-	Application(int gamepad_id);
+	Application();
 	void Run();
 
 private:

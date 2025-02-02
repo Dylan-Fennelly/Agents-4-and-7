@@ -35,25 +35,8 @@ void gui::Container::HandleEvent(const sf::Event& event)
         return;
     }
 
-    if (event.type == sf::Event::KeyReleased)
-    {
-        if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::Up)
-        {
-            SelectPrevious();
-        }
-        else if (event.key.code == sf::Keyboard::S || event.key.code == sf::Keyboard::Down)
-        {
-            SelectNext();
-        }
-        else if (event.key.code == sf::Keyboard::Return || event.key.code == sf::Keyboard::Space)
-        {
-            if (HasSelection())
-            {
-                m_children[m_selected_child]->Activate();
-            }
-        }
-    }
-    else if (event.type == sf::Event::JoystickMoved)
+
+    if (event.type == sf::Event::JoystickMoved)
     {
         HandleJoystickNavigation(event);
     }
@@ -79,7 +62,7 @@ void gui::Container::HandleJoystickNavigation(const sf::Event& event)
     constexpr float threshold = 50.f; // Deadzone threshold to prevent accidental movement
     sf::Time delay = sf::milliseconds(200); // Delay between navigation changes
 
-    if (event.joystickMove.axis == sf::Joystick::PovY || event.joystickMove.axis == sf::Joystick::Y)
+    if (event.joystickMove.axis == sf::Joystick::PovX || event.joystickMove.axis == sf::Joystick::Y)
     {
         sf::Time now = m_clock.getElapsedTime();
         if (now - m_last_joystick_move_time < delay)

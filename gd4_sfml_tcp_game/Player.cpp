@@ -2,6 +2,7 @@
 #include "ReceiverCategories.hpp"
 #include "Aircraft.hpp"
 #include <iostream>
+#include "Constants.hpp"
 
 struct AircraftMover
 {
@@ -71,7 +72,7 @@ void Player::SetGamepad(Gamepad gamepad)
 
 void Player::InitialiseActions()
 {
-    const float kPlayerSpeed = 200.f;
+    const float kPlayerSpeed = PLAYER_SPEED;
 
     // Move Left
     Command moveLeft;

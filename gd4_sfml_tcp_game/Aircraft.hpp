@@ -7,7 +7,6 @@
 #include "ProjectileType.hpp"
 #include <SFML/Graphics/Sprite.hpp>
 #include "Animation.hpp"
-
 class Aircraft : public Entity
 {
 public:
@@ -45,6 +44,8 @@ private:
 	AircraftType m_type;
 	sf::Sprite m_sprite;
 	Animation m_explosion;
+
+
 
 	TextNode* m_health_display;
 	TextNode* m_missile_display;

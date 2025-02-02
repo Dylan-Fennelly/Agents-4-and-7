@@ -8,7 +8,5 @@ enum class Action
 	kMissileFire,
 	kBulletFire,
 	kPause,
-	kRotateLeft,
-	kRotateRight,
 	kActionCount
 };

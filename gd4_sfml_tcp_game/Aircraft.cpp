@@ -7,6 +7,7 @@
 #include "PickupType.hpp"
 #include "Pickup.hpp"
 #include "SoundNode.hpp"
+#include "AimingRectangle.hpp"
 
 namespace
 {
@@ -50,6 +51,7 @@ Aircraft::Aircraft(AircraftType type, const TextureHolder& textures, const FontH
 	, m_spawned_pickup(false)
 	, m_played_explosion_sound(false)
 
+
 {
 	m_explosion.SetFrameSize(sf::Vector2i(256, 256));
 	m_explosion.SetNumFrames(16);
@@ -90,6 +92,7 @@ Aircraft::Aircraft(AircraftType type, const TextureHolder& textures, const FontH
 
 	UpdateTexts();
 }
+
 
 unsigned int Aircraft::GetCategory() const
 {
@@ -233,6 +236,7 @@ void Aircraft::CreateProjectile(SceneNode& node, ProjectileType type, float x_of
 	float sign = IsAllied() ? -1.f : 1.f;
 	projectile->setPosition(GetWorldPosition() + offset * sign);
 	projectile->SetVelocity(velocity * projectile->GetMaxSpeed() * sign);
+	projectile->rotate(rotation);
 
 	node.AttachChild(std::move(projectile));
 }
@@ -267,18 +271,17 @@ void Aircraft::DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) co
 	}
 }
 
+
 void Aircraft::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 {
 	if (IsDestroyed())
 	{
 		CheckPickupDrop(commands);
 		m_explosion.Update(dt);
-		// Play explosion sound only once
 		if (!m_played_explosion_sound)
 		{
 			SoundEffect soundEffect = (Utility::RandomInt(2) == 0) ? SoundEffect::kExplosion1 : SoundEffect::kExplosion2;
 			PlayLocalSound(commands, soundEffect);
-
 			m_played_explosion_sound = true;
 		}
 		return;
@@ -287,11 +290,9 @@ void Aircraft::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 	Entity::UpdateCurrent(dt, commands);
 	UpdateTexts();
 	UpdateMovementPattern(dt);
-
 	UpdateRollAnimation();
-
-	//Check if bullets or misiles are fired
 	CheckProjectileLaunch(dt, commands);
+
 }
 
 void Aircraft::CheckProjectileLaunch(sf::Time dt, CommandQueue& commands)
