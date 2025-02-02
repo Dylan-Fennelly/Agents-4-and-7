@@ -10,7 +10,6 @@
 #include "PickupType.hpp"
 #include "Pickup.hpp"
 #include "SoundNode.hpp"
-#include "AimingRectangle.hpp"
 
 namespace
 {
@@ -166,30 +165,30 @@ void Aircraft::UpdateTexts()
 	}
 }
 
-void Aircraft::UpdateMovementPattern(sf::Time dt)
-{
-	//Enemy AI
-	const std::vector<Direction>& directions = Table[static_cast<int>(m_type)].m_directions;
-	if (!directions.empty())
-	{
-		//Move along the current direction, then change direction
-		if (m_distance_travelled > directions[m_directions_index].m_distance)
-		{
-			m_directions_index = (m_directions_index + 1) % directions.size();
-			m_distance_travelled = 0.f;
-		}
-
-		//Compute velocity
-		//Add 90 to move down the screen, 0 is right
-
-		double radians = Utility::ToRadians(directions[m_directions_index].m_angle + 90.f);
-		float vx = GetMaxSpeed() * std::cos(radians);
-		float vy = GetMaxSpeed() * std::sin(radians);
-
-		SetVelocity(vx, vy);
-		m_distance_travelled += GetMaxSpeed() * dt.asSeconds();
-	}
-}
+//void Aircraft::UpdateMovementPattern(sf::Time dt)
+//{
+//	//Enemy AI
+//	const std::vector<Direction>& directions = Table[static_cast<int>(m_type)].m_directions;
+//	if (!directions.empty())
+//	{
+//		//Move along the current direction, then change direction
+//		if (m_distance_travelled > directions[m_directions_index].m_distance)
+//		{
+//			m_directions_index = (m_directions_index + 1) % directions.size();
+//			m_distance_travelled = 0.f;
+//		}
+//
+//		//Compute velocity
+//		//Add 90 to move down the screen, 0 is right
+//
+//		double radians = Utility::ToRadians(directions[m_directions_index].m_angle + 90.f);
+//		float vx = GetMaxSpeed() * std::cos(radians);
+//		float vy = GetMaxSpeed() * std::sin(radians);
+//
+//		SetVelocity(vx, vy);
+//		m_distance_travelled += GetMaxSpeed() * dt.asSeconds();
+//	}
+//}
 
 float Aircraft::GetMaxSpeed() const
 {
@@ -202,6 +201,7 @@ void Aircraft::Fire()
 	{
 		m_is_firing = true;
 	}
+	
 }
 
 
@@ -333,7 +333,7 @@ void Aircraft::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 
 	Entity::UpdateCurrent(dt, commands);
 	UpdateTexts();
-	UpdateMovementPattern(dt);
+//	UpdateMovementPattern(dt);
 	UpdateRollAnimation();
 	CheckProjectileLaunch(dt, commands);
 
