@@ -4,11 +4,11 @@
 #pragma once
 enum class SoundEffect
 {
-	kAlliedGunfire,
+	kPistolShot,
 	kEnemyGunfire,
-	kExplosion1,
+	kDyingZombie,
 	kExplosion2,
-	kLaunchMissile,
+	kLaunchRocket,
 	kCollectPickup,
 	kButton
 };
