@@ -45,13 +45,27 @@ void gui::Container::HandleEvent(const sf::Event& event)
     }
     else if (event.type == sf::Event::JoystickButtonPressed)
     {
-		if (event.joystickButton.button == GetContext().player->GetGamepad().GetButton(ButtonFunction::kConfirm))
+        if (event.joystickButton.joystickId == GetContext().player->GetGamepad().GetJoystickId())
         {
-            if (HasSelection())
+            if (event.joystickButton.button == GetContext().player->GetGamepad().GetButton(ButtonFunction::kConfirm))
             {
-                m_children[m_selected_child]->Activate();
+                if (HasSelection())
+                {
+                    m_children[m_selected_child]->Activate();
+                }
             }
         }
+        else if (event.joystickButton.joystickId == GetContext().player2->GetGamepad().GetJoystickId())
+        {
+            if (event.joystickButton.button == GetContext().player2->GetGamepad().GetButton(ButtonFunction::kConfirm))
+            {
+                if (HasSelection())
+                {
+                    m_children[m_selected_child]->Activate();
+                }
+            }
+        }
+
     }
 }
 
@@ -59,7 +73,7 @@ State::Context gui::Container::GetContext() const
 {
 	return m_context;
 }
-
+//Todo: this needs to be passed off the gamepad class
 void gui::Container::HandleJoystickNavigation(const sf::Event& event)
 {
     constexpr float threshold = 50.f; // Deadzone threshold to prevent accidental movement

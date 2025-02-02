@@ -69,16 +69,16 @@ sf::FloatRect SceneNode::GetBoundingRect() const
     return sf::FloatRect();
 }
 
-void SceneNode::DrawBoundingRect(sf::RenderTarget& target, sf::RenderStates states, sf::FloatRect& rect) const
-{
-    sf::RectangleShape shape;
-    shape.setPosition(sf::Vector2f(rect.left, rect.top));
-    shape.setSize(sf::Vector2f(rect.width, rect.height));
-    shape.setFillColor(sf::Color::Transparent);
-    shape.setOutlineColor(sf::Color::Green);
-    shape.setOutlineThickness(1.f);
-    target.draw(shape);
-}
+//void SceneNode::DrawBoundingRect(sf::RenderTarget& target, sf::RenderStates states, sf::FloatRect& rect) const
+//{
+//    sf::RectangleShape shape;
+//    shape.setPosition(sf::Vector2f(rect.left, rect.top));
+//    shape.setSize(sf::Vector2f(rect.width, rect.height));
+//    shape.setFillColor(sf::Color::Transparent);
+//    shape.setOutlineColor(sf::Color::Green);
+//    shape.setOutlineThickness(1.f);
+//    target.draw(shape);
+//}
 
 void SceneNode::CheckSceneCollision(SceneNode& scene_graph, std::set<Pair>& collision_pairs)
 {
@@ -122,7 +122,7 @@ void SceneNode::draw(sf::RenderTarget& target, sf::RenderStates states) const
     DrawCurrent(target, states);
     DrawChildren(target, states);
     sf::FloatRect rect = GetBoundingRect();
-    DrawBoundingRect(target, states, rect);
+    //DrawBoundingRect(target, states, rect);
 }
 
 void SceneNode::DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) const

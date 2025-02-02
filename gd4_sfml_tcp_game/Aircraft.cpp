@@ -55,8 +55,8 @@ Aircraft::Aircraft(AircraftType type, const TextureHolder& textures, const FontH
 
 
 {
-	m_explosion.SetFrameSize(sf::Vector2i(256, 256));
-	m_explosion.SetNumFrames(16);
+	m_explosion.SetFrameSize(sf::Vector2i(100, 100));
+	m_explosion.SetNumFrames(60);
 	m_explosion.SetDuration(sf::seconds(1));
 	Utility::CentreOrigin(m_sprite);
 	Utility::CentreOrigin(m_explosion);

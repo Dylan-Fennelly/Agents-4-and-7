@@ -12,8 +12,7 @@ ControllerSelectState::ControllerSelectState(StateStack& stack, Context context)
 {
     // Set up instruction text (using your font from context)
     m_instructionText.setFont(context.fonts->Get(Font::kMain));
-    m_instructionText.setString("Player 1: Press any button on your controller\n"
-        "Player 2: Press any button on your controller");
+    m_instructionText.setString("Player 1: Press any button on your controller");
     Utility::CentreOrigin(m_instructionText);
     m_instructionText.setPosition(context.window->getView().getSize() / 2.f);
 }
@@ -28,7 +27,10 @@ bool ControllerSelectState::HandleEvent(const sf::Event& event)
         {
             m_player1Registered = true;
             m_player1Joystick = joystickId;
-            // Optionally, update the instruction text to show player 1 has been registered.
+
+            // Clear the instruction text for Player 1
+            m_instructionText.setString("Player 2: Press any button on your controller");
+            Utility::CentreOrigin(m_instructionText);
         }
         else if (!m_player2Registered && joystickId != m_player1Joystick)
         {
@@ -41,8 +43,7 @@ bool ControllerSelectState::HandleEvent(const sf::Event& event)
     if (m_player1Registered && m_player2Registered)
     {
         // Store the joystick IDs in the context (or in the Player objects)
-        // For example, if your context has pointers to player objects:
-		GetContext().player->SetGamepad(Gamepad(m_player1Joystick, GetContext().player->GetPlayerID()));
+        GetContext().player->SetGamepad(Gamepad(m_player1Joystick, GetContext().player->GetPlayerID()));
         GetContext().player2->SetGamepad(Gamepad(m_player2Joystick, GetContext().player2->GetPlayerID()));
 
         // Pop the controller selection state and push the next state.
@@ -57,7 +58,11 @@ void ControllerSelectState::Draw()
 {
     sf::RenderWindow& window = *GetContext().window;
     window.clear();
-    window.draw(m_instructionText);
+
+    // Draw the instruction text only if it's not empty
+    if (!m_instructionText.getString().isEmpty()) {
+        window.draw(m_instructionText);
+    }
 }
 
 bool ControllerSelectState::Update(sf::Time)

@@ -32,7 +32,7 @@ public:
 	void OnCommand(const Command& command, sf::Time dt);
 
 	virtual sf::FloatRect GetBoundingRect() const;
-	void DrawBoundingRect(sf::RenderTarget& target, sf::RenderStates states, sf::FloatRect& rect) const;
+	//void DrawBoundingRect(sf::RenderTarget& target, sf::RenderStates states, sf::FloatRect& rect) const;
 
 	void CheckSceneCollision(SceneNode& scene_graph, std::set<Pair>& collison_pairs);
 	void RemoveWrecks();
