@@ -85,14 +85,14 @@ std::vector<PickupData> InitializePickupData()
     //Added by Albert
 	//Invincibility
 	data[static_cast<int>(PickupType::kInvincibility)].m_texture = TextureID::kInvincibility;
-	data[static_cast<int>(PickupType::kInvincibility)].m_texture_rect = sf::IntRect(0, 0, 100, 100);
+	data[static_cast<int>(PickupType::kInvincibility)].m_texture_rect = sf::IntRect(0, 0, 50, 50);
 	data[static_cast<int>(PickupType::kInvincibility)].m_action = std::bind(&Aircraft::ActivateInvincibility, std::placeholders::_1, sf::seconds(5));
 
     //Added by Albert
     //Minigun
     data[static_cast<int>(PickupType::kMinigun)].m_texture = TextureID::kMinigun;
-    data[static_cast<int>(PickupType::kMinigun)].m_texture_rect = sf::IntRect(0, 0, 100, 100);
-    data[static_cast<int>(PickupType::kMinigun)].m_action = std::bind(&Aircraft::IncreaseFireRate, std::placeholders::_1);
+    data[static_cast<int>(PickupType::kMinigun)].m_texture_rect = sf::IntRect(0, 0, 50, 50);
+    data[static_cast<int>(PickupType::kMinigun)].m_action = std::bind(&Aircraft::ActivateMinigun, std::placeholders::_1, sf::seconds(5));
     
     return data;
 }
