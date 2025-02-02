@@ -80,7 +80,6 @@ std::vector<PickupData> InitializePickupData()
 
     data[static_cast<int>(PickupType::kMissileRefill)].m_texture = TextureID::kEntities;
     data[static_cast<int>(PickupType::kMissileRefill)].m_texture_rect = sf::IntRect(40, 64, 40, 40);
-    
     data[static_cast<int>(PickupType::kMissileRefill)].m_action = std::bind(&Aircraft::CollectMissile, std::placeholders::_1, 3);
 
     data[static_cast<int>(PickupType::kFireSpread)].m_texture = TextureID::kEntities;

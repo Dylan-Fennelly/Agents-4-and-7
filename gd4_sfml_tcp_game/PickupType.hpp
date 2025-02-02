@@ -6,4 +6,8 @@ enum class PickupType
 	kFireSpread,
 	kFireRate,
 	kPickupCount
+
+	//kHealth
+	//kInvincibility
+	//kMinigun
 };
