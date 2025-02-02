@@ -4,8 +4,8 @@
 #pragma once
 enum class AircraftType
 {
-	kEagle,
-	kRaptor,
+	kAgentFour,
+	kZombie,
 	kAvenger,
 	kAircraftCount
 };
