@@ -34,14 +34,17 @@ private:
 	void AdaptPlayerPosition();
 	void AdaptPlayerVelocity();
 
-	void SpawnEnemies();
-	void AddEnemies();
-	void AddEnemy(AircraftType type, float relx, float rely);
+	//void SpawnEnemies();
+	//void AddEnemies();
+	//void AddEnemy(AircraftType type, float relx, float rely);
+	void SpawnEnemy();
 	sf::FloatRect GetViewBounds() const;
 	sf::FloatRect GetBattleFieldBounds() const;
 
 	void DestroyEntitiesOutsideView();
 	void GuideMissiles();
+
+	void GuideEnemies(sf::Time dt);
 
 	void HandleCollisions();
 	void UpdateSounds();
@@ -77,6 +80,11 @@ private:
 
 	std::vector<SpawnPoint> m_enemy_spawn_points;
 	std::vector<Aircraft*> m_active_enemies;
+
+	// New member variables for enemy spawning
+	sf::Time m_enemySpawnTimer;     // Accumulated time since the last enemy spawn
+	sf::Time m_enemySpawnInterval;  // Randomized interval between spawns
+
 
 	BloomEffect m_bloom_effect;
 };

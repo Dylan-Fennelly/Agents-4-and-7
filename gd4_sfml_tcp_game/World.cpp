@@ -17,8 +17,10 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 	,m_scene_layers()
 	,m_world_bounds(0.f,0.f, m_camera.getSize().x, 3000.f)
 	,m_spawn_position(m_camera.getSize().x/2.f, m_world_bounds.height - m_camera.getSize().y/2.f)
-	,m_scrollspeed(-50.f)
+	,m_scrollspeed(0.f)
 	,m_player_aircraft(nullptr)
+	, m_enemySpawnTimer(sf::Time::Zero)
+	, m_enemySpawnInterval(sf::seconds(2.f)) // Initial spawn interval; will be randomized after each spawn.
 {
 	m_scene_texture.create(m_target.getSize().x, m_target.getSize().y);
 	LoadTextures();
@@ -32,9 +34,19 @@ void World::Update(sf::Time dt)
 	m_camera.move(0, m_scrollspeed * dt.asSeconds());
 	
 	//m_player_aircraft->SetVelocity(0.f, 0.f);
+	m_enemySpawnTimer += dt;
+	if (m_enemySpawnTimer >= m_enemySpawnInterval)
+	{
+		SpawnEnemy();
+		m_enemySpawnTimer = sf::Time::Zero;
+		// Randomize the next spawn interval (for example, between 1.5 and 3 seconds):
+		float nextInterval = 1.5f + static_cast<float>(Utility::RandomInt(1500)) / 1000.f; // 1.5 to 3.0 seconds
+		m_enemySpawnInterval = sf::seconds(nextInterval);
+	}
 
 	DestroyEntitiesOutsideView();
 	GuideMissiles();
+	GuideEnemies(dt);
 
 	//Forward commands to the scenegraph
 	while (!m_command_queue.IsEmpty())
@@ -47,7 +59,6 @@ void World::Update(sf::Time dt)
 
 	m_scenegraph.RemoveWrecks();
 
-	SpawnEnemies();
 
 	m_scenegraph.Update(dt, m_command_queue);
 	AdaptPlayerPosition();
@@ -158,7 +169,7 @@ void World::BuildScene()
 	std::unique_ptr<SoundNode> soundNode(new SoundNode(m_sounds));
 	m_scenegraph.AttachChild(std::move(soundNode));
 
-	AddEnemies();
+	//AddEnemies();
 
 	/*std::unique_ptr<Aircraft> left_escort(new Aircraft(AircraftType::kRaptor, m_textures, m_fonts));
 	left_escort->setPosition(-80.f, 50.f);
@@ -196,43 +207,132 @@ void World::AdaptPlayerVelocity()
 //	m_player_aircraft->Accelerate(0.f, m_scrollspeed);
 }
 
-void World::SpawnEnemies()
+//void World::SpawnEnemies()
+//{
+//	//Spawn an enemy when it is relevant i.e when it is in the Battlefieldboudns
+//	while (!m_enemy_spawn_points.empty() && m_enemy_spawn_points.back().m_y > GetBattleFieldBounds().top)
+//	{
+//		SpawnPoint spawn = m_enemy_spawn_points.back();
+//		std::unique_ptr<Aircraft> enemy(new Aircraft(spawn.m_type, m_textures, m_fonts));
+//		enemy->setPosition(spawn.m_x, spawn.m_y);
+//		enemy->setRotation(180.f);
+//		m_scene_layers[static_cast<int>(SceneLayers::kUpperAir)]->AttachChild(std::move(enemy));
+//		m_enemy_spawn_points.pop_back();
+//	}
+//}
+//
+//void World::AddEnemies()
+//{
+//	AddEnemy(AircraftType::kRaptor, 0.f, 500.f);
+//	AddEnemy(AircraftType::kRaptor, 0.f, 1000.f);
+//	AddEnemy(AircraftType::kRaptor, 100.f, 1100.f);
+//	AddEnemy(AircraftType::kRaptor, -100.f, 1100.f);
+//	AddEnemy(AircraftType::kAvenger, -70.f, 1400.f);
+//	AddEnemy(AircraftType::kAvenger, 70.f, 1400.f);
+//	AddEnemy(AircraftType::kAvenger, 70.f, 1600.f);
+//
+//	//Sort the enemies according to y-value so that enemies are checked first
+//	std::sort(m_enemy_spawn_points.begin(), m_enemy_spawn_points.end(), [](SpawnPoint lhs, SpawnPoint rhs)
+//	{
+//		return lhs.m_y < rhs.m_y;
+//	});
+//
+//}
+//
+//void World::AddEnemy(AircraftType type, float relx, float rely)
+//{
+//	SpawnPoint spawn(type, m_spawn_position.x + relx, m_spawn_position.y - rely);
+//	m_enemy_spawn_points.emplace_back(spawn);
+//}
+void World::SpawnEnemy()
 {
-	//Spawn an enemy when it is relevant i.e when it is in the Battlefieldboudns
-	while (!m_enemy_spawn_points.empty() && m_enemy_spawn_points.back().m_y > GetBattleFieldBounds().top)
+	// Choose an enemy type at random.
+	AircraftType type = (Utility::RandomInt(2) == 0) ? AircraftType::kRaptor : AircraftType::kAvenger;
+
+	// Get the current view bounds.
+	sf::FloatRect viewBounds = GetViewBounds();
+	// Define a margin to spawn outside the view.
+	float margin = 50.f;
+
+	// Determine a random side (0: top, 1: bottom, 2: left, 3: right)
+	int side = Utility::RandomInt(4);
+
+	sf::Vector2f spawnPos;
+	switch (side)
 	{
-		SpawnPoint spawn = m_enemy_spawn_points.back();
-		std::unique_ptr<Aircraft> enemy(new Aircraft(spawn.m_type, m_textures, m_fonts));
-		enemy->setPosition(spawn.m_x, spawn.m_y);
-		enemy->setRotation(180.f);
-		m_scene_layers[static_cast<int>(SceneLayers::kUpperAir)]->AttachChild(std::move(enemy));
-		m_enemy_spawn_points.pop_back();
+	case 0: // Top: spawn at a random x within view (plus margin) and above the view.
+	{
+		int minX = static_cast<int>(viewBounds.left + margin);
+		int maxX = static_cast<int>(viewBounds.left + viewBounds.width - margin);
+		float x = static_cast<float>(minX + Utility::RandomInt(maxX - minX));
+		float y = viewBounds.top - margin;
+		spawnPos = sf::Vector2f(x, y);
+		break;
 	}
-}
-
-void World::AddEnemies()
-{
-	AddEnemy(AircraftType::kRaptor, 0.f, 500.f);
-	AddEnemy(AircraftType::kRaptor, 0.f, 1000.f);
-	AddEnemy(AircraftType::kRaptor, 100.f, 1100.f);
-	AddEnemy(AircraftType::kRaptor, -100.f, 1100.f);
-	AddEnemy(AircraftType::kAvenger, -70.f, 1400.f);
-	AddEnemy(AircraftType::kAvenger, 70.f, 1400.f);
-	AddEnemy(AircraftType::kAvenger, 70.f, 1600.f);
-
-	//Sort the enemies according to y-value so that enemies are checked first
-	std::sort(m_enemy_spawn_points.begin(), m_enemy_spawn_points.end(), [](SpawnPoint lhs, SpawnPoint rhs)
+	case 1: // Bottom: spawn at a random x within view (plus margin) and below the view.
 	{
-		return lhs.m_y < rhs.m_y;
-	});
+		int minX = static_cast<int>(viewBounds.left + margin);
+		int maxX = static_cast<int>(viewBounds.left + viewBounds.width - margin);
+		float x = static_cast<float>(minX + Utility::RandomInt(maxX - minX));
+		float y = viewBounds.top + viewBounds.height + margin;
+		spawnPos = sf::Vector2f(x, y);
+		break;
+	}
+	case 2: // Left: spawn at a random y within view (plus margin) and to the left of the view.
+	{
+		int minY = static_cast<int>(viewBounds.top + margin);
+		int maxY = static_cast<int>(viewBounds.top + viewBounds.height - margin);
+		float y = static_cast<float>(minY + Utility::RandomInt(maxY - minY));
+		float x = viewBounds.left - margin;
+		spawnPos = sf::Vector2f(x, y);
+		break;
+	}
+	case 3: // Right: spawn at a random y within view (plus margin) and to the right of the view.
+	{
+		int minY = static_cast<int>(viewBounds.top + margin);
+		int maxY = static_cast<int>(viewBounds.top + viewBounds.height - margin);
+		float y = static_cast<float>(minY + Utility::RandomInt(maxY - minY));
+		float x = viewBounds.left + viewBounds.width + margin;
+		spawnPos = sf::Vector2f(x, y);
+		break;
+	}
+	default:
+		// Default to top if something goes wrong.
+		spawnPos = sf::Vector2f(viewBounds.left + viewBounds.width / 2.f, viewBounds.top - margin);
+		break;
+	}
 
+	// Create the enemy and set its properties.
+	std::unique_ptr<Aircraft> enemy(new Aircraft(type, m_textures, m_fonts));
+	enemy->setPosition(spawnPos);
+
+	// Compute the center of the view (target point).
+	sf::Vector2f viewCenter(viewBounds.left + viewBounds.width / 2.f, viewBounds.top + viewBounds.height / 2.f);
+
+	// Compute a vector from the spawn position toward the view center.
+	sf::Vector2f toCenter = viewCenter - spawnPos;
+	float length = std::sqrt(toCenter.x * toCenter.x + toCenter.y * toCenter.y);
+	if (length != 0.f)
+	{
+		toCenter /= length;
+	}
+
+	// Compute the angle (in degrees) so that the enemy faces the center.
+	// Adjust the angle if your sprite's default orientation requires it.
+	float angleRadians = std::atan2(toCenter.y, toCenter.x);
+	float angleDegrees = static_cast<float>(Utility::ToDegrees(angleRadians));
+	// If your enemy sprite is designed to face upward (0° = up) then add 90 degrees.
+	angleDegrees += 90.f;
+	enemy->setRotation(angleDegrees);
+
+	// Optionally, set an initial velocity if needed. 
+	// We'll leave it at zero so that GuideEnemies() can update it later.
+	enemy->SetVelocity(0.f, 0.f);
+
+	// Attach the new enemy to the UpperAir scene layer.
+	m_scene_layers[static_cast<int>(SceneLayers::kUpperAir)]->AttachChild(std::move(enemy));
 }
 
-void World::AddEnemy(AircraftType type, float relx, float rely)
-{
-	SpawnPoint spawn(type, m_spawn_position.x + relx, m_spawn_position.y - rely);
-	m_enemy_spawn_points.emplace_back(spawn);
-}
 
 sf::FloatRect World::GetViewBounds() const
 {
@@ -253,7 +353,7 @@ sf::FloatRect World::GetBattleFieldBounds() const
 void World::DestroyEntitiesOutsideView()
 {
 	Command command;
-	command.category = static_cast<int>(ReceiverCategories::kEnemyAircraft) | static_cast<int>(ReceiverCategories::kProjectile);
+	command.category = static_cast<int>(ReceiverCategories::kProjectile);
 	command.action = DerivedAction<Entity>([this](Entity& e, sf::Time dt)
 		{
 			//Does the object intersect with the battlefield
@@ -310,6 +410,47 @@ void World::GuideMissiles()
 	m_command_queue.Push(missileGuider);
 	m_active_enemies.clear();
 }
+void World::GuideEnemies(sf::Time dt)
+{
+	// Command to adjust enemy aircraft velocities.
+	Command enemyGuideCommand;
+	enemyGuideCommand.category = static_cast<int>(ReceiverCategories::kEnemyAircraft);
+	enemyGuideCommand.action = DerivedAction<Aircraft>([this](Aircraft& enemy, sf::Time dt)
+		{
+			// Skip destroyed enemies
+			if (enemy.IsDestroyed())
+				return;
+
+			// Get current positions.
+			sf::Vector2f enemyPos = enemy.GetWorldPosition();
+			sf::Vector2f playerPos = m_player_aircraft->GetWorldPosition();
+
+			// Compute direction vector from enemy to player.
+			sf::Vector2f direction = playerPos - enemyPos;
+			float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
+			if (length != 0.f)
+			{
+				direction /= length;
+			}
+
+			// Set enemy velocity toward the player.
+			enemy.SetVelocity(direction * enemy.GetMaxSpeed());
+			float angleRadians = std::atan2(direction.y, direction.x);
+			float angleDegrees = static_cast<float>(Utility::ToDegrees(angleRadians));
+
+			// Adjust angle if your sprite's default orientation requires it.
+			// For example, if your enemy sprite faces upward by default, add 90 degrees.
+			angleDegrees += 90.f;
+
+			enemy.SetRotation(angleDegrees);
+
+		});
+
+	// Push the command so it gets executed on enemy aircraft.
+	m_command_queue.Push(enemyGuideCommand);
+}
+
+
 
 bool MatchesCategories(SceneNode::Pair& colliders, ReceiverCategories type1, ReceiverCategories type2)
 {
