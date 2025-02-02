@@ -1,3 +1,6 @@
+/*Albert Skalinski - D00248346
+  Dylan Fennelly - D00248176*/
+
 #pragma once
 #include "Entity.hpp"
 #include "AircraftType.hpp"
@@ -7,6 +10,8 @@
 #include "ProjectileType.hpp"
 #include <SFML/Graphics/Sprite.hpp>
 #include "Animation.hpp"
+#include <SFML/Graphics/Shader.hpp>
+
 class Aircraft : public Entity
 {
 public:
@@ -16,6 +21,13 @@ public:
 	void IncreaseFireRate();
 	void IncreaseFireSpread();
 	void CollectMissile(unsigned int count);
+	
+	//Added by Albert
+	void ActivateInvincibility(sf::Time duration);
+	//Added by Albert
+	void Damage(int points) override;
+	//Added by Albert
+	void ActivateMinigun();
 
 	void UpdateTexts();
 	void UpdateMovementPattern(sf::Time dt);
@@ -69,5 +81,11 @@ private:
 	bool m_spawned_pickup;
 	bool m_played_explosion_sound;
 
+	//Added by Albert
+	bool m_is_invincible;
+	//Added by Albert
+	sf::Time m_invincibility_timer;
+	//Added by Albert
+	sf::Shader m_invincibilityShader;
 };
 

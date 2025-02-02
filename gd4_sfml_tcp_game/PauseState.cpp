@@ -1,3 +1,6 @@
+/*Albert Skalinski - D00248346
+  Dylan Fennelly - D00248176*/
+
 #include "PauseState.hpp"
 #include "ResourceHolder.hpp"
 #include <SFML/Graphics/RenderWindow.hpp>

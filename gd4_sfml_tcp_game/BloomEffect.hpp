@@ -1,3 +1,6 @@
+/*Albert Skalinski - D00248346
+  Dylan Fennelly - D00248176*/
+
 #pragma once
 #include "PostEffect.hpp"
 #include "ResourceIdentifiers.hpp"
@@ -29,7 +32,6 @@ private:
 	void Blur(const sf::RenderTexture& input, sf::RenderTexture& output, sf::Vector2f offsetFactor);
 	void Downsample(const sf::RenderTexture& input, sf::RenderTexture& output);
 	void Add(const sf::RenderTexture& source, const sf::RenderTexture& bloom, sf::RenderTarget& target);
-
 
 private:
 	ShaderHolder		m_shaders;

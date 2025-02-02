@@ -1,3 +1,6 @@
+/*Albert Skalinski - D00248346
+  Dylan Fennelly - D00248176*/
+
 #include "GameOverState.hpp"
 #include "ResourceHolder.hpp"
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -16,10 +19,12 @@ GameOverState::GameOverState(StateStack& stack, Context context)
     m_game_over_text.setFont(font);
     if (context.player->GetMissionStatus() == MissionStatus::kMissionSuccess)
     {
+        context.music->Play(MusicThemes::kGameWonTheme);
         m_game_over_text.setString("Mission Success");
     }
     else
     {
+        context.music->Play(MusicThemes::kGameOverTheme);
         m_game_over_text.setString("Mission Failure");
     }
 
@@ -47,7 +52,7 @@ bool GameOverState::Update(sf::Time dt)
 {
     //Show gameover for 3 seconds and then return to the main menu
     m_elapsed_time += dt;
-    if (m_elapsed_time > sf::seconds(3))
+    if (m_elapsed_time > sf::seconds(6))
     {
         RequestStackClear();
         RequestStackPush(StateID::kMenu);
