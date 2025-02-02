@@ -210,17 +210,39 @@ void Aircraft::CreateBullet(SceneNode& node, const TextureHolder& textures) cons
 	}
 	
 }
-
 void Aircraft::CreateProjectile(SceneNode& node, ProjectileType type, float x_offset, float y_offset, const TextureHolder& textures) const
 {
 	std::unique_ptr<Projectile> projectile(new Projectile(type, textures));
-	sf::Vector2f offset(x_offset * m_sprite.getGlobalBounds().width, y_offset * m_sprite.getGlobalBounds().height);
-	sf::Vector2f velocity(0, projectile->GetMaxSpeed());
+
+	// Get aircraft rotation (in degrees) and convert to radians
+	float rotation = getRotation();
+	float radians = Utility::ToRadians(rotation);
+
+	// Calculate rotated offset to align with aircraft's rotation
+	sf::Vector2f offset(
+		x_offset * m_sprite.getGlobalBounds().width * std::cos(radians) - y_offset * m_sprite.getGlobalBounds().height * std::sin(radians),
+		x_offset * m_sprite.getGlobalBounds().width * std::sin(radians) + y_offset * m_sprite.getGlobalBounds().height * std::cos(radians)
+	);
+
+	// Corrected bullet velocity so it moves forward
+	sf::Vector2f velocity(
+		-std::sin(radians),  // Inverted X for correct forward movement
+		std::cos(radians)    // Inverted Y for correct forward movement
+	);
 
 	float sign = IsAllied() ? -1.f : 1.f;
 	projectile->setPosition(GetWorldPosition() + offset * sign);
-	projectile->SetVelocity(velocity* sign);
+	projectile->SetVelocity(velocity * projectile->GetMaxSpeed() * sign);
+
 	node.AttachChild(std::move(projectile));
+}
+
+
+
+void Aircraft::SetRotation(float angle)
+{
+	setRotation(angle);
+	m_sprite.setRotation(0);
 }
 
 sf::FloatRect Aircraft::GetBoundingRect() const
@@ -360,3 +382,4 @@ void Aircraft::PlayLocalSound(CommandQueue& commands, SoundEffect effect)
 
 	commands.Push(command);
 }
+

@@ -14,6 +14,18 @@ struct AircraftMover
 
     sf::Vector2f velocity;
 };
+struct AircraftRotator
+{
+    AircraftRotator(float angle) : rotation_angle(angle) {}
+
+    void operator()(Aircraft& aircraft, sf::Time) const
+    {
+        aircraft.setRotation(rotation_angle);
+    }
+
+    float rotation_angle;
+};
+
 
 Player::Player(unsigned int player_id, unsigned int joystick_id)
     : m_player_id(player_id) // Assign player ID

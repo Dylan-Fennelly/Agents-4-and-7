@@ -4,6 +4,7 @@
 #include <SFML/Window/Event.hpp>
 #include "StateStack.hpp"
 #include "Utility.hpp"
+#include "Aircraft.hpp"
 Gamepad::Gamepad(unsigned int joystick_id)
 	: m_joystick_id(joystick_id)
 	, m_dead_zone(15.f)
@@ -112,6 +113,29 @@ void Gamepad::Update(CommandQueue& command_queue)
 			command_queue.Push(m_action_command_bindings[moveAction]);
 		}
 	}
+	//xbox = (-v,u) ps4 = (-R,Z) => we need to use a ternary operator to check if the controller is a ps4 controller
+	//We then get the position of the axis and assign it to the correct variable
+	float rightStickX = -(GetAxisPosition(m_controller_type == ControllerType::kPs4 ? sf::Joystick::R : sf::Joystick::V)); // Right stick X-axis
+	float rightStickY = GetAxisPosition(m_controller_type == ControllerType::kPs4 ? sf::Joystick::Z : sf::Joystick::U); // Right stick Y-axis
+ 
+
+	// Ensure movement is beyond the dead zone
+	if (std::hypot(rightStickX, rightStickY) > m_dead_zone)
+	{
+		// Calculate desired rotation angle in degrees
+		float angle = std::atan2(rightStickY, rightStickX) * 180.f / 3.14159265f;
+
+		// Create a rotation command dynamically
+		Command rotateCommand;
+		rotateCommand.action = DerivedAction<Aircraft>([angle](Aircraft& aircraft, sf::Time)
+			{
+				aircraft.SetRotation(angle); // Assuming you have a SetRotation method in Aircraft
+			});
+		rotateCommand.category = static_cast<unsigned int>(ReceiverCategories::kPlayerAircraft);
+
+		command_queue.Push(rotateCommand);
+	}
+
 }
 
 
