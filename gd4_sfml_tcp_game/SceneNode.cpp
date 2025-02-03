@@ -145,7 +145,7 @@ unsigned int SceneNode::GetCategory() const
 
 void SceneNode::SetCategory(ReceiverCategories category)
 {
-	m_default_category = category;
+	m_default_category = category;  //Scene Nodes needed a way changing their category
 }
 
 void SceneNode::CheckNodeCollision(SceneNode& node, std::set<Pair>& collision_pairs)

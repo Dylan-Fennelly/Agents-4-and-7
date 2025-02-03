@@ -108,7 +108,7 @@ unsigned int Aircraft::GetCategory() const
 {
 	if (IsAllied())
 	{
-		return static_cast<unsigned int>(SceneNode::GetCategory());
+		return static_cast<unsigned int>(SceneNode::GetCategory()); //Modifyied the SceneNode to return the category
 	}
 	return static_cast<unsigned int>(ReceiverCategories::kEnemyAircraft);
 
@@ -222,11 +222,15 @@ void Aircraft::CreateProjectile(SceneNode& node, ProjectileType type, float x_of
 {
 	std::unique_ptr<Projectile> projectile(new Projectile(type, textures));
 
+	//We need to take the players roatation into account so that our bullets have the right rotaation
 	// Get aircraft rotation (in degrees) and convert to radians
+
+
 	float rotation = getRotation();
 	float radians = Utility::ToRadians(rotation);
 
 	// Calculate rotated offset to align with aircraft's rotation
+	//Dylan - I used ChatGpt to asset in the semantics of calculating the bullets offset
 	sf::Vector2f offset(
 		x_offset * m_sprite.getGlobalBounds().width * std::cos(radians) - y_offset * m_sprite.getGlobalBounds().height * std::sin(radians),
 		x_offset * m_sprite.getGlobalBounds().width * std::sin(radians) + y_offset * m_sprite.getGlobalBounds().height * std::cos(radians)
@@ -238,7 +242,7 @@ void Aircraft::CreateProjectile(SceneNode& node, ProjectileType type, float x_of
 		std::cos(radians)    // Inverted Y for correct forward movement
 	);
 
-	float sign = IsAllied() ? -1.f : 1.f;
+	float sign = IsAllied() ? -1.f : 1.f; //Unless we add zombies with guns we probally dont need this 
 	projectile->setPosition(GetWorldPosition() + offset * sign);
 	projectile->SetVelocity(velocity * projectile->GetMaxSpeed() * sign);
 	projectile->rotate(rotation);
@@ -248,8 +252,8 @@ void Aircraft::CreateProjectile(SceneNode& node, ProjectileType type, float x_of
 
 void Aircraft::SetRotation(float angle)
 {
-	setRotation(angle);
-	m_sprite.setRotation(0);
+	setRotation(angle); //We rotate using the entity class
+	m_sprite.setRotation(0); //Set the rotation of the sprite to 0 so we dont have the sprite the wrong way
 }
 
 sf::FloatRect Aircraft::GetBoundingRect() const

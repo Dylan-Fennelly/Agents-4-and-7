@@ -16,7 +16,7 @@ ControllerSelectState::ControllerSelectState(StateStack& stack, Context context)
     Utility::CentreOrigin(m_instructionText);
     m_instructionText.setPosition(context.window->getView().getSize() / 2.f);
 }
-
+//This allows us to let the players decide which controller that they want to use - Todo: Add a way to let players to undo their selection
 bool ControllerSelectState::HandleEvent(const sf::Event& event)
 {
     if (event.type == sf::Event::JoystickButtonPressed)
@@ -39,14 +39,14 @@ bool ControllerSelectState::HandleEvent(const sf::Event& event)
         }
     }
 
-    // Once both players have registered, push the next state (e.g. MenuState or GameState)
+    // Once both players have registered, push the next state
     if (m_player1Registered && m_player2Registered)
     {
-        // Store the joystick IDs in the context (or in the Player objects)
+        // Set the players gamepadss
         GetContext().player->SetGamepad(Gamepad(m_player1Joystick, GetContext().player->GetPlayerID()));
         GetContext().player2->SetGamepad(Gamepad(m_player2Joystick, GetContext().player2->GetPlayerID()));
 
-        // Pop the controller selection state and push the next state.
+        // Pop the controller selection state and push the menu.
         RequestStackPop();
         RequestStackPush(StateID::kMenu);
     }

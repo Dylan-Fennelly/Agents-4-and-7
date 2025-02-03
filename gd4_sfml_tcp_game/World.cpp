@@ -34,7 +34,7 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 
 	// === Create Player 2 ===
 	auto player2 = std::make_unique<Aircraft>(AircraftType::kAgentFour, m_textures, m_fonts);
-	player2->SetCategory(ReceiverCategories::kAlliedAircraft);
+	player2->SetCategory(ReceiverCategories::kAlliedAircraft); //We are using the categorys to control the playert
 	player2->setPosition(m_spawn_position.x + 50.f, m_spawn_position.y); // Offset right
 	m_player_aircrafts.push_back(player2.get());
 	m_scene_layers[static_cast<int>(SceneLayers::kUpperAir)]->AttachChild(std::move(player2));
@@ -46,14 +46,15 @@ void World::Update(sf::Time dt)
 	m_camera.move(0, m_scrollspeed * dt.asSeconds());
 
 	//m_player_aircraft->SetVelocity(0.f, 0.f);
-	m_enemySpawnTimer += dt;
-	if (m_enemySpawnTimer >= m_enemySpawnInterval)
-	{
-		if ((m_totalElapsed.getElapsedTime() < sf::seconds(15)))
+	
+	m_enemySpawnTimer += dt;//Track the time until the next enemy spawn
+	if (m_enemySpawnTimer >= m_enemySpawnInterval) // Time to spawn a new enemy? 
+	{												//ToDO:Check if the nesting on this if statement is correct
+		if ((m_totalElapsed.getElapsedTime() < sf::seconds(180))) //Spawm enemies for 3 minutes 
 		{
 			SpawnEnemy();
 			m_enemySpawnTimer = sf::Time::Zero;
-			// Randomize the next spawn interval (for example, between 1.5 and 3 seconds):
+			// Randomize the next spawn interval (for example, between 1.5 and 2 seconds):
 			float nextInterval = 0.75f + static_cast<float>(Utility::RandomInt(1250)) / 1000.f; // 0.75 to 2.0 seconds
 			m_enemySpawnInterval = sf::seconds(nextInterval);
 		}
@@ -62,7 +63,7 @@ void World::Update(sf::Time dt)
 
 	DestroyEntitiesOutsideView();
 	GuideMissiles();
-	GuideEnemies(dt);
+	GuideEnemies(dt); //Guide the enemies towards the players
 
 	//Forward commands to the scenegraph
 	while (!m_command_queue.IsEmpty())
@@ -73,6 +74,8 @@ void World::Update(sf::Time dt)
 
 	HandleCollisions();
 	// Remove dead players from m_player_aircrafts
+	//Dylan - This is a lambda function that removes the player from the vector if they are marked for removal it prevents an annoying bug where a pointer to a player that has been destroyed is still in the vector
+	//Chatgpt helped with the structure of this code - I've written too much c# lately and I'm getting rusty with c++
 	m_player_aircrafts.erase(
 		std::remove_if(m_player_aircrafts.begin(), m_player_aircrafts.end(),
 			[](Aircraft* player) { return player->IsMarkedForRemoval(); }),
@@ -121,9 +124,9 @@ bool World::HasAlivePlayer() const
 }
 
 
-bool World::HasPlayerReachedEnd(sf::Time dt)
+bool World::HasPlayerReachedEnd(sf::Time dt) //Check if there are any enemies left 
 {
-	if (sf::seconds(10)< m_totalElapsed.getElapsedTime())
+	if (sf::seconds(10) < m_totalElapsed.getElapsedTime()) //Give the enemy spawner some time to spawn enemies
 	{
 		Command enemyCollector;
 		enemyCollector.category = static_cast<int>(ReceiverCategories::kEnemyAircraft);
@@ -205,12 +208,6 @@ void World::BuildScene()
 	finish_sprite->setPosition(0.f, -76.f);
 	m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(finish_sprite));
 
-	////Add the player's aircraft
-	//std::unique_ptr<Aircraft> leader(new Aircraft(AircraftType::kEagle, m_textures, m_fonts));
-	//m_player_aircraft = leader.get();
-	//m_player_aircraft->setPosition(m_spawn_position);
-	//m_player_aircraft->SetVelocity(40.f, m_scrollspeed);
-	//m_scene_layers[static_cast<int>(SceneLayers::kUpperAir)]->AttachChild(std::move(leader));
 
 	//Add the particle nodes to the scene
 	std::unique_ptr<ParticleNode> smokeNode(new ParticleNode(ParticleType::kSmoke, m_textures));
@@ -226,18 +223,9 @@ void World::BuildScene()
 
 void World::AdaptPlayerPosition()
 {
-	////keep the player on the screen
-	//sf::FloatRect view_bounds(m_camera.getCenter() - m_camera.getSize() / 2.f, m_camera.getSize());
-	//const float border_distance = 40.f;
 
-	//sf::Vector2f position = m_player_aircraft->getPosition();
-	//position.x = std::max(position.x, view_bounds.left + border_distance);
-	//position.x = std::min(position.x, view_bounds.left + view_bounds.width - border_distance);
-	//position.y = std::max(position.y, view_bounds.top + border_distance);
-	//position.y = std::min(position.y, view_bounds.top + view_bounds.height -border_distance);
-	//m_player_aircraft->setPosition(position);
 
-	//we need to adapt this for the player vector
+	//we needed to adapt this for the player vector
 	for (auto& player : m_player_aircrafts)
 	{
 		sf::FloatRect view_bounds(m_camera.getCenter() - m_camera.getSize() / 2.f, m_camera.getSize());
@@ -253,14 +241,8 @@ void World::AdaptPlayerPosition()
 
 void World::AdaptPlayerVelocity()
 {
-	//sf::Vector2f velocity = m_player_aircraft->GetVelocity();
 
-	////If they are moving diagonally divide by sqrt 2
-	//if (velocity.x != 0.f && velocity.y != 0.f)
-	//{
-	//	m_player_aircraft->SetVelocity(velocity / std::sqrt(2.f));
-	//}
-	//We need to adapt this for the player vector
+	//We needed to adapt this for the player vector
 	for (auto& player : m_player_aircrafts)
 	{
 		sf::Vector2f velocity = player->GetVelocity();
@@ -270,15 +252,12 @@ void World::AdaptPlayerVelocity()
 			player->SetVelocity(velocity / std::sqrt(2.f));
 		}
 	}
-
-	//Add scrolling velocity
-//	m_player_aircraft->Accelerate(0.f, m_scrollspeed);
 }
 
 void World::SpawnEnemy()
 {
 	// Choose an enemy type at random.
-	AircraftType type = (Utility::RandomInt(2) == 0) ? AircraftType::kZombie : AircraftType::kAvenger;
+	AircraftType type = (Utility::RandomInt(2) == 0) ? AircraftType::kZombie : AircraftType::kAvenger; 
 
 	// Get the current view bounds.
 	sf::FloatRect viewBounds = GetViewBounds();
@@ -348,16 +327,12 @@ void World::SpawnEnemy()
 		toCenter /= length;
 	}
 
-	// Compute the angle (in degrees) so that the enemy faces the center.
-	// Adjust the angle if your sprite's default orientation requires it.
 	float angleRadians = std::atan2(toCenter.y, toCenter.x);
 	float angleDegrees = static_cast<float>(Utility::ToDegrees(angleRadians));
-	// If your enemy sprite is designed to face upward (0° = up) then add 90 degrees.
-	angleDegrees += 90.f;
+	angleDegrees += 90.f;//Is this necessary anymore ?
 	enemy->setRotation(angleDegrees);
 
 	// Optionally, set an initial velocity if needed. 
-	// We'll leave it at zero so that GuideEnemies() can update it later.
 	enemy->SetVelocity(0.f, 0.f);
 
 	// Attach the new enemy to the UpperAir scene layer.
@@ -384,7 +359,7 @@ sf::FloatRect World::GetBattleFieldBounds() const
 void World::DestroyEntitiesOutsideView()
 {
 	Command command;
-	command.category = static_cast<int>(ReceiverCategories::kProjectile);
+	command.category = static_cast<int>(ReceiverCategories::kProjectile); //We only want to remove strat bullets, this lets the enemies spawn off screen
 	command.action = DerivedAction<Entity>([this](Entity& e, sf::Time dt)
 		{
 			//Does the object intersect with the battlefield
@@ -396,7 +371,7 @@ void World::DestroyEntitiesOutsideView()
 	m_command_queue.Push(command);
 }
 
-void World::GuideMissiles()
+void World::GuideMissiles() //Todo: Remove this as there are no more missiles
 {
 	//Target the closest enemy in the world
 	Command enemyCollector;
@@ -441,7 +416,7 @@ void World::GuideMissiles()
 	m_command_queue.Push(missileGuider);
 	m_active_enemies.clear();
 }
-void World::GuideEnemies(sf::Time dt)
+void World::GuideEnemies(sf::Time dt) //Heavily based on the guide missile - makes the zombies fleshy missles
 {
 	// Command to adjust enemy aircraft velocities.
 	Command enemyGuideCommand;

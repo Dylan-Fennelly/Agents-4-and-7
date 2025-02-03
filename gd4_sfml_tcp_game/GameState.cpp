@@ -8,7 +8,7 @@
 GameState::GameState(StateStack& stack, Context context)
 	: State(stack, context)
 	, m_world(*context.window, *context.fonts, *context.sounds) 
-	, m_player(*context.player)
+	, m_player(*context.player) //Messy way to add the players should be a container of players
 	, m_player2(*context.player2)
 {
 	//Play the music
@@ -36,7 +36,7 @@ bool GameState::Update(sf::Time dt)
 	}
 	CommandQueue& commands = m_world.GetCommandQueue();
 	m_player.HandleRealTimeInput(commands);
-	m_player2.HandleRealTimeInput(commands);
+	m_player2.HandleRealTimeInput(commands);//Handle the second players inputs (again this should be a loop iterateing over players)
 	return true;
 }
 
@@ -44,9 +44,9 @@ bool GameState::HandleEvent(const sf::Event& event)
 {
 	CommandQueue& commands = m_world.GetCommandQueue();
 	m_player.HandleEvent(event, commands);
-	m_player2.HandleEvent(event, commands);
+	m_player2.HandleEvent(event, commands);// Handle the second players inputs (again this should be a loop iterateing over players)
 
-	//Escape should bring up the pause menu
+	//Escape should bring up the pause menu - We'll leave this in idk why button it feels right
 	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
 	{
 		RequestStackPush(StateID::kPause);

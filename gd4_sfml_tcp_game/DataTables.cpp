@@ -8,6 +8,8 @@
 #include "Aircraft.hpp"
 #include "ParticleType.hpp"
 
+  //Todo: Remove the hard-coded values and replace them with values from a file so that they can be easily changed
+
 std::vector<AircraftData> InitializeAircraftData()
 {
     std::vector<AircraftData> data(static_cast<int>(AircraftType::kAircraftCount));

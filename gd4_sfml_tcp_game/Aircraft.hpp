@@ -29,7 +29,6 @@ public:
 	void ActivateMinigun(sf::Time duration);
 
 	void UpdateTexts();
-	void UpdateMovementPattern(sf::Time dt);
 
 	float GetMaxSpeed() const;
 	void Fire();

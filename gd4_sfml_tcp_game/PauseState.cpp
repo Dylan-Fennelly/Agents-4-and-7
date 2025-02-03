@@ -1,6 +1,8 @@
 /*Albert Skalinski - D00248346
   Dylan Fennelly - D00248176*/
 
+  //todo: Rewrite this use buttons not inputs for pause and cancel
+
 #include "PauseState.hpp"
 #include "ResourceHolder.hpp"
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -64,7 +66,7 @@ bool PauseState::HandleEvent(const sf::Event& event)
             RequestStackPush(StateID::kMenu);
         }
     }
-
+    //We really should check who paused and only let them unpause
     // Handle joystick button input
     else if (event.type == sf::Event::JoystickButtonPressed)
     {
@@ -73,7 +75,7 @@ bool PauseState::HandleEvent(const sf::Event& event)
         {
             RequestStackPop();
         }
-        else if (event.joystickButton.button == gamepad.GetButton(ButtonFunction::kCancel))
+        else if (event.joystickButton.button == gamepad.GetButton(ButtonFunction::kCancel)) 
         {
             RequestStackClear();
             RequestStackPush(StateID::kMenu);

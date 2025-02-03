@@ -183,6 +183,7 @@ int Utility::Length(sf::Vector2f vector)
 {
 	return sqrtf(powf(vector.x, 2) + powf(vector.y, 2));
 }
+//Todo:Evaluate if this really should be here
 bool Utility::IsRealTimeAction(Action action)
 {
 	switch (action)

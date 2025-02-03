@@ -20,6 +20,7 @@ struct AircraftMover
 
     sf::Vector2f velocity;
 };
+//This struct is used to rotate the aircraft
 struct AircraftRotator
 {
     AircraftRotator(float angle) : rotation_angle(angle) {}
@@ -37,9 +38,7 @@ Player::Player()
     : m_player_id(++m_player_count) // Assign player ID
     , m_current_mission_status(MissionStatus::kMissionRunning)
 	, m_gamepad(0,0)
-{
-    //Set initial action bindings
-    /*InitialiseActions();*/
+{ //We now longer initalise actions on construction as we dont have a joystick id yet
 }
 
 void Player::HandleEvent(const sf::Event& event, CommandQueue& command_queue)
@@ -122,10 +121,11 @@ void Player::InitialiseActions()
     m_gamepad.AssignAction(Action::kBulletFire, ButtonFunction::kConfirm);
 
     // Missile Fire
-    Command fireMissile;
+    /*Command fireMissile;
     fireMissile.action = DerivedAction<Aircraft>([](Aircraft& a, sf::Time) { a.LaunchMissile(); });
-    fireMissile.category = static_cast<unsigned int>((m_player_id == 1) ? ReceiverCategories::kPlayerAircraft : ReceiverCategories::kAlliedAircraft);
-    m_gamepad.AssignCommand(Action::kMissileFire, fireMissile);
+    fireMissile.category = static_cast<unsigned int>((m_player_id == 1) ? ReceiverCategories::kPlayerAircraft : ReceiverCategories::kAlliedAircraft);*/
+	//Maybe someday the agents will get missile launchers, but not today.
+    m_gamepad.AssignCommand(Action::kMissileFire, Command());
     m_gamepad.AssignAction(Action::kMissileFire, ButtonFunction::kCancel);
 
 	//Assigning pause to prevent an issue where pause will take a random button if there is no match

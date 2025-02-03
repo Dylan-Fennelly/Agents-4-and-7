@@ -6,29 +6,8 @@
 #include <iostream>
 #include "Application.hpp"
 
-//We dont need this anymore as the title state handles assigning a joystick to the player class, it will oc
- unsigned int DetectJoystick()
-{
-	 sf::Joystick::update();//Because we dont have a window at this statge we need to manually update to get the default id for the joystick
-	for (unsigned int i = 0; i < sf::Joystick::Count; ++i)
-	{
-		if (sf::Joystick::isConnected(i))
-		{
-			std::cout << "Joystick " << i << " is connected!" << std::endl;
-			sf::Joystick::Identification id = sf::Joystick::getIdentification(i);
-			std::cout << " - Name: " << id.name.toAnsiString() << std::endl;
-			std::cout << " - Vendor ID: " << id.vendorId << std::endl;
-			std::cout << " - Product ID: " << id.productId << std::endl;
-			std::cout << " - Button Count: " << sf::Joystick::getButtonCount(i) << std::endl;
-			return i;
-		}
-	}
-	return -1;
-}
 int main()
 {
-	//int joystick_id = DetectJoystick();
-	//TextureHolder game_textures;
 	try
 	{
 		Application app;
@@ -39,6 +18,8 @@ int main()
 		std::cout << e.what() << std::endl;
 	}
 }
+
+//The Below is a test for joystick input
 //
 //#include <SFML/Graphics.hpp>
 //#include <SFML/Window.hpp>

@@ -109,7 +109,6 @@ void SettingsState::UpdateLabels()
         // Get the mapped joystick button number from the gamepad
         unsigned int buttonNumber1 = player.GetGamepad().GetButton(function);
 		unsigned int buttonNumber2 = player2.GetGamepad().GetButton(function);
-        // Convert that to a string (you might have a helper to convert numbers to a nicer string)
         std::string buttonString = "P1:"+std::to_string(buttonNumber1) +"\tP2:" +std::to_string(buttonNumber2);
         // Update the label text accordingly
         m_binding_labels[i]->SetText(buttonString);

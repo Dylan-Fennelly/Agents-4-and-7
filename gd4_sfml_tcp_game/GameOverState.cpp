@@ -20,12 +20,12 @@ GameOverState::GameOverState(StateStack& stack, Context context)
     if (context.player->GetMissionStatus() == MissionStatus::kMissionSuccess)
     {
         context.music->Play(MusicThemes::kGameWonTheme);
-        m_game_over_text.setString("Mission Success");
+        m_game_over_text.setString("You Survived!");
     }
     else
     {
         context.music->Play(MusicThemes::kGameOverTheme);
-        m_game_over_text.setString("Mission Failure");
+        m_game_over_text.setString("You Died....");
     }
 
     m_game_over_text.setCharacterSize(70);

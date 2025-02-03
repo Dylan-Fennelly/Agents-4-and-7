@@ -83,10 +83,18 @@ private:
 	std::vector<SpawnPoint> m_enemy_spawn_points;
 	std::vector<Aircraft*> m_active_enemies;
 
-	// New member variables for enemy spawning
-	sf::Time m_enemySpawnTimer;     // Accumulated time since the last enemy spawn
-	sf::Time m_enemySpawnInterval;  // Randomized interval between spawns
-	sf::Clock m_totalElapsed;// Total time elapsed since the game started
+	/// <summary>
+	/// Accumulated time since the last enemy spawn
+	/// </summary>
+	sf::Time m_enemySpawnTimer;
+	/// <summary>
+	/// Randomized interval between spawns
+	/// </summary>
+	sf::Time m_enemySpawnInterval;
+	/// <summary>
+	/// Clock to track the total elapsed time
+	/// </summary>
+	sf::Clock m_totalElapsed;
 
 	BloomEffect m_bloom_effect;
 };

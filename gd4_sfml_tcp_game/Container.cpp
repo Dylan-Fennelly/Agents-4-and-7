@@ -28,6 +28,7 @@ bool gui::Container::IsSelectable() const
 {
     return false;
 }
+//ToDO:Consider passing the statestack, that way we can use the canel button to leave a menu
 
 void gui::Container::HandleEvent(const sf::Event& event)
 {
@@ -43,8 +44,11 @@ void gui::Container::HandleEvent(const sf::Event& event)
     {
         HandleJoystickNavigation(event);
     }
+
+	//Here we check if the event is a button press
     else if (event.type == sf::Event::JoystickButtonPressed)
     {
+		//Make sure the right player is pressing the right button
         if (event.joystickButton.joystickId == GetContext().player->GetGamepad().GetJoystickId())
         {
             if (event.joystickButton.button == GetContext().player->GetGamepad().GetButton(ButtonFunction::kConfirm))
