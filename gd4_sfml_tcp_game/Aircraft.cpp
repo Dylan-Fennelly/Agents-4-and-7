@@ -126,7 +126,7 @@ unsigned int Aircraft::GetCategory() const
 {
 	if (IsAllied())
 	{
-		return static_cast<unsigned int>(SceneNode::GetCategory()); //Modifyied the SceneNode to return the category
+		return static_cast<unsigned int>(ReceiverCategories::kPlayerAircraft);
 	}
 	return static_cast<unsigned int>(ReceiverCategories::kEnemyAircraft);
 

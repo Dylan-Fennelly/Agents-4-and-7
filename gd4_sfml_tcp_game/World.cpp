@@ -28,19 +28,19 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 	LoadTextures();
 	BuildScene();
 	m_camera.setCenter(m_spawn_position);
-	// === Create Player 1 ===
-	auto player1 = std::make_unique<Aircraft>(AircraftType::kAgentFour, m_textures, m_fonts);
-	player1->SetCategory(ReceiverCategories::kPlayerAircraft);
-	player1->setPosition(m_spawn_position.x - 50.f, m_spawn_position.y); // Offset left
-	m_player_aircrafts.push_back(player1.get());
-	m_scene_layers[static_cast<int>(SceneLayers::kUpperAir)]->AttachChild(std::move(player1));
+	//// === Create Player 1 ===
+	//auto player1 = std::make_unique<Aircraft>(AircraftType::kAgentFour, m_textures, m_fonts);
+	//player1->SetCategory(ReceiverCategories::kPlayerAircraft);
+	//player1->setPosition(m_spawn_position.x - 50.f, m_spawn_position.y); // Offset left
+	//m_player_aircrafts.push_back(player1.get());
+	//m_scene_layers[static_cast<int>(SceneLayers::kUpperAir)]->AttachChild(std::move(player1));
 
-	// === Create Player 2 ===
-	auto player2 = std::make_unique<Aircraft>(AircraftType::kAgentFour, m_textures, m_fonts);
-	player2->SetCategory(ReceiverCategories::kAlliedAircraft); //We are using the categorys to control the playert
-	player2->setPosition(m_spawn_position.x + 50.f, m_spawn_position.y); // Offset right
-	m_player_aircrafts.push_back(player2.get());
-	m_scene_layers[static_cast<int>(SceneLayers::kUpperAir)]->AttachChild(std::move(player2));
+	//// === Create Player 2 ===
+	//auto player2 = std::make_unique<Aircraft>(AircraftType::kAgentFour, m_textures, m_fonts);
+	//player2->SetCategory(ReceiverCategories::kAlliedAircraft); //We are using the categorys to control the playert
+	//player2->setPosition(m_spawn_position.x + 50.f, m_spawn_position.y); // Offset right
+	//m_player_aircrafts.push_back(player2.get());
+	//m_scene_layers[static_cast<int>(SceneLayers::kUpperAir)]->AttachChild(std::move(player2));
 }
 
 void World::Update(sf::Time dt)

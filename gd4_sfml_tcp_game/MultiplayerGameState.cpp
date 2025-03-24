@@ -166,7 +166,7 @@ bool MultiplayerGameState::Update(sf::Time dt)
 			CommandQueue& commands = m_world.GetCommandQueue();
 			for (auto& pair : m_players)
 			{
-				pair.second->HandleRealTimeInput(commands);
+				pair.second->HandleRealtimeInput(commands);
 			}
 		}
 

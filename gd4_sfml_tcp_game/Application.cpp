@@ -8,7 +8,7 @@
 #include "PauseState.hpp"
 #include "SettingsState.hpp"
 #include "GameOverState.hpp"
-#include "ControllerSelectState.hpp"
+//#include "ControllerSelectState.hpp"
 #include "MultiplayerGameState.hpp"
 
 const sf::Time Application::kTimePerFrame = sf::seconds(1.f/60.f);
