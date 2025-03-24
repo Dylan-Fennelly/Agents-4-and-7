@@ -7,7 +7,7 @@
 #include "ParticleNode.hpp"
 #include "SoundNode.hpp"
 
-World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sounds)
+World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sounds, bool networked)
 	:m_target(output_target)
 	, m_camera(output_target.getDefaultView())
 	, m_textures()
@@ -15,11 +15,14 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 	, m_sounds(sounds)
 	, m_scenegraph(ReceiverCategories::kNone)
 	, m_scene_layers()
-	, m_world_bounds(0.f, 0.f, m_camera.getSize().x, 3000.f)
+	, m_world_bounds(0.f, 0.f, m_camera.getSize().x, 5000.f)
 	, m_spawn_position(m_camera.getSize().x / 2.f, m_world_bounds.height - m_camera.getSize().y / 2.f)
 	, m_scrollspeed(0.f)
 	, m_enemySpawnTimer(sf::Time::Zero)
 	, m_enemySpawnInterval(sf::seconds(2.f)) // Initial spawn interval; will be randomized after each spawn.
+	, m_player_aircrafts()
+	, m_networked_world(networked)
+	, m_network_node(nullptr)
 {
 	m_scene_texture.create(m_target.getSize().x, m_target.getSize().y);
 	LoadTextures();
@@ -45,7 +48,6 @@ void World::Update(sf::Time dt)
 	//Scroll the world
 	m_camera.move(0, m_scrollspeed * dt.asSeconds());
 
-	//m_player_aircraft->SetVelocity(0.f, 0.f);
 	
 	m_enemySpawnTimer += dt;//Track the time until the next enemy spawn
 	if (m_enemySpawnTimer >= m_enemySpawnInterval) // Time to spawn a new enemy? 
@@ -76,16 +78,20 @@ void World::Update(sf::Time dt)
 	// Remove dead players from m_player_aircrafts
 	//Dylan - This is a lambda function that removes the player from the vector if they are marked for removal it prevents an annoying bug where a pointer to a player that has been destroyed is still in the vector
 	//Chatgpt helped with the structure of this code - I've written too much c# lately and I'm getting rusty with c++
-	m_player_aircrafts.erase(
+	/*m_player_aircrafts.erase(
 		std::remove_if(m_player_aircrafts.begin(), m_player_aircrafts.end(),
 			[](Aircraft* player) { return player->IsMarkedForRemoval(); }),
-		m_player_aircrafts.end());
+		m_player_aircrafts.end());*/
+
+	auto first_to_remove = std::remove_if(m_player_aircrafts.begin(), m_player_aircrafts.end(), std::mem_fn(&Aircraft::IsMarkedForRemoval));
+	m_player_aircrafts.erase(first_to_remove, m_player_aircrafts.end());
 
 	m_scenegraph.RemoveWrecks();
 
 
 	m_scenegraph.Update(dt, m_command_queue);
 	AdaptPlayerPosition();
+	UpdateSounds();
 }
 
 void World::Draw()
@@ -105,6 +111,63 @@ void World::Draw()
 	}
 }
 
+Aircraft* World::GetAircraft(int identifier) const
+{
+	for (Aircraft* a : m_player_aircrafts)
+	{
+		if (a->GetIdentifier() == identifier)
+		{
+			return a;
+		}
+	}
+	return nullptr;
+}
+
+void World::RemoveAircraft(int identifier)
+{
+	Aircraft* aircraft = GetAircraft(identifier);
+	if (aircraft)
+	{
+		aircraft->Destroy();
+		m_player_aircrafts.erase(std::find(m_player_aircrafts.begin(), m_player_aircrafts.end(), aircraft));
+	}
+}
+
+Aircraft* World::AddAircraft(int identifier)
+{
+	std::unique_ptr<Aircraft> player(new Aircraft(AircraftType::kEagle, m_textures, m_fonts));
+	player->setPosition(m_camera.getCenter());
+	player->SetIdentifier(identifier);
+
+	m_player_aircrafts.emplace_back(player.get());
+	m_scene_layers[static_cast<int>(SceneLayers::kUpperAir)]->AttachChild(std::move(player));
+	return m_player_aircrafts.back();
+}
+
+void World::CreatePickup(sf::Vector2f position, PickupType type)
+{
+	std::unique_ptr<Pickup> pickup(new Pickup(type, m_textures));
+	pickup->setPosition(position);
+	pickup->SetVelocity(0.f, 1.f);
+	m_scene_layers[static_cast<int>(SceneLayers::kUpperAir)]->AttachChild(std::move(pickup));
+}
+
+bool World::PollGameAction(GameActions::Action& out)
+{
+	return m_network_node->PollGameAction(out);
+}
+
+void World::SetCurrentBattleFieldPosition(float lineY)
+{
+	m_camera.setCenter(m_camera.getCenter().x, lineY - m_camera.getSize().y / 2);
+	m_spawn_position.y = m_world_bounds.height;
+}
+
+void World::SetWorldHeight(float height)
+{
+	m_world_bounds.height = height;
+}
+
 CommandQueue& World::GetCommandQueue()
 {
 	return m_command_queue;
@@ -112,15 +175,7 @@ CommandQueue& World::GetCommandQueue()
 
 bool World::HasAlivePlayer() const
 {
-	if (!m_player_aircrafts.empty())
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-
+	return !m_player_aircrafts.empty();
 }
 
 
@@ -145,11 +200,7 @@ bool World::HasPlayerReachedEnd(sf::Time dt) //Check if there are any enemies le
 		{
 			return false;
 		}
-
 	}
-
-
-
 }
 
 void World::LoadTextures()
