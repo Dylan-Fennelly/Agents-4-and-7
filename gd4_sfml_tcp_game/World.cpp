@@ -135,7 +135,7 @@ void World::RemoveAircraft(int identifier)
 
 Aircraft* World::AddAircraft(int identifier)
 {
-	std::unique_ptr<Aircraft> player(new Aircraft(AircraftType::kEagle, m_textures, m_fonts));
+	std::unique_ptr<Aircraft> player(new Aircraft(AircraftType::kAgentFour, m_textures, m_fonts));
 	player->setPosition(m_camera.getCenter());
 	player->SetIdentifier(identifier);
 

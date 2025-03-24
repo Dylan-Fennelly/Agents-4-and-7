@@ -3,6 +3,7 @@
 
 #pragma once
 #include <SFML/Graphics/RenderWindow.hpp>
+#include "KeyBinding.hpp"
 #include "Player.hpp"
 #include "ResourceHolder.hpp"
 #include "ResourceIdentifiers.hpp"
