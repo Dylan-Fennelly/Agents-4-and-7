@@ -18,6 +18,10 @@ public:
 	Aircraft(AircraftType type, const TextureHolder& textures, const FontHolder& fonts);
 	unsigned int GetCategory() const override;
 
+	void DisablePickups();
+	int GetIdentifier();
+	void SetIdentifier(int identifier);
+
 	void IncreaseFireRate();
 	void CollectMissile(unsigned int count);
 	
@@ -39,6 +43,7 @@ public:
 
 	sf::FloatRect GetBoundingRect() const override;
 	bool IsMarkedForRemoval() const override;
+	void Remove() override;
 	void PlayLocalSound(CommandQueue& commands, SoundEffect effect);
 	
 
@@ -78,8 +83,11 @@ private:
 
 	bool m_is_marked_for_removal;
 	bool m_show_explosion;
+	bool m_explosion_began;
 	bool m_spawned_pickup;
-	bool m_played_explosion_sound;
+	bool m_pickups_enabled;
+
+	int m_identifier;
 
 	//Added by Albert
 	bool m_is_invincible;
