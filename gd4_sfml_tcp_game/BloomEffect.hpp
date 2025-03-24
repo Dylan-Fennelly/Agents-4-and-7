@@ -17,7 +17,7 @@ class BloomEffect : public PostEffect
 public:
 	BloomEffect();
 
-	virtual void Apply(const sf::RenderTexture& input, sf::RenderTarget& output);
+	virtual void Apply(const sf::RenderTexture& input, sf::RenderTarget& output) override;
 
 
 private:

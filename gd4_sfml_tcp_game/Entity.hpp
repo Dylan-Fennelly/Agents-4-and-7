@@ -16,12 +16,14 @@ public:
 	void Accelerate(float vx, float vy);
 
 	int GetHitPoints() const;
+	void SetHitpoints(int points);
 	void Repair(int points);
 	//Added by Albert
 	//I made the Damage function virtual so that it can be overridden by the Aircraft class
 	virtual void Damage(int points);
 	void Destroy();
 	virtual bool IsDestroyed() const override;
+	virtual void Remove();
 
 	virtual void UpdateCurrent(sf::Time dt, CommandQueue& commands);
 	
