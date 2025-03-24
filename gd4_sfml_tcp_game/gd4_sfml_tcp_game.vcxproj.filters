@@ -123,12 +123,6 @@
     <ClCompile Include="SoundNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Gamepad.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ControllerSelectState.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GameServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -311,16 +305,10 @@
     <ClInclude Include="SoundNode.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Gamepad.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ControllerType.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ButtonFunction.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ControllerSelectState.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NetworkProtocol.hpp">

@@ -1,17 +1,7 @@
-/*Albert Skalinski - D00248346
-  Dylan Fennelly - D00248176*/
-
 #include "Container.hpp"
-#include "Player.hpp"
-#include "ButtonFunction.hpp"
-//Because we dont have access to the player class we are not able to access the gamepad class - this makes it impossible to get the joystick id from the player class
-//We need to add a context to the container class so that we can get the joystick id from the context
 
-
-gui::Container::Container(State::Context context)
-    : m_selected_child(-1), 
-    m_last_joystick_move_time(sf::Time::Zero)
-	, m_context(context)
+gui::Container::Container()
+    :m_selected_child(-1)
 {
 }
 
@@ -19,7 +9,7 @@ void gui::Container::Pack(Component::Ptr component)
 {
     m_children.emplace_back(component);
     if (!HasSelection() && component->IsSelectable())
-    { 
+    {
         Select(m_children.size() - 1);
     }
 }
@@ -28,76 +18,29 @@ bool gui::Container::IsSelectable() const
 {
     return false;
 }
-//ToDO:Consider passing the statestack, that way we can use the canel button to leave a menu
 
 void gui::Container::HandleEvent(const sf::Event& event)
 {
-    // If a child is active, forward the event
     if (HasSelection() && m_children[m_selected_child]->IsActive())
     {
         m_children[m_selected_child]->HandleEvent(event);
-        return;
     }
-
-
-    if (event.type == sf::Event::JoystickMoved)
+    else if (event.type == sf::Event::KeyReleased)
     {
-        HandleJoystickNavigation(event);
-    }
-
-	//Here we check if the event is a button press
-    else if (event.type == sf::Event::JoystickButtonPressed)
-    {
-		//Make sure the right player is pressing the right button
-        if (event.joystickButton.joystickId == GetContext().player->GetGamepad().GetJoystickId())
-        {
-            if (event.joystickButton.button == GetContext().player->GetGamepad().GetButton(ButtonFunction::kConfirm))
-            {
-                if (HasSelection())
-                {
-                    m_children[m_selected_child]->Activate();
-                }
-            }
-        }
-        else if (event.joystickButton.joystickId == GetContext().player2->GetGamepad().GetJoystickId())
-        {
-            if (event.joystickButton.button == GetContext().player2->GetGamepad().GetButton(ButtonFunction::kConfirm))
-            {
-                if (HasSelection())
-                {
-                    m_children[m_selected_child]->Activate();
-                }
-            }
-        }
-
-    }
-}
-
-State::Context gui::Container::GetContext() const
-{
-	return m_context;
-}
-//Todo: this needs to be passed off the gamepad class
-void gui::Container::HandleJoystickNavigation(const sf::Event& event)
-{
-    constexpr float threshold = 50.f; // Deadzone threshold to prevent accidental movement
-    sf::Time delay = sf::milliseconds(200); // Delay between navigation changes
-
-    if (event.joystickMove.axis == sf::Joystick::PovX || event.joystickMove.axis == sf::Joystick::Y)
-    {
-        sf::Time now = m_clock.getElapsedTime();
-        if (now - m_last_joystick_move_time < delay)
-            return; // Prevent rapid switching
-
-        if (event.joystickMove.position < -threshold) // Up
+        if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::Up)
         {
             SelectPrevious();
-            m_last_joystick_move_time = now;
         }
-        else if (event.joystickMove.position > threshold) // Down
+        else if (event.key.code == sf::Keyboard::S || event.key.code == sf::Keyboard::Down)
         {
             SelectNext();
-            m_last_joystick_move_time = now;
+        }
+        else if (event.key.code == sf::Keyboard::Return || event.key.code == sf::Keyboard::Space)
+        {
+            if (HasSelection())
+            {
+                m_children[m_selected_child]->Activate();
+            }
         }
     }
 }
@@ -135,6 +78,7 @@ void gui::Container::SelectNext()
     {
         return;
     }
+    //Search for the next selectable component
     int next = m_selected_child;
     do
     {

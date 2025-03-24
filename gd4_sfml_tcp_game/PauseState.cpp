@@ -14,7 +14,7 @@
 PauseState::PauseState(StateStack& stack, Context context, bool lets_updates_through)
     :State(stack, context)
     , m_lets_updates_through(lets_updates_through)
-	, m_gui_container(context)
+	, m_gui_container()
 {
     sf::Font& font = context.fonts->Get(Font::kMain);
     sf::Vector2f view_size = context.window->getView().getSize();

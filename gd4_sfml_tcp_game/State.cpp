@@ -1,18 +1,9 @@
-/*Albert Skalinski - D00248346
-  Dylan Fennelly - D00248176*/
-
 #include "State.hpp"
 #include "StateID.hpp"
 #include "StateStack.hpp"
 
-State::Context::Context(sf::RenderWindow& window, TextureHolder& textures, FontHolder& fonts, Player& player, Player& player2, MusicPlayer& music, SoundPlayer& sounds) 
-    : window(&window)
-    , textures(&textures)
-    , fonts(&fonts)
-    , player(&player)
-	, player2(&player2)
-    , music(&music)
-    , sounds(&sounds)
+State::Context::Context(sf::RenderWindow& window, TextureHolder& textures, FontHolder& fonts, MusicPlayer& music, SoundPlayer& sounds, KeyBinding& keys1, KeyBinding& keys2) : window(&window), textures(&textures), fonts(&fonts), music(&music), sounds(&sounds), keys1(&keys1)
+, keys2(&keys2)
 {
 }
 
@@ -42,4 +33,14 @@ void State::RequestStackClear()
 State::Context State::GetContext() const
 {
     return m_context;
+}
+
+void State::OnActivate()
+{
+
+}
+
+void State::OnDestroy()
+{
+
 }

@@ -94,7 +94,7 @@ MultiplayerGameState::MultiplayerGameState(StateStack& stack, Context context, b
 	m_socket.setBlocking(false);
 
 	//Play the game music
-	context.music->Play(MusicThemes::kMissionTheme);
+	context.music->Play(MusicThemes::kGameplayTheme);
 }
 
 void MultiplayerGameState::Draw()
@@ -166,7 +166,7 @@ bool MultiplayerGameState::Update(sf::Time dt)
 			CommandQueue& commands = m_world.GetCommandQueue();
 			for (auto& pair : m_players)
 			{
-				pair.second->HandleRealtimeInput(commands);
+				pair.second->HandleRealTimeInput(commands);
 			}
 		}
 
@@ -232,7 +232,7 @@ bool MultiplayerGameState::Update(sf::Time dt)
 			{
 				if (Aircraft* aircraft = m_world.GetAircraft(identifier))
 				{
-					position_update_packet << identifier << aircraft->getPosition().x << aircraft->getPosition().y << static_cast<sf::Int32>(aircraft->GetHitPoints()) << static_cast<sf::Int32>(aircraft->GetMissileAmmo());
+					position_update_packet << identifier << aircraft->getPosition().x << aircraft->getPosition().y << static_cast<sf::Int32>(aircraft->GetHitPoints()) << static_cast<sf::Int32>(0);
 				}
 			}
 			m_socket.send(position_update_packet);
@@ -414,7 +414,6 @@ void MultiplayerGameState::HandlePacket(sf::Int32 packet_type, sf::Packet& packe
 			Aircraft* aircraft = m_world.AddAircraft(aircraft_identifier);
 			aircraft->setPosition(aircraft_position);
 			aircraft->SetHitpoints(hitpoints);
-			aircraft->SetMissileAmmo(missile_ammo);
 
 			m_players[aircraft_identifier].reset(new Player(&m_socket, aircraft_identifier, nullptr));
 		}
@@ -471,8 +470,8 @@ void MultiplayerGameState::HandlePacket(sf::Int32 packet_type, sf::Packet& packe
 		float relative_x;
 		packet >> type >> height >> relative_x;
 
-		m_world.AddEnemy(static_cast<AircraftType>(type), relative_x, height);
-		m_world.SortEnemies();
+		//m_world.AddEnemy(static_cast<AircraftType>(type), relative_x, height);
+		//m_world.SortEnemies();
 	}
 	break;
 
@@ -502,7 +501,7 @@ void MultiplayerGameState::HandlePacket(sf::Int32 packet_type, sf::Packet& packe
 		float current_view_position = m_world.GetViewBounds().top + m_world.GetViewBounds().height;
 
 		//Set the world's scroll compensation according to whether the view is behind or ahead
-		m_world.SetWorldScrollCompensation(current_view_position / current_world_position);
+		//m_world.SetWorldScrollCompensation(current_view_position / current_world_position);
 
 		for (sf::Int32 i = 0; i < aircraft_count; ++i)
 		{
@@ -519,7 +518,6 @@ void MultiplayerGameState::HandlePacket(sf::Int32 packet_type, sf::Packet& packe
 				sf::Vector2f interpolated_position = aircraft->getPosition() + (aircraft_position - aircraft->getPosition()) * 0.1f;
 				aircraft->setPosition(interpolated_position);
 				aircraft->SetHitpoints(hitpoints);
-				aircraft->SetMissileAmmo(ammo);
 			}
 		}
 	}
