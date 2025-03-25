@@ -254,11 +254,11 @@ bool MultiplayerGameState::HandleEvent(const sf::Event& event)
 {
 	//Game input handling
 	CommandQueue& commands = m_world.GetCommandQueue();
-
+	sf::View view = m_world.GetCamera();
 	//Forward events to all players
 	for (auto& pair : m_players)
 	{
-		pair.second->HandleEvent(event, commands);
+		pair.second->HandleEvent(event, commands , m_window , view);
 	}
 
 	if (event.type == sf::Event::KeyPressed)

@@ -40,6 +40,7 @@ public:
 	void CreateBullet(SceneNode& node, const TextureHolder& textures) const;
 	void CreateProjectile(SceneNode& node, ProjectileType type, float x_float, float y_offset, const TextureHolder& textures) const;
 	void SetRotation(float angle);
+	float GetRotation() const;
 
 	sf::FloatRect GetBoundingRect() const override;
 	bool IsMarkedForRemoval() const override;
@@ -88,6 +89,8 @@ private:
 	bool m_pickups_enabled;
 
 	int m_identifier;
+
+	float m_rotation;
 
 	//Added by Albert
 	bool m_is_invincible;

@@ -48,7 +48,9 @@ sf::Keyboard::Key KeyBinding::GetAssignedKey(Action action) const
 	for (auto pair : m_key_map)
 	{
 		if (pair.second == action)
+		{
 			return pair.first;
+		}
 	}
 
 	return sf::Keyboard::Unknown;
@@ -77,7 +79,10 @@ std::vector<Action> KeyBinding::GetRealtimeActions() const
 	{
 		// If key is pressed and an action is a realtime action, store it
 		if (sf::Keyboard::isKeyPressed(pair.first) && IsRealtimeAction(pair.second))
+		{
 			actions.push_back(pair.second);
+		}
+			
 	}
 
 	return actions;

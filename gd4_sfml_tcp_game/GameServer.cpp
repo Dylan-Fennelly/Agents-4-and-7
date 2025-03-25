@@ -242,6 +242,12 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
 
     switch (static_cast<Client::PacketType> (packet_type))
     {
+
+	case Client::PacketType::kRotationUpdate:
+    {
+
+    }
+    break;
     case Client::PacketType::kQuit:
     {
         receiving_peer.m_timed_out = true;

@@ -11,6 +11,7 @@
 #include "Pickup.hpp"
 #include "SoundNode.hpp"
 #include "NetworkNode.hpp"
+#include <iostream>
 
 namespace
 {
@@ -55,6 +56,7 @@ Aircraft::Aircraft(AircraftType type, const TextureHolder& textures, const FontH
 	, m_spawned_pickup(false)
 	, m_pickups_enabled(true)
 	, m_identifier(0)
+	, m_rotation(0.f)
 
 
 
@@ -277,8 +279,15 @@ void Aircraft::CreateProjectile(SceneNode& node, ProjectileType type, float x_of
 
 void Aircraft::SetRotation(float angle)
 {
+	//m_rotation = angle;
+	//std::cout << "Rotation: " << angle << std::endl;
 	setRotation(angle); //We rotate using the entity class
 	m_sprite.setRotation(0); //Set the rotation of the sprite to 0 so we dont have the sprite the wrong way
+}
+
+float Aircraft::GetRotation() const
+{
+	return 0.0f;
 }
 
 sf::FloatRect Aircraft::GetBoundingRect() const
