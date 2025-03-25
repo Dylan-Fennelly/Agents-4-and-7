@@ -420,6 +420,20 @@ void MultiplayerGameState::HandlePacket(sf::Int32 packet_type, sf::Packet& packe
 	}
 	break;
 
+	case Server::PacketType::kRotationUpdate:
+	{
+		sf::Int32 aircraft_identifier;
+		float rotation;
+		packet >> aircraft_identifier >> rotation;
+
+		Aircraft* aircraft = m_world.GetAircraft(aircraft_identifier);
+		if (aircraft)
+		{
+			aircraft->SetRotation(rotation);
+		}
+	}
+	break;
+
 	case Server::PacketType::kAcceptCoopPartner:
 	{
 		sf::Int32 aircraft_identifier;

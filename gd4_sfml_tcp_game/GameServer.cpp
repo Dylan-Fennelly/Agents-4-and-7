@@ -245,7 +245,15 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
 
 	case Client::PacketType::kRotationUpdate:
     {
+        sf::Int32 aircraft_identifier;
+		float angle;
+		packet >> aircraft_identifier >> angle;
 
+        sf::Packet update;
+		update << static_cast<sf::Int32>(Server::PacketType::kRotationUpdate);
+		update << aircraft_identifier;
+		update << angle;
+		SendToAll(update);
     }
     break;
     case Client::PacketType::kQuit:
@@ -259,8 +267,7 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
     {
         sf::Int32 aircraft_identifier;
         sf::Int32 action;
-        packet >> aircraft_identifier >> action;
-        NotifyPlayerEvent(aircraft_identifier, action);
+        
     }
     break;
 
