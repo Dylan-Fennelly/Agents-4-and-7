@@ -173,57 +173,58 @@ void GameServer::Tick()
     {
         std::size_t enemy_count = 1;
 
-        // Get the current view bounds.
         sf::FloatRect viewBounds = GetViewBounds();
-        // Define a margin to spawn outside the view.
         float margin = 50.f;
 
-        // Determine a random side (0: top, 1: bottom, 2: left, 3: right)
+        // Expand the bounds to include the margin
+        viewBounds.left -= margin;
+        viewBounds.top -= margin;
+        viewBounds.width += 2 * margin;
+        viewBounds.height += 2 * margin;
+
+        // Determine a random side
         int side = Utility::RandomInt(4);
 
         sf::Vector2f spawnPos;
         switch (side)
         {
-        case 0: // Top: spawn at a random x within view (plus margin) and above the view.
-        {
-            int minX = static_cast<int>(viewBounds.left + margin);
-            int maxX = static_cast<int>(viewBounds.left + viewBounds.width - margin);
-            float x = static_cast<float>(minX + Utility::RandomInt(maxX - minX));
-            float y = viewBounds.top - margin;
-            spawnPos = sf::Vector2f(x, y);
+        case 0: // Top
+            spawnPos.x = viewBounds.left + Utility::RandomInt(static_cast<int>(viewBounds.width));
+            spawnPos.y = viewBounds.top - margin;
             break;
-        }
-        case 1: // Bottom: spawn at a random x within view (plus margin) and below the view.
-        {
-            int minX = static_cast<int>(viewBounds.left + margin);
-            int maxX = static_cast<int>(viewBounds.left + viewBounds.width - margin);
-            float x = static_cast<float>(minX + Utility::RandomInt(maxX - minX));
-            float y = viewBounds.top + viewBounds.height + margin;
-            spawnPos = sf::Vector2f(x, y);
+        case 1: // Bottom
+            spawnPos.x = viewBounds.left + Utility::RandomInt(static_cast<int>(viewBounds.width));
+            spawnPos.y = viewBounds.top + viewBounds.height + margin;
             break;
-        }
-        case 2: // Left: spawn at a random y within view (plus margin) and to the left of the view.
-        {
-            int minY = static_cast<int>(viewBounds.top + margin);
-            int maxY = static_cast<int>(viewBounds.top + viewBounds.height - margin);
-            float y = static_cast<float>(minY + Utility::RandomInt(maxY - minY));
-            float x = viewBounds.left - margin;
-            spawnPos = sf::Vector2f(x, y);
+        case 2: // Left
+            spawnPos.x = viewBounds.left - margin;
+            spawnPos.y = viewBounds.top + Utility::RandomInt(static_cast<int>(viewBounds.height));
             break;
-        }
-        case 3: // Right: spawn at a random y within view (plus margin) and to the right of the view.
-        {
-            int minY = static_cast<int>(viewBounds.top + margin);
-            int maxY = static_cast<int>(viewBounds.top + viewBounds.height - margin);
-            float y = static_cast<float>(minY + Utility::RandomInt(maxY - minY));
-            float x = viewBounds.left + viewBounds.width + margin;
-            spawnPos = sf::Vector2f(x, y);
+        case 3: // Right
+            spawnPos.x = viewBounds.left + viewBounds.width + margin;
+            spawnPos.y = viewBounds.top + Utility::RandomInt(static_cast<int>(viewBounds.height));
             break;
-        }
         default:
-            // Default to top if something goes wrong.
             spawnPos = sf::Vector2f(viewBounds.left + viewBounds.width / 2.f, viewBounds.top - margin);
             break;
+        }
+
+        std::cout << "Spawn Position: (" << spawnPos.x << ", " << spawnPos.y << "), Side: " << side << "\n";
+
+        //Send the spawn packets to the clients
+        for (std::size_t i = 0; i < enemy_count; ++i)
+        {
+            sf::Packet packet;
+            packet << static_cast<sf::Int32>(Server::PacketType::kSpawnEnemy);
+            packet << static_cast<sf::Int32>(1 + Utility::RandomInt(static_cast<int>(AircraftType::kAircraftCount) - 1));
+
+            packet << spawnPos.x;
+            packet << spawnPos.y;
+
+            std::cout << "Sending enemy spawn packet: Type=" << 1 + Utility::RandomInt(static_cast<int>(AircraftType::kAircraftCount) - 1)
+                << ", Position=(" << spawnPos.x << ", " << spawnPos.y << ")\n";
+
+            SendToAll(packet);
         }
 
         m_last_spawn_time = Now();
