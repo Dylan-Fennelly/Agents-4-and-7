@@ -9,15 +9,18 @@
 #include <memory>
 #include <string>
 #include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics.hpp>
+
 
 class GameServer
 {
 public:
-	explicit GameServer(sf::Vector2f battlefield_size);
+	explicit GameServer(sf::Vector2f battlefield_size, sf::RenderTarget& target);
 	~GameServer();
 	void NotifyPlayerSpawn(sf::Int32 aircraft_identifier);
 	void NotifyPlayerRealtimeChange(sf::Int32 aircraft_identifier, sf::Int32 action, bool action_enabled);
 	void NotifyPlayerEvent(sf::Int32 aircraft_identifier, sf::Int32 action);
+	sf::FloatRect GetViewBounds() const;
 
 private:
 	struct RemotePeer
@@ -80,5 +83,8 @@ private:
 
 	sf::Time m_last_spawn_time;
 	sf::Time m_time_for_next_spawn;
+
+	sf::RenderTarget& m_target;
+	sf::View m_camera;
 };
 

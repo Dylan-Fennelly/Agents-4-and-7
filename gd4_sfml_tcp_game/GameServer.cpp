@@ -6,7 +6,7 @@
 #include "PickupType.hpp"
 #include "AircraftType.hpp"
 
-GameServer::GameServer(sf::Vector2f battlefield_size)
+GameServer::GameServer(sf::Vector2f battlefield_size, sf::RenderTarget& output_target)
     : m_thread(&GameServer::ExecutionThread, this)
     , m_listening_state(false)
     , m_client_timeout(sf::seconds(5.f))
@@ -21,6 +21,8 @@ GameServer::GameServer(sf::Vector2f battlefield_size)
     , m_waiting_thread_end(false)
     , m_last_spawn_time(sf::Time::Zero)
     , m_time_for_next_spawn(sf::seconds(5.f))
+	, m_target(output_target)
+	, m_camera(output_target.getDefaultView())
 {
     m_listener_socket.setBlocking(false);
     m_peers[0].reset(new RemotePeer());
@@ -121,6 +123,11 @@ void GameServer::ExecutionThread()
     }
 }
 
+sf::FloatRect GameServer::GetViewBounds() const
+{
+    return sf::FloatRect(m_camera.getCenter() - m_camera.getSize() / 2.f, m_camera.getSize());
+}
+
 void GameServer::Tick()
 {
     UpdateClientState();
@@ -161,39 +168,87 @@ void GameServer::Tick()
     //Check if it is time to spawn enemies
     if (Now() >= m_time_for_next_spawn + m_last_spawn_time)
     {
-        //Not going to spawn enemies near the end
-        if (m_battlefield_rect.top > 600.f)
+        std::size_t enemy_count = 100;
+        //float spawn_centre = static_cast<float>(Utility::RandomInt(500) - 250);
+
+        ////If there is only one enemy it is at spawn_centre
+        //float plane_distance = 0.f;
+        //float next_spawn_position = spawn_centre;
+
+        ////If there are two enemies they should be centred on the spawn centre
+        //if (enemy_count == 2)
+        //{
+        //    plane_distance = static_cast<float>(150 + Utility::RandomInt(250));
+        //    next_spawn_position = spawn_centre - plane_distance / 2.f;
+        //}
+
+        // Get the current view bounds.
+        sf::FloatRect viewBounds = GetViewBounds();
+        // Define a margin to spawn outside the view.
+        float margin = 50.f;
+
+        // Determine a random side (0: top, 1: bottom, 2: left, 3: right)
+        int side = Utility::RandomInt(4);
+
+        sf::Vector2f spawnPos;
+        switch (side)
         {
-            std::size_t enemy_count = 1 + Utility::RandomInt(2);
-            float spawn_centre = static_cast<float>(Utility::RandomInt(500) - 250);
-
-            //If there is only one enemy it is at spawn_centre
-            float plane_distance = 0.f;
-            float next_spawn_position = spawn_centre;
-
-            //If there are two enemies they should be centred on the spawn centre
-            if (enemy_count == 2)
-            {
-                plane_distance = static_cast<float>(150 + Utility::RandomInt(250));
-                next_spawn_position = spawn_centre - plane_distance / 2.f;
-            }
-
-            //Send the spawn packets to the clients
-            for (std::size_t i = 0; i < enemy_count; ++i)
-            {
-                sf::Packet packet;
-                packet << static_cast<sf::Int32>(Server::PacketType::kSpawnEnemy);
-                packet << static_cast<sf::Int32>(1 + Utility::RandomInt(static_cast<int>(AircraftType::kAircraftCount) - 1));
-
-                packet << m_world_height - m_battlefield_rect.top + 500;
-                packet << next_spawn_position;
-
-                next_spawn_position += plane_distance / 2.f;
-                SendToAll(packet);
-            }
-            m_last_spawn_time = Now();
-            m_time_for_next_spawn = sf::milliseconds(2000 + Utility::RandomInt(6000));
+        case 0: // Top: spawn at a random x within view (plus margin) and above the view.
+        {
+            int minX = static_cast<int>(viewBounds.left + margin);
+            int maxX = static_cast<int>(viewBounds.left + viewBounds.width - margin);
+            float x = static_cast<float>(minX + Utility::RandomInt(maxX - minX));
+            float y = viewBounds.top - margin;
+            spawnPos = sf::Vector2f(x, y);
+            break;
         }
+        case 1: // Bottom: spawn at a random x within view (plus margin) and below the view.
+        {
+            int minX = static_cast<int>(viewBounds.left + margin);
+            int maxX = static_cast<int>(viewBounds.left + viewBounds.width - margin);
+            float x = static_cast<float>(minX + Utility::RandomInt(maxX - minX));
+            float y = viewBounds.top + viewBounds.height + margin;
+            spawnPos = sf::Vector2f(x, y);
+            break;
+        }
+        case 2: // Left: spawn at a random y within view (plus margin) and to the left of the view.
+        {
+            int minY = static_cast<int>(viewBounds.top + margin);
+            int maxY = static_cast<int>(viewBounds.top + viewBounds.height - margin);
+            float y = static_cast<float>(minY + Utility::RandomInt(maxY - minY));
+            float x = viewBounds.left - margin;
+            spawnPos = sf::Vector2f(x, y);
+            break;
+        }
+        case 3: // Right: spawn at a random y within view (plus margin) and to the right of the view.
+        {
+            int minY = static_cast<int>(viewBounds.top + margin);
+            int maxY = static_cast<int>(viewBounds.top + viewBounds.height - margin);
+            float y = static_cast<float>(minY + Utility::RandomInt(maxY - minY));
+            float x = viewBounds.left + viewBounds.width + margin;
+            spawnPos = sf::Vector2f(x, y);
+            break;
+        }
+        default:
+            // Default to top if something goes wrong.
+            spawnPos = sf::Vector2f(viewBounds.left + viewBounds.width / 2.f, viewBounds.top - margin);
+            break;
+        }
+
+        //Send the spawn packets to the clients
+        for (std::size_t i = 0; i < enemy_count; ++i)
+        {
+            sf::Packet packet;
+            packet << static_cast<sf::Int32>(Server::PacketType::kSpawnEnemy);
+            packet << static_cast<sf::Int32>(1 + Utility::RandomInt(static_cast<int>(AircraftType::kAircraftCount) - 1));
+
+            packet << spawnPos.x;
+			packet << spawnPos.y;
+
+            SendToAll(packet);
+        }
+        m_last_spawn_time = Now();
+        m_time_for_next_spawn = sf::seconds(0.75f + static_cast<float>(Utility::RandomInt(1250)) / 1000.f);
     }
 }
 
