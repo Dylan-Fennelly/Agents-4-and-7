@@ -149,7 +149,7 @@ void Player::HandleRealtimeInput(CommandQueue& commands)
 
 void Player::HandleRealtimeNetworkInput(CommandQueue& commands)
 {
-    std::cout << "Check: " << (m_socket && !IsLocal()) << std::endl;
+    //std::cout << "Check: " << (m_socket && !IsLocal()) << std::endl;
 
 
     if (m_socket && !IsLocal())

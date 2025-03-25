@@ -5,6 +5,8 @@
 #include "Utility.hpp"
 #include "PickupType.hpp"
 #include "AircraftType.hpp"
+#include <iostream>
+#include "World.hpp"
 
 GameServer::GameServer(sf::Vector2f battlefield_size, sf::RenderTarget& output_target)
     : m_thread(&GameServer::ExecutionThread, this)
@@ -23,6 +25,7 @@ GameServer::GameServer(sf::Vector2f battlefield_size, sf::RenderTarget& output_t
     , m_time_for_next_spawn(sf::seconds(5.f))
 	, m_target(output_target)
 	, m_camera(output_target.getDefaultView())
+    , m_player_aircrafts()
 {
     m_listener_socket.setBlocking(false);
     m_peers[0].reset(new RemotePeer());
@@ -131,7 +134,7 @@ sf::FloatRect GameServer::GetViewBounds() const
 void GameServer::Tick()
 {
     UpdateClientState();
-
+    //GuideEnemies();
     //Check if the game is over = all planes postion.y < offset
 
     bool all_aircraft_done = true;
@@ -163,24 +166,12 @@ void GameServer::Tick()
         {
             ++itr;
         }
-    }
+    } 
 
     //Check if it is time to spawn enemies
     if (Now() >= m_time_for_next_spawn + m_last_spawn_time)
     {
-        std::size_t enemy_count = 100;
-        //float spawn_centre = static_cast<float>(Utility::RandomInt(500) - 250);
-
-        ////If there is only one enemy it is at spawn_centre
-        //float plane_distance = 0.f;
-        //float next_spawn_position = spawn_centre;
-
-        ////If there are two enemies they should be centred on the spawn centre
-        //if (enemy_count == 2)
-        //{
-        //    plane_distance = static_cast<float>(150 + Utility::RandomInt(250));
-        //    next_spawn_position = spawn_centre - plane_distance / 2.f;
-        //}
+        std::size_t enemy_count = 1;
 
         // Get the current view bounds.
         sf::FloatRect viewBounds = GetViewBounds();
@@ -235,18 +226,6 @@ void GameServer::Tick()
             break;
         }
 
-        //Send the spawn packets to the clients
-        for (std::size_t i = 0; i < enemy_count; ++i)
-        {
-            sf::Packet packet;
-            packet << static_cast<sf::Int32>(Server::PacketType::kSpawnEnemy);
-            packet << static_cast<sf::Int32>(1 + Utility::RandomInt(static_cast<int>(AircraftType::kAircraftCount) - 1));
-
-            packet << spawnPos.x;
-			packet << spawnPos.y;
-
-            SendToAll(packet);
-        }
         m_last_spawn_time = Now();
         m_time_for_next_spawn = sf::seconds(0.75f + static_cast<float>(Utility::RandomInt(1250)) / 1000.f);
     }

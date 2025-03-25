@@ -10,6 +10,7 @@
 #include <string>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics.hpp>
+#include "Aircraft.hpp"
 
 
 class GameServer
@@ -86,5 +87,7 @@ private:
 
 	sf::RenderTarget& m_target;
 	sf::View m_camera;
+	std::vector<Aircraft*> m_player_aircrafts;
+	std::vector<Aircraft*> m_enemy_aircrafts;
 };
 
