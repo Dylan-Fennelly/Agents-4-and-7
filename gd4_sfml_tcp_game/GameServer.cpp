@@ -286,7 +286,6 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
         receiving_peer.m_aircraft_identifiers.emplace_back(m_aircraft_identifier_counter);
         m_aircraft_info[m_aircraft_identifier_counter].m_position = sf::Vector2f(m_battlefield_rect.width / 2, m_battlefield_rect.top + m_battlefield_rect.height / 2);
         m_aircraft_info[m_aircraft_identifier_counter].m_hitpoints = 100;
-        m_aircraft_info[m_aircraft_identifier_counter].m_missile_ammo = 2;
 
         sf::Packet request_packet;
         request_packet << static_cast<sf::Int32>(Server::PacketType::kAcceptCoopPartner);
@@ -328,10 +327,12 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
             sf::Int32 aircraft_hitpoints;
             sf::Int32 missile_ammo;
             sf::Vector2f aircraft_position;
-            packet >> aircraft_identifier >> aircraft_position.x >> aircraft_position.y >> aircraft_hitpoints >> missile_ammo;
+			float aircraft_rotation;
+            packet >> aircraft_identifier >> aircraft_position.x >> aircraft_position.y >> aircraft_hitpoints >> aircraft_rotation;
             m_aircraft_info[aircraft_identifier].m_position = aircraft_position;
+			m_aircraft_info[aircraft_identifier].m_rotation = aircraft_rotation;
             m_aircraft_info[aircraft_identifier].m_hitpoints = aircraft_hitpoints;
-            m_aircraft_info[aircraft_identifier].m_missile_ammo = missile_ammo;
+
         }
     }
     break;
@@ -374,7 +375,6 @@ void GameServer::HandleIncomingConnections()
         //Order the new client to spawn its player 1
         m_aircraft_info[m_aircraft_identifier_counter].m_position = sf::Vector2f(m_battlefield_rect.width / 2, m_battlefield_rect.top + m_battlefield_rect.height / 2);
         m_aircraft_info[m_aircraft_identifier_counter].m_hitpoints = 100;
-        m_aircraft_info[m_aircraft_identifier_counter].m_missile_ammo = 2;
 
         sf::Packet packet;
         packet << static_cast<sf::Int32>(Server::PacketType::kSpawnSelf);
@@ -455,7 +455,7 @@ void GameServer::InformWorldState(sf::TcpSocket& socket)
         {
             for (sf::Int32 identifier : m_peers[i]->m_aircraft_identifiers)
             {
-                packet << identifier << m_aircraft_info[identifier].m_position.x << m_aircraft_info[identifier].m_position.y << m_aircraft_info[identifier].m_hitpoints << m_aircraft_info[identifier].m_missile_ammo;
+                packet << identifier << m_aircraft_info[identifier].m_position.x << m_aircraft_info[identifier].m_position.y << m_aircraft_info[identifier].m_hitpoints << m_aircraft_info[identifier].m_rotation;
             }
         }
     }
@@ -497,7 +497,7 @@ void GameServer::UpdateClientState()
 
     for (const auto& aircraft : m_aircraft_info)
     {
-        update_client_state_packet << aircraft.first << aircraft.second.m_position.x << aircraft.second.m_position.y << aircraft.second.m_hitpoints << aircraft.second.m_missile_ammo;
+        update_client_state_packet << aircraft.first << aircraft.second.m_position.x << aircraft.second.m_position.y << aircraft.second.m_hitpoints << aircraft.second.m_rotation;
     }
 
     SendToAll(update_client_state_packet);

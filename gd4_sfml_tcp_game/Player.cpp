@@ -76,17 +76,17 @@ struct AircraftRotator
                 // Calculate angle in radians and convert it to degrees
                 float angle = std::atan2(direction.y, direction.x) * 180.f / 3.14159265f;
                 angle += 90.f;
-              //  aircraft.SetRotation(angle);
+                aircraft.SetRotation(angle);
 				std::cout << "Angle: " << angle << std::endl;
                 // Send rotation update to server
-                if (m_socket)
-                {
-                    sf::Packet packet;
-                    packet << static_cast<sf::Int32>(Client::PacketType::kRotationUpdate);
-                    packet << aircraft_id;
-                    packet << angle;
-                    m_socket->send(packet);
-                }
+                //if (m_socket)
+                //{
+                //    sf::Packet packet;
+                //    packet << static_cast<sf::Int32>(Client::PacketType::kRotationUpdate);
+                //    packet << aircraft_id;
+                //    packet << angle;
+                //    m_socket->send(packet);
+                //}
             
         }
     }
