@@ -287,7 +287,7 @@ void Aircraft::SetRotation(float angle)
 
 float Aircraft::GetRotation() const
 {
-	return 0.0f;
+	return getRotation();
 }
 
 sf::FloatRect Aircraft::GetBoundingRect() const
