@@ -5,14 +5,16 @@
 #include "Utility.hpp"
 #include "PickupType.hpp"
 #include "AircraftType.hpp"
+#include <iostream>
+#include "World.hpp"
 
-GameServer::GameServer(sf::Vector2f battlefield_size)
+GameServer::GameServer(sf::Vector2f battlefield_size, sf::RenderTarget& output_target)
     : m_thread(&GameServer::ExecutionThread, this)
     , m_listening_state(false)
     , m_client_timeout(sf::seconds(5.f))
     , m_max_connected_players(15)
     , m_connected_players(0)
-    , m_world_height(5000.f)
+    , m_world_height(1000.f)
     , m_battlefield_rect(0.f, m_world_height - battlefield_size.y, battlefield_size.x, battlefield_size.y)
     , m_battlefield_scrollspeed(-50.f)
     , m_aircraft_count(0)
@@ -21,6 +23,9 @@ GameServer::GameServer(sf::Vector2f battlefield_size)
     , m_waiting_thread_end(false)
     , m_last_spawn_time(sf::Time::Zero)
     , m_time_for_next_spawn(sf::seconds(5.f))
+	, m_target(output_target)
+	, m_camera(output_target.getDefaultView())
+    , m_player_aircrafts()
 {
     m_listener_socket.setBlocking(false);
     m_peers[0].reset(new RemotePeer());
@@ -106,7 +111,8 @@ void GameServer::ExecutionThread()
         //Fixed time step
         while (frame_time >= frame_rate)
         {
-          //  m_battlefield_rect.top += m_battlefield_scrollspeed * frame_rate.asSeconds();
+            //m_battlefield_rect.top += m_battlefield_scrollspeed * frame_rate.asSeconds();
+
             frame_time -= frame_rate;
         }
 
@@ -121,10 +127,15 @@ void GameServer::ExecutionThread()
     }
 }
 
+sf::FloatRect GameServer::GetViewBounds() const
+{
+    return sf::FloatRect(m_camera.getCenter() - m_camera.getSize() / 2.f, m_camera.getSize());
+}
+
 void GameServer::Tick()
 {
     UpdateClientState();
-
+    //GuideEnemies();
     //Check if the game is over = all planes postion.y < offset
 
     bool all_aircraft_done = true;
@@ -156,44 +167,71 @@ void GameServer::Tick()
         {
             ++itr;
         }
-    }
+    } 
 
     //Check if it is time to spawn enemies
     if (Now() >= m_time_for_next_spawn + m_last_spawn_time)
     {
-        //Not going to spawn enemies near the end
-        if (m_battlefield_rect.top > 600.f)
+        std::size_t enemy_count = 1;
+
+        sf::FloatRect viewBounds = GetViewBounds();
+        std::cout << "View Bounds: Left = " << viewBounds.left << ", Top = " << viewBounds.top
+            << ", Width = " << viewBounds.width << ", Height = " << viewBounds.height << std::endl;
+        float margin = 2.f;
+
+        // Expand the bounds to include the margin
+        viewBounds.left -= margin;
+        viewBounds.top -= margin;
+        viewBounds.width += 2 * margin;
+        viewBounds.height += 2 * margin;
+
+        // Determine a random side
+        int side = Utility::RandomInt(4);
+
+        sf::Vector2f spawnPos;
+        switch (side)
         {
-            std::size_t enemy_count = 1 + Utility::RandomInt(2);
-            float spawn_centre = static_cast<float>(Utility::RandomInt(500) - 250);
-
-            //If there is only one enemy it is at spawn_centre
-            float plane_distance = 0.f;
-            float next_spawn_position = spawn_centre;
-
-            //If there are two enemies they should be centred on the spawn centre
-            if (enemy_count == 2)
-            {
-                plane_distance = static_cast<float>(150 + Utility::RandomInt(250));
-                next_spawn_position = spawn_centre - plane_distance / 2.f;
-            }
-
-            //Send the spawn packets to the clients
-            for (std::size_t i = 0; i < enemy_count; ++i)
-            {
-                sf::Packet packet;
-                packet << static_cast<sf::Int32>(Server::PacketType::kSpawnEnemy);
-                packet << static_cast<sf::Int32>(1 + Utility::RandomInt(static_cast<int>(AircraftType::kAircraftCount) - 1));
-
-                packet << m_world_height - m_battlefield_rect.top + 500;
-                packet << next_spawn_position;
-
-                next_spawn_position += plane_distance / 2.f;
-                SendToAll(packet);
-            }
-            m_last_spawn_time = Now();
-            m_time_for_next_spawn = sf::milliseconds(2000 + Utility::RandomInt(6000));
+        case 0: // Top
+            spawnPos.x = viewBounds.left + Utility::RandomInt(static_cast<int>(viewBounds.width));
+            spawnPos.y = viewBounds.top - margin;
+            break;
+        case 1: // Bottom
+            spawnPos.x = viewBounds.left + Utility::RandomInt(static_cast<int>(viewBounds.width));
+            spawnPos.y = viewBounds.top + viewBounds.height + margin;
+            break;
+        case 2: // Left
+            spawnPos.x = viewBounds.left - margin;
+            spawnPos.y = viewBounds.top + Utility::RandomInt(static_cast<int>(viewBounds.height));
+            break;
+        case 3: // Right
+            spawnPos.x = viewBounds.left + viewBounds.width + margin;
+            spawnPos.y = viewBounds.top + Utility::RandomInt(static_cast<int>(viewBounds.height));
+            break;
+        default:
+            spawnPos = sf::Vector2f(viewBounds.left + viewBounds.width / 2.f, viewBounds.top - margin);
+            break;
         }
+
+        std::cout << "Spawn Position: (" << spawnPos.x << ", " << spawnPos.y << "), Side: " << side << "\n";
+
+        //Send the spawn packets to the clients
+        for (std::size_t i = 0; i < enemy_count; ++i)
+        {
+            sf::Packet packet;
+            packet << static_cast<sf::Int32>(Server::PacketType::kSpawnEnemy);
+            packet << static_cast<sf::Int32>(1 + Utility::RandomInt(static_cast<int>(AircraftType::kAircraftCount) - 1));
+
+            packet << spawnPos.x;
+            packet << spawnPos.y;
+
+            std::cout << "Sending enemy spawn packet: Type=" << 1 + Utility::RandomInt(static_cast<int>(AircraftType::kAircraftCount) - 1)
+                << ", Position=(" << spawnPos.x << ", " << spawnPos.y << ")\n";
+
+            SendToAll(packet);
+        }
+
+        m_last_spawn_time = Now();
+        m_time_for_next_spawn = sf::seconds(0.75f + static_cast<float>(Utility::RandomInt(1250)) / 1000.f);
     }
 }
 
