@@ -232,7 +232,7 @@ bool MultiplayerGameState::Update(sf::Time dt)
 			{
 				if (Aircraft* aircraft = m_world.GetAircraft(identifier))
 				{
-					position_update_packet << identifier << aircraft->getPosition().x << aircraft->getPosition().y << static_cast<sf::Int32>(aircraft->GetHitPoints()) << static_cast<sf::Int32>(0);
+					position_update_packet << identifier << aircraft->getPosition().x << aircraft->getPosition().y << static_cast<sf::Int32>(aircraft->GetHitPoints()) << aircraft->GetRotation();
 				}
 			}
 			m_socket.send(position_update_packet);
@@ -254,11 +254,11 @@ bool MultiplayerGameState::HandleEvent(const sf::Event& event)
 {
 	//Game input handling
 	CommandQueue& commands = m_world.GetCommandQueue();
-
+	sf::View view = m_world.GetCamera();
 	//Forward events to all players
 	for (auto& pair : m_players)
 	{
-		pair.second->HandleEvent(event, commands);
+		pair.second->HandleEvent(event, commands , m_window , view);
 	}
 
 	if (event.type == sf::Event::KeyPressed)
@@ -367,6 +367,7 @@ void MultiplayerGameState::HandlePacket(sf::Int32 packet_type, sf::Packet& packe
 		Aircraft* aircraft = m_world.AddAircraft(aircraft_identifier);
 		aircraft->setPosition(aircraft_position);
 		m_players[aircraft_identifier].reset(new Player(&m_socket, aircraft_identifier, GetContext().keys1));
+		std::cout << "Spawned self with identifier: " << aircraft_identifier << std::endl;
 		m_local_player_identifiers.push_back(aircraft_identifier);
 		m_game_started = true;
 	}
@@ -381,6 +382,7 @@ void MultiplayerGameState::HandlePacket(sf::Int32 packet_type, sf::Packet& packe
 		Aircraft* aircraft = m_world.AddAircraft(aircraft_identifier);
 		aircraft->setPosition(aircraft_position);
 		m_players[aircraft_identifier].reset(new Player(&m_socket, aircraft_identifier, nullptr));
+		std::cout << "Player connected with identifier: " << aircraft_identifier << std::endl;
 	}
 	break;
 
@@ -416,6 +418,20 @@ void MultiplayerGameState::HandlePacket(sf::Int32 packet_type, sf::Packet& packe
 			aircraft->SetHitpoints(hitpoints);
 
 			m_players[aircraft_identifier].reset(new Player(&m_socket, aircraft_identifier, nullptr));
+		}
+	}
+	break;
+
+	case Server::PacketType::kRotationUpdate:
+	{
+		sf::Int32 aircraft_identifier;
+		float rotation;
+		packet >> aircraft_identifier >> rotation;
+
+		Aircraft* aircraft = m_world.GetAircraft(aircraft_identifier);
+		if (aircraft)
+		{
+			aircraft->SetRotation(rotation);
 		}
 	}
 	break;
@@ -509,8 +525,8 @@ void MultiplayerGameState::HandlePacket(sf::Int32 packet_type, sf::Packet& packe
 			sf::Vector2f aircraft_position;
 			sf::Int32 aircraft_identifier;
 			sf::Int32 hitpoints;
-			sf::Int32 ammo;
-			packet >> aircraft_identifier >> aircraft_position.x >> aircraft_position.y >> hitpoints >> ammo;
+			float rotation;
+			packet >> aircraft_identifier >> aircraft_position.x >> aircraft_position.y >> hitpoints >> rotation;
 
 			Aircraft* aircraft = m_world.GetAircraft(aircraft_identifier);
 			bool is_local_plane = std::find(m_local_player_identifiers.begin(), m_local_player_identifiers.end(), aircraft_identifier) != m_local_player_identifiers.end();
@@ -518,7 +534,9 @@ void MultiplayerGameState::HandlePacket(sf::Int32 packet_type, sf::Packet& packe
 			{
 				sf::Vector2f interpolated_position = aircraft->getPosition() + (aircraft_position - aircraft->getPosition()) * 0.1f;
 				aircraft->setPosition(interpolated_position);
+				aircraft->SetRotation(rotation);
 				aircraft->SetHitpoints(hitpoints);
+
 			}
 		}
 	}

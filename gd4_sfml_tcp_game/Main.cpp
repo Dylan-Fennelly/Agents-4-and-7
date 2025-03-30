@@ -124,3 +124,46 @@ int main()
 //    return 0;
 //}
 //
+//Code for testig mou
+//
+//#include <SFML/Graphics.hpp>
+//#include <cmath>
+//
+//int main() {
+//    sf::RenderWindow window(sf::VideoMode(800, 600), "Rotating Shape");
+//    window.setFramerateLimit(60);
+//
+//    // Create a triangle shape using a convex shape
+//    sf::ConvexShape triangle;
+//    triangle.setPointCount(3);
+//    triangle.setPoint(0, sf::Vector2f(0, -20));
+//    triangle.setPoint(1, sf::Vector2f(-10, 10));
+//    triangle.setPoint(2, sf::Vector2f(10, 10));
+//    triangle.setFillColor(sf::Color::Green);
+//    triangle.setOrigin(0, 0);
+//    triangle.setPosition(400, 300); // Center of the window
+//
+//    while (window.isOpen()) {
+//        sf::Event event;
+//        while (window.pollEvent(event)) {
+//            if (event.type == sf::Event::Closed)
+//                window.close();
+//        }
+//
+//        // Get mouse position and convert to world coordinates
+//        sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+//        sf::Vector2f shapePos = triangle.getPosition();
+//        sf::Vector2f direction = sf::Vector2f(mousePos) - shapePos;
+//
+//        // Calculate angle to mouse in degrees
+//        float angle = std::atan2(direction.y, direction.x) * 180.f / 3.14159f;
+//        triangle.setRotation(angle + 90.f); // Offset so triangle points at the mouse
+//
+//        window.clear();
+//        window.draw(triangle);
+//        window.display();
+//    }
+//
+//    return 0;
+//}
+

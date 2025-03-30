@@ -10,6 +10,7 @@ namespace Server
 		kInitialState, //This takes two float values, the world height and the initial scrolling in it, then an sf::Int32 with the number of aircraft, then for each aircraft its identifier and its position, health and missiles
 		kPlayerEvent, //This takes two sf::Int32 variables, the aircraft identifier and the action identified as in Action.hpp, this is used to tell everyone that plane x has an triggered some action
 		kPlayerRealtimeChange, //Same as PlayerEvent for real time actions
+		kRotationUpdate, //Takes one sf::Int32 with the aircraft identifier, and a float with the new rotation
 		kPlayerConnect, //The same as SpawnSelf but indicates and aircraft from a different client
 		kPlayerDisconnect, //Takes sf::Int32 aircraft identifier that is disconnecting
 		kAcceptCoopPartner, //This says we are free to spawn another local plane. It takes sf::Int32 and two float values with the id of the hot seat multiplayer and its position
@@ -27,6 +28,7 @@ namespace Client
 	{
 		kPlayerEvent, // Two sf::Int32, aircraft identifer and event. It is used to request the server to trigger an event on the aircraft
 		kPlayerRealtimeChange, // The same kPlayerEvent, additionally takes a boolean for real time action
+		kRotationUpdate, // sf::Int32 with the aircraft identifier, and a float with the new rotation
 		kRequestCoopPartner, //No parameters. It is sent when the user presses Return to request a local partner. The server will AcceptCoopPartner 
 		kStateUpdate, //sf::Int32 with number of local aircraft, for each aircraft send sf::Int32 identifier, two floats for position, health and ammo 
 		kGameEvent, //This is for explosions

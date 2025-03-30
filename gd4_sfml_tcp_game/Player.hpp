@@ -7,13 +7,15 @@
 #include "KeyBinding.hpp"
 #include "CommandQueue.hpp"
 #include <SFML/Network/TcpSocket.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/View.hpp>
 
 
 class Player
 {
 public:
 	Player(sf::TcpSocket* socket, sf::Int32 identifier, const KeyBinding* binding);
-	void HandleEvent(const sf::Event& event, CommandQueue& command);
+	void HandleEvent(const sf::Event& event, CommandQueue& command, sf::RenderWindow& window, sf::View camera);
 	void HandleRealtimeInput(CommandQueue& command);
 	void HandleRealtimeNetworkInput(CommandQueue& commands);
 

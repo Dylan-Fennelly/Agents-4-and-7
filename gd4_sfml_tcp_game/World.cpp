@@ -9,7 +9,7 @@
 #include <iostream>
 
 World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sounds, bool networked)
-	:m_target(output_target)
+	: m_target(output_target)
 	, m_camera(output_target.getDefaultView())
 	, m_textures()
 	, m_fonts(font)
@@ -170,6 +170,11 @@ void World::SetWorldHeight(float height)
 CommandQueue& World::GetCommandQueue()
 {
 	return m_command_queue;
+}
+
+sf::View World::GetCamera() const
+{
+	return m_camera;
 }
 
 bool World::HasAlivePlayer() const

@@ -37,6 +37,8 @@ public:
 	void AddEnemy(AircraftType type, float relx, float rely);
 	void SortEnemies();
 
+	sf::View GetCamera() const;
+
 	bool HasAlivePlayer() const;
 	bool HasPlayerReachedEnd(sf::Time dt);
 
