@@ -10,6 +10,8 @@
 #include "PickupType.hpp"
 #include "Pickup.hpp"
 #include "SoundNode.hpp"
+#include "NetworkNode.hpp"
+#include <iostream>
 
 namespace
 {
@@ -50,8 +52,12 @@ Aircraft::Aircraft(AircraftType type, const TextureHolder& textures, const FontH
 	, m_missile_ammo(2)
 	, m_is_marked_for_removal(false)
 	, m_show_explosion(true)
+	, m_explosion_began(false)
 	, m_spawned_pickup(false)
-	, m_played_explosion_sound(false)
+	, m_pickups_enabled(true)
+	, m_identifier(0)
+	, m_rotation(0.f)
+
 
 
 {
@@ -102,13 +108,27 @@ Aircraft::Aircraft(AircraftType type, const TextureHolder& textures, const FontH
 
 	UpdateTexts();
 }
+void Aircraft::DisablePickups()
+{
+	m_pickups_enabled = false;
+}
+
+int	Aircraft::GetIdentifier()
+{
+	return m_identifier;
+}
+
+void Aircraft::SetIdentifier(int identifier)
+{
+	m_identifier = identifier;
+}
 
 
 unsigned int Aircraft::GetCategory() const
 {
 	if (IsAllied())
 	{
-		return static_cast<unsigned int>(SceneNode::GetCategory()); //Modifyied the SceneNode to return the category
+		return static_cast<unsigned int>(ReceiverCategories::kPlayerAircraft);
 	}
 	return static_cast<unsigned int>(ReceiverCategories::kEnemyAircraft);
 
@@ -157,7 +177,14 @@ void Aircraft::Damage(int points)
 
 void Aircraft::UpdateTexts()
 {
-	m_health_display->SetString(std::to_string(GetHitPoints()) + "HP");
+	if (IsDestroyed())
+	{
+		m_health_display->SetString("");
+	}
+	else
+	{
+		m_health_display->SetString(std::to_string(GetHitPoints()) + "HP");
+	}
 	m_health_display->setPosition(0.f, 50.f);
 	m_health_display->setRotation(-getRotation());
 
@@ -252,8 +279,15 @@ void Aircraft::CreateProjectile(SceneNode& node, ProjectileType type, float x_of
 
 void Aircraft::SetRotation(float angle)
 {
+	//m_rotation = angle;
+	//std::cout << "Rotation: " << angle << std::endl;
 	setRotation(angle); //We rotate using the entity class
 	m_sprite.setRotation(0); //Set the rotation of the sprite to 0 so we dont have the sprite the wrong way
+}
+
+float Aircraft::GetRotation() const
+{
+	return getRotation();
 }
 
 sf::FloatRect Aircraft::GetBoundingRect() const
@@ -322,11 +356,26 @@ void Aircraft::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 	{
 		CheckPickupDrop(commands);
 		m_explosion.Update(dt);
-		if (!m_played_explosion_sound)
+		if (!m_explosion_began)
 		{
 			SoundEffect soundEffect = (Utility::RandomInt(2) == 0) ? SoundEffect::kDyingZombie : SoundEffect::kDyingZombie2;
 			PlayLocalSound(commands, soundEffect);
-			m_played_explosion_sound = true;
+			//Emit network game action for enemy explodes
+			if (!IsAllied())
+			{
+				sf::Vector2f position = GetWorldPosition();
+
+				Command command;
+				command.category = static_cast<int>(ReceiverCategories::kNetwork);
+				command.action = DerivedAction<NetworkNode>([position](NetworkNode& node, sf::Time)
+					{
+						node.NotifyGameAction(GameActions::kEnemyExplode, position);
+					});
+
+				commands.Push(command);
+			}
+
+			m_explosion_began = true;
 		}
 		return;
 	}
@@ -371,6 +420,12 @@ void Aircraft::CheckProjectileLaunch(sf::Time dt, CommandQueue& commands)
 bool Aircraft::IsAllied() const
 {
 	return m_type == AircraftType::kAgentFour;
+}
+
+void Aircraft::Remove()
+{
+	Entity::Remove();
+	m_show_explosion = false;
 }
 
 void Aircraft::CreatePickup(SceneNode& node, const TextureHolder& textures) const

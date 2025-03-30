@@ -16,19 +16,36 @@
 
 #include <array>
 
+#include "PickupType.hpp"
+#include "NetworkNode.hpp"
+
 class World : private sf::NonCopyable
 {
 public:
-	explicit World(sf::RenderTarget& target, FontHolder& font, SoundPlayer& sounds);
+	explicit World(sf::RenderTarget& target, FontHolder& font, SoundPlayer& sounds, bool networked = false);
 	void Update(sf::Time dt);
 	void Draw();
 
+	sf::FloatRect GetViewBounds() const;
 	CommandQueue& GetCommandQueue();
+
+	Aircraft* AddAircraft(int identifier);
+	void RemoveAircraft(int identifier);
+	void SetCurrentBattleFieldPosition(float line_y);
+	void SetWorldHeight(float height);
+
+	void AddEnemy(AircraftType type, float relx, float rely);
+	void SortEnemies();
+
+	sf::View GetCamera() const;
 
 	bool HasAlivePlayer() const;
 	bool HasPlayerReachedEnd(sf::Time dt);
-	//bool HasPlayerReachedEnd(sf::Time dt);
 
+	Aircraft* GetAircraft(int identifier) const;
+	sf::FloatRect GetBattlefieldBounds() const;
+	void CreatePickup(sf::Vector2f position, PickupType type);
+	bool PollGameAction(GameActions::Action& out);
 
 private:
 	void LoadTextures();
@@ -36,12 +53,7 @@ private:
 	void AdaptPlayerPosition();
 	void AdaptPlayerVelocity();
 
-	//void SpawnEnemies();
-	//void AddEnemies();
-	//void AddEnemy(AircraftType type, float relx, float rely);
 	void SpawnEnemy();
-	sf::FloatRect GetViewBounds() const;
-	sf::FloatRect GetBattleFieldBounds() const;
 
 	void DestroyEntitiesOutsideView();
 	void GuideMissiles();
@@ -77,7 +89,6 @@ private:
 	sf::Vector2f m_spawn_position;
 	float m_scrollspeed;
 	std::vector<Aircraft*> m_player_aircrafts;
-	/*Aircraft* m_player_aircraft;*/
 	CommandQueue m_command_queue;
 
 	std::vector<SpawnPoint> m_enemy_spawn_points;
@@ -97,5 +108,7 @@ private:
 	sf::Clock m_totalElapsed;
 
 	BloomEffect m_bloom_effect;
+	bool m_networked_world;
+	NetworkNode* m_network_node;
 };
 
