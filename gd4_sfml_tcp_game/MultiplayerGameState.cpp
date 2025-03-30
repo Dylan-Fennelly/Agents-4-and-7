@@ -73,7 +73,7 @@ MultiplayerGameState::MultiplayerGameState(StateStack& stack, Context context, b
 
 	if (m_host)
 	{
-		m_game_server.reset(new GameServer(sf::Vector2f(m_window.getSize())));
+		m_game_server.reset(new GameServer(sf::Vector2f(m_window.getSize().x, m_window.getSize().y), m_window));
 		ip = "127.0.0.1";
 	}
 	else
@@ -479,13 +479,14 @@ void MultiplayerGameState::HandlePacket(sf::Int32 packet_type, sf::Packet& packe
 	//New Enemy to be created
 	case Server::PacketType::kSpawnEnemy:
 	{
-		float height;
 		sf::Int32 type;
-		float relative_x;
-		packet >> type >> height >> relative_x;
+		sf::Vector2f position;
+		packet >> type >> position.x >> position.y;
+		std::cout << "Received spawn enemy packet. Type: " << type
+			<< ", Position: (" << position.x << ", " << position.y << ")\n";
 
-		//m_world.AddEnemy(static_cast<AircraftType>(type), relative_x, height);
-		//m_world.SortEnemies();
+		//m_world.AddEnemy(static_cast<AircraftType>(type), 500, 5000);
+		m_world.AddEnemy(static_cast<AircraftType>(type), position.x, position.y);
 	}
 	break;
 

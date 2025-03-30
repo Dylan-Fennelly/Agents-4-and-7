@@ -6,6 +6,7 @@
 #include "Projectile.hpp"
 #include "ParticleNode.hpp"
 #include "SoundNode.hpp"
+#include <iostream>
 
 World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sounds, bool networked)
 	: m_target(output_target)
@@ -49,22 +50,21 @@ void World::Update(sf::Time dt)
 	m_camera.move(0, m_scrollspeed * dt.asSeconds());
 
 	
-	m_enemySpawnTimer += dt;//Track the time until the next enemy spawn
-	if (m_enemySpawnTimer >= m_enemySpawnInterval) // Time to spawn a new enemy? 
-	{												//ToDO:Check if the nesting on this if statement is correct
-		if ((m_totalElapsed.getElapsedTime() < sf::seconds(180))) //Spawm enemies for 3 minutes 
-		{
-			SpawnEnemy();
-			m_enemySpawnTimer = sf::Time::Zero;
-			// Randomize the next spawn interval (for example, between 1.5 and 2 seconds):
-			float nextInterval = 0.75f + static_cast<float>(Utility::RandomInt(1250)) / 1000.f; // 0.75 to 2.0 seconds
-			m_enemySpawnInterval = sf::seconds(nextInterval);
-		}
-		
-	}
+	//m_enemySpawnTimer += dt;//Track the time until the next enemy spawn
+	//if (m_enemySpawnTimer >= m_enemySpawnInterval) // Time to spawn a new enemy? 
+	//{												//ToDO:Check if the nesting on this if statement is correct
+	//	if ((m_totalElapsed.getElapsedTime() < sf::seconds(180))) //Spawm enemies for 3 minutes 
+	//	{
+	//		SpawnEnemy();
+	//		m_enemySpawnTimer = sf::Time::Zero;
+	//		// Randomize the next spawn interval (for example, between 1.5 and 2 seconds):
+	//		float nextInterval = 0.75f + static_cast<float>(Utility::RandomInt(1250)) / 1000.f; // 0.75 to 2.0 seconds
+	//		m_enemySpawnInterval = sf::seconds(nextInterval);
+	//	}
+	//	
+	//}
 
 	DestroyEntitiesOutsideView();
-	GuideMissiles();
 	GuideEnemies(dt); //Guide the enemies towards the players
 
 	//Forward commands to the scenegraph
@@ -87,7 +87,6 @@ void World::Update(sf::Time dt)
 	m_player_aircrafts.erase(first_to_remove, m_player_aircrafts.end());
 
 	m_scenegraph.RemoveWrecks();
-
 
 	m_scenegraph.Update(dt, m_command_queue);
 	AdaptPlayerPosition();
@@ -344,94 +343,43 @@ sf::FloatRect World::GetBattlefieldBounds() const
 
 }
 
-void World::SpawnEnemy()
+void World::AddEnemy(AircraftType type, float x, float y)
 {
-	// Choose an enemy type at random.
-	AircraftType type = (Utility::RandomInt(2) == 0) ? AircraftType::kZombie : AircraftType::kAvenger; 
-
-	// Get the current view bounds.
-	sf::FloatRect viewBounds = GetViewBounds();
-	// Define a margin to spawn outside the view.
-	float margin = 50.f;
-
-	// Determine a random side (0: top, 1: bottom, 2: left, 3: right)
-	int side = Utility::RandomInt(4);
-
-	sf::Vector2f spawnPos;
-	switch (side)
-	{
-	case 0: // Top: spawn at a random x within view (plus margin) and above the view.
-	{
-		int minX = static_cast<int>(viewBounds.left + margin);
-		int maxX = static_cast<int>(viewBounds.left + viewBounds.width - margin);
-		float x = static_cast<float>(minX + Utility::RandomInt(maxX - minX));
-		float y = viewBounds.top - margin;
-		spawnPos = sf::Vector2f(x, y);
-		break;
-	}
-	case 1: // Bottom: spawn at a random x within view (plus margin) and below the view.
-	{
-		int minX = static_cast<int>(viewBounds.left + margin);
-		int maxX = static_cast<int>(viewBounds.left + viewBounds.width - margin);
-		float x = static_cast<float>(minX + Utility::RandomInt(maxX - minX));
-		float y = viewBounds.top + viewBounds.height + margin;
-		spawnPos = sf::Vector2f(x, y);
-		break;
-	}
-	case 2: // Left: spawn at a random y within view (plus margin) and to the left of the view.
-	{
-		int minY = static_cast<int>(viewBounds.top + margin);
-		int maxY = static_cast<int>(viewBounds.top + viewBounds.height - margin);
-		float y = static_cast<float>(minY + Utility::RandomInt(maxY - minY));
-		float x = viewBounds.left - margin;
-		spawnPos = sf::Vector2f(x, y);
-		break;
-	}
-	case 3: // Right: spawn at a random y within view (plus margin) and to the right of the view.
-	{
-		int minY = static_cast<int>(viewBounds.top + margin);
-		int maxY = static_cast<int>(viewBounds.top + viewBounds.height - margin);
-		float y = static_cast<float>(minY + Utility::RandomInt(maxY - minY));
-		float x = viewBounds.left + viewBounds.width + margin;
-		spawnPos = sf::Vector2f(x, y);
-		break;
-	}
-	default:
-		// Default to top if something goes wrong.
-		spawnPos = sf::Vector2f(viewBounds.left + viewBounds.width / 2.f, viewBounds.top - margin);
-		break;
-	}
+	std::cout << "Attempting to spawn enemy of type: " << static_cast<int>(type)
+		<< " at position (" << x << ", " << y << ")\n";
 
 	// Create the enemy and set its properties.
 	std::unique_ptr<Aircraft> enemy(new Aircraft(type, m_textures, m_fonts));
-	enemy->setPosition(spawnPos);
+	enemy->setPosition(x, y);
+	std::cout << "Enemy created at position (" << enemy->getPosition().x << ", " << enemy->getPosition().y << ")\n";
+
+	sf::Vector2f velocity = enemy->GetVelocity();
+	std::cout << "Enemy velocity: (" << velocity.x << ", " << velocity.y << ")\n";
 
 	// Compute the center of the view (target point).
-	sf::Vector2f viewCenter(viewBounds.left + viewBounds.width / 2.f, viewBounds.top + viewBounds.height / 2.f);
+	sf::Vector2f viewCenter(m_camera.getCenter());
 
 	// Compute a vector from the spawn position toward the view center.
-	sf::Vector2f toCenter = viewCenter - spawnPos;
+	sf::Vector2f toCenter = viewCenter - sf::Vector2f(x, y);
 	float length = std::sqrt(toCenter.x * toCenter.x + toCenter.y * toCenter.y);
 	if (length != 0.f)
 	{
 		toCenter /= length;
 	}
 
+	// Calculate the angle from the spawn position to the view center.
 	float angleRadians = std::atan2(toCenter.y, toCenter.x);
 	float angleDegrees = static_cast<float>(Utility::ToDegrees(angleRadians));
-	angleDegrees += 90.f;//Is this necessary anymore ?
+	angleDegrees += 90.f;  // Adjust for the sprite's orientation if needed.
+
 	enemy->setRotation(angleDegrees);
 
-	// Optionally, set an initial velocity if needed. 
-	enemy->SetVelocity(0.f, 0.f);
-
-	if (m_networked_world)
-	{
-		enemy->DisablePickups();
-	}
+	// Optionally, set an initial velocity if needed.
+	//enemy->SetVelocity(0.f, 0.f);
 
 	// Attach the new enemy to the UpperAir scene layer.
 	m_scene_layers[static_cast<int>(SceneLayers::kUpperAir)]->AttachChild(std::move(enemy));
+	std::cout << "Enemy attached to the scene layer.\n";
 }
 
 void World::DestroyEntitiesOutsideView()
@@ -449,51 +397,6 @@ void World::DestroyEntitiesOutsideView()
 	m_command_queue.Push(command);
 }
 
-void World::GuideMissiles() //Todo: Remove this as there are no more missiles
-{
-	//Target the closest enemy in the world
-	Command enemyCollector;
-	enemyCollector.category = static_cast<int>(ReceiverCategories::kEnemyAircraft);
-	enemyCollector.action = DerivedAction<Aircraft>([this](Aircraft& enemy, sf::Time)
-		{
-			if (!enemy.IsDestroyed())
-			{
-				m_active_enemies.emplace_back(&enemy);
-			}
-		});
-
-	Command missileGuider;
-	missileGuider.category = static_cast<int>(ReceiverCategories::kAlliedProjectile);
-	missileGuider.action = DerivedAction<Projectile>([this](Projectile& missile, sf::Time dt)
-		{
-			if (!missile.IsGuided())
-			{
-				return;
-			}
-
-			float min_distance = std::numeric_limits<float>::max();
-			Aircraft* closest_enemy = nullptr;
-
-			for (Aircraft* enemy : m_active_enemies)
-			{
-				float enemy_distance = Distance(missile, *enemy);
-				if (enemy_distance < min_distance)
-				{
-					closest_enemy = enemy;
-					min_distance = enemy_distance;
-				}
-			}
-
-			if (closest_enemy)
-			{
-				missile.GuideTowards(closest_enemy->GetWorldPosition());
-			}
-		});
-
-	m_command_queue.Push(enemyCollector);
-	m_command_queue.Push(missileGuider);
-	m_active_enemies.clear();
-}
 void World::GuideEnemies(sf::Time dt) //Heavily based on the guide missile - makes the zombies fleshy missles
 {
 	// Command to adjust enemy aircraft velocities.
