@@ -14,7 +14,7 @@ GameServer::GameServer(sf::Vector2f battlefield_size, sf::RenderTarget& output_t
     , m_client_timeout(sf::seconds(5.f))
     , m_max_connected_players(15)
     , m_connected_players(0)
-    , m_world_height(5000.f)
+    , m_world_height(1000.f)
     , m_battlefield_rect(0.f, m_world_height - battlefield_size.y, battlefield_size.x, battlefield_size.y)
     , m_battlefield_scrollspeed(-50.f)
     , m_aircraft_count(0)
@@ -111,7 +111,7 @@ void GameServer::ExecutionThread()
         //Fixed time step
         while (frame_time >= frame_rate)
         {
-            m_battlefield_rect.top += m_battlefield_scrollspeed * frame_rate.asSeconds();
+            //m_battlefield_rect.top += m_battlefield_scrollspeed * frame_rate.asSeconds();
             frame_time -= frame_rate;
         }
 
@@ -174,7 +174,9 @@ void GameServer::Tick()
         std::size_t enemy_count = 1;
 
         sf::FloatRect viewBounds = GetViewBounds();
-        float margin = 50.f;
+        std::cout << "View Bounds: Left = " << viewBounds.left << ", Top = " << viewBounds.top
+            << ", Width = " << viewBounds.width << ", Height = " << viewBounds.height << std::endl;
+        float margin = 2.f;
 
         // Expand the bounds to include the margin
         viewBounds.left -= margin;
