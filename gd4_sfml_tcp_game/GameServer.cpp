@@ -7,6 +7,7 @@
 #include "AircraftType.hpp"
 #include <iostream>
 #include "World.hpp"
+#include <fstream>
 
 GameServer::GameServer(sf::Vector2f battlefield_size, sf::RenderTarget& output_target)
     : m_thread(&GameServer::ExecutionThread, this)
@@ -444,6 +445,18 @@ void GameServer::HandleIncomingConnections()
     }
 }
 
+void GameServer::LogSurvivalTime(sf::Int32 identifier, float time_survived)
+{
+    std::ofstream log_file("survival_times.txt", std::ios::app); // Open file in append mode
+    if (!log_file)
+    {
+        std::cerr << "Error: Could not open log file for writing!" << std::endl;
+        return;
+    }
+
+    log_file << "Player " << identifier << " survived " << time_survived << " seconds\n";
+}
+
 void GameServer::HandleDisconnections()
 {
     for (auto itr = m_peers.begin(); itr != m_peers.end();)
@@ -451,10 +464,13 @@ void GameServer::HandleDisconnections()
         if ((*itr)->m_timed_out)
         {
             //Inform everyone of a disconnection, erase
-            for (sf::Int32 identifer : (*itr)->m_aircraft_identifiers)
+            for (sf::Int32 identifier : (*itr)->m_aircraft_identifiers)
             {
-                SendToAll((sf::Packet() << static_cast<sf::Int32>(Server::PacketType::kPlayerDisconnect) << identifer));
-                m_aircraft_info.erase(identifer);
+                SendToAll((sf::Packet() << static_cast<sf::Int32>(Server::PacketType::kPlayerDisconnect) << identifier));
+                m_aircraft_info.erase(identifier);
+				float time_survived = Now().asSeconds();
+                std::cout << "Player " << identifier << " has survived " << time_survived << " seconds" << std::endl;
+                LogSurvivalTime(identifier, time_survived);
             }
 
             m_connected_players--;
@@ -470,7 +486,6 @@ void GameServer::HandleDisconnections()
             }
 
             BroadcastMessage("A player has disconnected");
-
         }
         else
         {

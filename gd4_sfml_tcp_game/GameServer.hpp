@@ -61,6 +61,8 @@ private:
 	void SendToAll(sf::Packet& packet);
 	void UpdateClientState();
 
+	void LogSurvivalTime(sf::Int32 identifier, float time_survived);
+
 private:
 	sf::Thread m_thread;
 	sf::Clock m_clock;
