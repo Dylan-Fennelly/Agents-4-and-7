@@ -47,12 +47,6 @@ MultiplayerGameState::MultiplayerGameState(StateStack& stack, Context context, b
 	m_broadcast_text.setFont(context.fonts->Get(Font::kMain));
 	m_broadcast_text.setPosition(1024.f / 2, 100.f);
 
-	m_player_invitation_text.setFont(context.fonts->Get(Font::kMain));
-	m_player_invitation_text.setCharacterSize(20);
-	m_player_invitation_text.setFillColor(sf::Color::White);
-	m_player_invitation_text.setString("Press Enter to spawn player 2");
-	m_player_invitation_text.setPosition(1000 - m_player_invitation_text.getLocalBounds().width, 760 - m_player_invitation_text.getLocalBounds().height);
-
 	//Use this for "Attempt to connect" and "Failed to connect" messages
 	m_failed_connection_text.setFont(context.fonts->Get(Font::kMain));
 	m_failed_connection_text.setCharacterSize(35);
@@ -264,14 +258,14 @@ bool MultiplayerGameState::HandleEvent(const sf::Event& event)
 	if (event.type == sf::Event::KeyPressed)
 	{
 		//If enter pressed, add second player co-op only if there is only 1 player
-		if (event.key.code == sf::Keyboard::Return && m_local_player_identifiers.size() == 1)
+		/*if (event.key.code == sf::Keyboard::Return && m_local_player_identifiers.size() == 1)
 		{
 			sf::Packet packet;
 			packet << static_cast<sf::Int32>(Client::PacketType::kRequestCoopPartner);
 			m_socket.send(packet);
-		}
+		}*/
 		//If escape is pressed, show the pause screen
-		else if (event.key.code == sf::Keyboard::Escape)
+		if (event.key.code == sf::Keyboard::Escape)
 		{
 			DisableAllRealtimeActions();
 			RequestStackPush(StateID::kNetworkPause);

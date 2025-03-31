@@ -18,7 +18,8 @@ namespace Server
 		kSpawnPickup, //Similar to kSpawnEnemy. sf::Int32 for pickup type in PickupType.hpp and two floats for position
 		kSpawnSelf, //This takes an sf::Int32 for the aircraft identifier and two float values for the initial position. 
 		kUpdateClientState, //This takes one float with the current scrolling of the world in the server, and then a sf::Int32 for the number of aircraft. For each aircraft, it packs one sf::Int32 value with the identifier, two floats for position, health, and ammo. Think about enemies. If we don't send anything they will be locally tracked
-		kMissionSuccess // This has no arguments. It just informs the client that the game is over and the client can show the appropriate state
+		kMissionSuccess, // This has no arguments. It just informs the client that the game is over and the client can show the appropriate state
+		//kStillHere, //This is a simple message to tell the server that the client is still here
 	};
 }
 
@@ -32,6 +33,7 @@ namespace Client
 		kRequestCoopPartner, //No parameters. It is sent when the user presses Return to request a local partner. The server will AcceptCoopPartner 
 		kStateUpdate, //sf::Int32 with number of local aircraft, for each aircraft send sf::Int32 identifier, two floats for position, health and ammo 
 		kGameEvent, //This is for explosions
+		kStillHere, //This is a simple message to tell the server that the client is still here
 		kQuit
 	};
 }

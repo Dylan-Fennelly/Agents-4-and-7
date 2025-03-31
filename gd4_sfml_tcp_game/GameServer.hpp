@@ -62,6 +62,7 @@ private:
 	void UpdateClientState();
 
 private:
+	std::vector<sf::Int32> m_observing_players;
 	sf::Thread m_thread;
 	sf::Clock m_clock;
 	sf::TcpListener m_listener_socket;

@@ -26,6 +26,7 @@ GameServer::GameServer(sf::Vector2f battlefield_size, sf::RenderTarget& output_t
 	, m_target(output_target)
 	, m_camera(output_target.getDefaultView())
     , m_player_aircrafts()
+	, m_observing_players()
 {
     m_listener_socket.setBlocking(false);
     m_peers[0].reset(new RemotePeer());
@@ -135,12 +136,10 @@ sf::FloatRect GameServer::GetViewBounds() const
 void GameServer::Tick()
 {
     UpdateClientState();
-    //Check if the game is over = all planes postion.y < offset
 
     bool all_aircraft_done = false;
     for (const auto& current : m_aircraft_info)
     {
-        //As long as one player has not crossed the finish line the game is still live
         if (Now() >= sf::seconds(900.f))
         {
             all_aircraft_done = true;
@@ -160,13 +159,23 @@ void GameServer::Tick()
     {
         if (itr->second.m_hitpoints <= 0)
         {
+            m_observing_players.push_back(itr->first);
             m_aircraft_info.erase(itr++);
         }
         else
         {
             ++itr;
         }
-    } 
+    }
+
+    // Send kStillHere packet for observing players
+    for (auto& observer : m_observing_players)
+    {
+        sf::Packet packet;
+        packet << static_cast<sf::Int32>(Client::PacketType::kStillHere);
+        packet << observer;
+        SendToAll(packet);
+    }
 
     //Check if it is time to spawn enemies
     if (Now() >= m_time_for_next_spawn + m_last_spawn_time)
@@ -365,6 +374,7 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
             sf::Vector2f aircraft_position;
 			float aircraft_rotation;
             packet >> aircraft_identifier >> aircraft_position.x >> aircraft_position.y >> aircraft_hitpoints >> aircraft_rotation;
+
             m_aircraft_info[aircraft_identifier].m_position = aircraft_position;
 			m_aircraft_info[aircraft_identifier].m_rotation = aircraft_rotation;
             m_aircraft_info[aircraft_identifier].m_hitpoints = aircraft_hitpoints;
@@ -398,6 +408,15 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
             SendToAll(packet);
         }
     }
+    break;
+    case Client::PacketType::kStillHere:
+    {
+        sf::Int32 aircraft_identifier;
+        packet >> aircraft_identifier;
+        // Handle the case where the player is observing.
+        std::cout << "Player " << aircraft_identifier << " is still here, observing.\n";
+    }
+    break;
     }
 }
 
