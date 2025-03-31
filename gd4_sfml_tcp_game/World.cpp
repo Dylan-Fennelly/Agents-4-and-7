@@ -257,7 +257,7 @@ void World::LoadTextures()
 	m_textures.Load(TextureID::kAgentSix, "Media/Textures/AgentSix.png");
 	m_textures.Load(TextureID::kAgentSeven, "Media/Textures/AgentSeven.png");
 	m_textures.Load(TextureID::kZombie, "Media/Textures/Zombie.png");
-	m_textures.Load(TextureID::kZombie2, "Media/Textures/Zombie.png");
+	m_textures.Load(TextureID::kZombie2, "Media/Textures/BloodyZombie.png");
 	m_textures.Load(TextureID::kLandscape, "Media/Textures/Desert.png");
 	m_textures.Load(TextureID::kBullet, "Media/Textures/Bullet.png");
 	m_textures.Load(TextureID::kMissile, "Media/Textures/Missile.png");
@@ -393,8 +393,18 @@ void World::AddEnemy(AircraftType type, float x, float y)
 	std::cout << "Attempting to spawn enemy of type: " << static_cast<int>(type)
 		<< " at position (" << x << ", " << y << ")\n";
 
+	TextureID texture_id;
+	if (type == AircraftType::kZombie)
+	{
+		texture_id = TextureID::kZombie2;
+	}
+	else if (type == AircraftType::kAvenger)
+	{
+		texture_id = TextureID::kZombie;
+	}
+
 	// Create the enemy and set its properties.
-	std::unique_ptr<Aircraft> enemy(new Aircraft(type, m_textures, m_fonts, TextureID::kZombie, " mm"));
+	std::unique_ptr<Aircraft> enemy(new Aircraft(type, m_textures, m_fonts, texture_id, " "));
 	enemy->setPosition(x, y);
 	std::cout << "Enemy created at position (" << enemy->getPosition().x << ", " << enemy->getPosition().y << ")\n";
 

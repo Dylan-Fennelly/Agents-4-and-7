@@ -2,7 +2,6 @@
   Dylan Fennelly - D00248176*/
 
 #include "Application.hpp"
-#include "GameState.hpp"
 #include "TitleState.hpp"
 #include "MenuState.hpp"
 #include "PauseState.hpp"

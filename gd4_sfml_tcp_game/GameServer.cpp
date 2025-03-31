@@ -135,7 +135,6 @@ sf::FloatRect GameServer::GetViewBounds() const
 void GameServer::Tick()
 {
     UpdateClientState();
-    //GuideEnemies();
     //Check if the game is over = all planes postion.y < offset
 
     bool all_aircraft_done = false;
