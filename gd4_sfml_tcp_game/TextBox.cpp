@@ -163,9 +163,15 @@ void TextBox::update()
 void TextBox::draw(sf::RenderWindow& window, bool showCursor)
 {
     window.draw(box);
-    if (selectionStart != -1) window.draw(highlight);
+    if (selectionStart != -1)
+    {
+        window.draw(highlight);
+    }
     window.draw(text);
-    if (cursorVisible&&showCursor) window.draw(cursor);
+    if (cursorVisible && showCursor)
+    {
+        window.draw(cursor);
+    }
 }
 
 sf::RectangleShape TextBox::getBox()

@@ -16,4 +16,6 @@ enum class StateID
 	kHostGame,
 	kJoinGame,
 	kControllerSelect,
+	kCredentialEntryHost,
+	kCredentialEntryJoin
 };
