@@ -42,14 +42,20 @@ int Entity::GetHitPoints() const
 
 void Entity::SetHitpoints(int points)
 {
-    //assert(points > 0);
     m_hitpoints = points;
 }
 void Entity::Repair(int points)
 {
     assert(points > 0);
-    //TODO Limit hitpoints
-    m_hitpoints += points;
+	if (m_hitpoints + points > 30)
+	{
+		m_hitpoints = 30;
+	}
+    else
+    {
+        m_hitpoints += points;
+    }
+    
 }
 
 void Entity::Damage(int points)

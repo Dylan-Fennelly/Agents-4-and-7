@@ -21,6 +21,7 @@ struct AircraftData
 {
 	int m_hitpoints;
 	float m_speed;
+	int randomSprite;
 	TextureID m_texture;
 	sf::IntRect m_texture_rect;
 	sf::Time m_fire_interval;

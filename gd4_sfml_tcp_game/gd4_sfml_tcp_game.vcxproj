@@ -146,7 +146,6 @@
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="GameOverState.cpp" />
     <ClCompile Include="GameServer.cpp" />
-    <ClCompile Include="GameState.cpp" />
     <ClCompile Include="KeyBinding.cpp" />
     <ClCompile Include="Label.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -197,7 +196,6 @@
     <ClInclude Include="Font.hpp" />
     <ClInclude Include="GameOverState.hpp" />
     <ClInclude Include="GameServer.hpp" />
-    <ClInclude Include="GameState.hpp" />
     <ClInclude Include="KeyBinding.hpp" />
     <ClInclude Include="Label.hpp" />
     <ClInclude Include="MenuOptions.hpp" />

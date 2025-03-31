@@ -9,10 +9,10 @@ KeyBinding::KeyBinding(int control_preconfiguration)
 	// Set initial key bindings for player 1
 	if (control_preconfiguration == 1)
 	{
-		m_key_map[sf::Keyboard::Left] = Action::kMoveLeft;
-		m_key_map[sf::Keyboard::Right] = Action::kMoveRight;
-		m_key_map[sf::Keyboard::Up] = Action::kMoveUp;
-		m_key_map[sf::Keyboard::Down] = Action::kMoveDown;
+		m_key_map[sf::Keyboard::A] = Action::kMoveLeft;
+		m_key_map[sf::Keyboard::D] = Action::kMoveRight;
+		m_key_map[sf::Keyboard::W] = Action::kMoveUp;
+		m_key_map[sf::Keyboard::S] = Action::kMoveDown;
 		m_key_map[sf::Keyboard::Space] = Action::kBulletFire;
 		m_key_map[sf::Keyboard::M] = Action::kMissileFire;
 	}
