@@ -487,7 +487,6 @@ void MultiplayerGameState::HandlePacket(sf::Int32 packet_type, sf::Packet& packe
 		std::cout << "Received spawn enemy packet. Type: " << type
 			<< ", Position: (" << position.x << ", " << position.y << ")\n";
 
-		//m_world.AddEnemy(static_cast<AircraftType>(type), 500, 5000);
 		m_world.AddEnemy(static_cast<AircraftType>(type), position.x, position.y);
 	}
 	break;

@@ -138,13 +138,13 @@ void GameServer::Tick()
     //GuideEnemies();
     //Check if the game is over = all planes postion.y < offset
 
-    bool all_aircraft_done = true;
+    bool all_aircraft_done = false;
     for (const auto& current : m_aircraft_info)
     {
         //As long as one player has not crossed the finish line the game is still live
-        if (current.second.m_position.y > 0.f)
+        if (Now() >= sf::seconds(30.f))
         {
-            all_aircraft_done = false;
+            all_aircraft_done = true;
             break;
         }
     }

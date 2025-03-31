@@ -35,13 +35,13 @@ namespace
 //	return TextureID::kAgentFour;
 //}
 
-Aircraft::Aircraft(AircraftType type, const TextureHolder& textures, const FontHolder& fonts, TextureID texture)  
+Aircraft::Aircraft(AircraftType type, const TextureHolder& textures, const FontHolder& fonts, TextureID texture, std::string name)  
 	: Entity(Table[static_cast<int>(type)].m_hitpoints)
 	, m_type(type)
 	, m_sprite(textures.Get(texture), Table[static_cast<int>(type)].m_texture_rect)
 	, m_explosion(textures.Get(TextureID::kExplosion))
 	, m_health_display(nullptr)
-	, m_missile_display(nullptr)
+	, m_name_display(nullptr)
 	, m_distance_travelled(0.f)
 	, m_directions_index(0)
 	, m_fire_rate(1)
@@ -57,6 +57,7 @@ Aircraft::Aircraft(AircraftType type, const TextureHolder& textures, const FontH
 	, m_pickups_enabled(true)
 	, m_identifier(0)
 	, m_rotation(0.f)
+	, m_name(name)
 
 
 
@@ -94,7 +95,7 @@ Aircraft::Aircraft(AircraftType type, const TextureHolder& textures, const FontH
 	{
 		std::string* missile_ammo = new std::string("");
 		std::unique_ptr<TextNode> missile_display(new TextNode(fonts, *missile_ammo));
-		m_missile_display = missile_display.get();
+		m_name_display = missile_display.get();
 		AttachChild(std::move(missile_display));
 	}
 
@@ -188,16 +189,17 @@ void Aircraft::UpdateTexts()
 	m_health_display->setPosition(0.f, 50.f);
 	m_health_display->setRotation(-getRotation());
 
-	if (m_missile_display)
+	if (m_name_display)
 	{
-		m_missile_display->setPosition(0.f, 70.f);
-		if (m_missile_ammo == 0)
+		m_name_display->setPosition(0.f, 70.f);
+		m_name_display->setRotation(-getRotation());
+		if (m_name == "")
 		{
-			m_missile_display->SetString("");
+			m_name_display->SetString("");
 		}
 		else
 		{
-			m_missile_display->SetString("M: " + std::to_string(m_missile_ammo));
+			m_name_display->SetString(m_name);
 		}
 	}
 }

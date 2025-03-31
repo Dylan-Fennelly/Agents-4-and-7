@@ -15,7 +15,7 @@
 class Aircraft : public Entity
 {
 public:
-	Aircraft(AircraftType type, const TextureHolder& textures, const FontHolder& fonts, TextureID texture);
+	Aircraft(AircraftType type, const TextureHolder& textures, const FontHolder& fonts, TextureID texture, std::string name);
 	unsigned int GetCategory() const override;
 
 	void DisablePickups();
@@ -66,7 +66,7 @@ private:
 
 
 	TextNode* m_health_display;
-	TextNode* m_missile_display;
+	TextNode* m_name_display;
 	float m_distance_travelled;
 	int m_directions_index;
 
@@ -100,5 +100,7 @@ private:
 	sf::Shader m_invincibilityShader;
 	//Added by Albert
 	sf::Time m_minigun_timer;
+
+	std::string m_name;
 };
 

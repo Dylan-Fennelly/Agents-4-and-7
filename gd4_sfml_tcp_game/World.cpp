@@ -136,35 +136,44 @@ Aircraft* World::AddAircraft(int identifier)
 {
 	int texture_id = identifier % 7;
 	TextureID texture;
+	std::string name;
 	switch (texture_id)
     {
 	case 1:
 		texture = TextureID::kAgentOne;
+		name = "Agent One";
         break;
 	case 2:
 		texture = TextureID::kAgentTwo;
+		name = "Agent Two";
         break;
 	case 3:
 		texture = TextureID::kAgentThree;
+		name = "Agent Three";
         break;
     case 4:
 		texture = TextureID::kAgentFour;
+		name = "Agent Four";
         break;
 	case 5:
 		texture = TextureID::kAgentFive;
+		name = "Agent Five";
         break;
     case 6:
 		texture = TextureID::kAgentSix;
+		name = "Agent Six";
         break;
 	case 7:
 		texture = TextureID::kAgentSeven;
+		name = "Agent Seven";
 		break;
 	default:
 		texture = TextureID::kAgentOne;
+		name = "Agent One";
         break;
     }
 
-	std::unique_ptr<Aircraft> player(new Aircraft(AircraftType::kAgent, m_textures, m_fonts, texture));
+	std::unique_ptr<Aircraft> player(new Aircraft(AircraftType::kAgent, m_textures, m_fonts, texture, name));
 	player->setPosition(m_camera.getCenter());
 	player->SetIdentifier(identifier);
 
@@ -385,7 +394,7 @@ void World::AddEnemy(AircraftType type, float x, float y)
 		<< " at position (" << x << ", " << y << ")\n";
 
 	// Create the enemy and set its properties.
-	std::unique_ptr<Aircraft> enemy(new Aircraft(type, m_textures, m_fonts, TextureID::kZombie));
+	std::unique_ptr<Aircraft> enemy(new Aircraft(type, m_textures, m_fonts, TextureID::kZombie, "Shit eater"));
 	enemy->setPosition(x, y);
 	std::cout << "Enemy created at position (" << enemy->getPosition().x << ", " << enemy->getPosition().y << ")\n";
 
