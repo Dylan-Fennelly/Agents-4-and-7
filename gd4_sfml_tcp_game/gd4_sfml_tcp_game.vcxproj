@@ -140,6 +140,7 @@
     <ClCompile Include="CommandQueue.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Container.cpp" />
+    <ClCompile Include="CredentialEntryState.cpp" />
     <ClCompile Include="DataTables.cpp" />
     <ClCompile Include="EmitterNode.cpp" />
     <ClCompile Include="Entity.cpp" />
@@ -165,6 +166,7 @@
     <ClCompile Include="SpriteNode.cpp" />
     <ClCompile Include="State.cpp" />
     <ClCompile Include="StateStack.cpp" />
+    <ClCompile Include="TextBox.cpp" />
     <ClCompile Include="TextNode.cpp" />
     <ClCompile Include="TextureHolder.cpp" />
     <ClCompile Include="TitleState.cpp" />
@@ -187,6 +189,7 @@
     <ClInclude Include="Constants.hpp" />
     <ClInclude Include="Container.hpp" />
     <ClInclude Include="ControllerType.hpp" />
+    <ClInclude Include="CredentialEntryState.hpp" />
     <ClInclude Include="DataTables.hpp" />
     <ClInclude Include="EmitterNode.hpp" />
     <ClInclude Include="Entity.hpp" />
@@ -228,6 +231,7 @@
     <ClInclude Include="State.hpp" />
     <ClInclude Include="StateID.hpp" />
     <ClInclude Include="StateStack.hpp" />
+    <ClInclude Include="TextBox.hpp" />
     <ClInclude Include="TextNode.hpp" />
     <ClInclude Include="TextureHolder.hpp" />
     <ClInclude Include="TextureID.hpp" />

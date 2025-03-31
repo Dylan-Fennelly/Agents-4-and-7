@@ -1,6 +1,3 @@
-/*Albert Skalinski - D00248346
-  Dylan Fennelly - D00248176*/
-
 #include "MenuState.hpp"
 #include "ResourceHolder.hpp"
 #include "Utility.hpp"
@@ -8,7 +5,6 @@
 
 MenuState::MenuState(StateStack& stack, Context context)
     :State(stack, context)
-
 {
     sf::Texture& texture = context.textures->Get(TextureID::kTitleScreen);
 
@@ -16,50 +12,50 @@ MenuState::MenuState(StateStack& stack, Context context)
 
     auto play_button = std::make_shared<gui::Button>(context);
     play_button->setPosition(100, 300);
-    play_button->SetText("Play");
+    play_button->SetText("Join Game");
     play_button->SetCallback([this]()
-    {
-        RequestStackPop();
-        RequestStackPush(StateID::kGame);
-    });
+        {
+            RequestStackPop();
+            RequestStackPush(StateID::kCredentialEntryJoin);
+        });
 
     auto host_play_button = std::make_shared<gui::Button>(context);
     host_play_button->setPosition(100, 350);
-    host_play_button->SetText("Host");
+    host_play_button->SetText("Host Game");
     host_play_button->SetCallback([this]()
         {
             RequestStackPop();
-            RequestStackPush(StateID::kHostGame);
+            RequestStackPush(StateID::kCredentialEntryHost);
         });
 
-    auto join_play_button = std::make_shared<gui::Button>(context);
-    join_play_button->setPosition(100, 400);
-    join_play_button->SetText("Join");
-    join_play_button->SetCallback([this]()
-        {
-            RequestStackPop();
-            RequestStackPush(StateID::kJoinGame);
-        });
+    //auto join_play_button = std::make_shared<gui::Button>(context);
+    //join_play_button->setPosition(100, 400);
+    //join_play_button->SetText("Join");
+    //join_play_button->SetCallback([this]()
+    //    {
+    //        RequestStackPop();
+    //        RequestStackPush(StateID::kJoinGame);
+    //    });
 
     auto settings_button = std::make_shared<gui::Button>(context);
-    settings_button->setPosition(100, 450);
+    settings_button->setPosition(100, 400);
     settings_button->SetText("Settings");
     settings_button->SetCallback([this]()
-    {
-        RequestStackPush(StateID::kSettings);
-    });
+        {
+            RequestStackPush(StateID::kSettings);
+        });
 
     auto exit_button = std::make_shared<gui::Button>(context);
     exit_button->setPosition(100, 500);
     exit_button->SetText("Exit");
     exit_button->SetCallback([this]()
-    {
+        {
             RequestStackPop();
-    });
+        });
 
     m_gui_container.Pack(play_button);
     m_gui_container.Pack(host_play_button);
-    m_gui_container.Pack(join_play_button);
+    //m_gui_container.Pack(join_play_button);
     m_gui_container.Pack(settings_button);
     m_gui_container.Pack(exit_button);
 
@@ -85,4 +81,3 @@ bool MenuState::HandleEvent(const sf::Event& event)
     m_gui_container.HandleEvent(event);
     return true;
 }
-
