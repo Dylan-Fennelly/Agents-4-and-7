@@ -7,7 +7,9 @@
 #include "Button.hpp"
 
 MenuState::MenuState(StateStack& stack, Context context)
-    :State(stack, context)
+    : State(stack, context)
+	, m_text_box(context.fonts->Get(Font::kMain), sf::Vector2f(100, 100), sf::Vector2f(200, 50), 20, 20)
+	, m_text_box_Selected(false)
 
 {
     sf::Texture& texture = context.textures->Get(TextureID::kTitleScreen);
@@ -73,16 +75,45 @@ void MenuState::Draw()
     window.setView(window.getDefaultView());
     window.draw(m_background_sprite);
     window.draw(m_gui_container);
+
+    m_text_box.draw(window, m_text_box_Selected);
 }
 
 bool MenuState::Update(sf::Time dt)
 {
+    if (m_text_box_Selected)
+    {
+        m_text_box.update();
+    }
     return true;
 }
 
 bool MenuState::HandleEvent(const sf::Event& event)
 {
-    m_gui_container.HandleEvent(event);
+
+    // Handle clicks to toggle text box selection
+    if (event.type == sf::Event::MouseButtonPressed)
+    {
+        sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
+        if (m_text_box.getBox().getGlobalBounds().contains(mousePos))
+        {
+            m_text_box_Selected = true;
+        }
+        else 
+        {
+            m_text_box_Selected = false;
+        }
+    }
+
+    // Pass events only if text box is selected
+    if (m_text_box_Selected) 
+    {
+        m_text_box.handleEvent(event);
+    }
+    else 
+    {
+        m_gui_container.HandleEvent(event);
+    }
     return true;
 }
 

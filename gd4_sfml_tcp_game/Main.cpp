@@ -166,4 +166,31 @@ int main()
 //
 //    return 0;
 //}
-
+//#include <SFML/Graphics.hpp>
+//#include <SFML/Window.hpp>
+//#include <SFML/System.hpp>
+//#include <iostream>
+//#include "TextBox.hpp"
+//int main() {
+//    sf::RenderWindow window(sf::VideoMode(800, 600), "TextBox Class");
+//    sf::Font font;
+//    font.loadFromFile("Media/Fonts/Sansation.ttf");
+//
+//    TextBox textBox(font, { 50, 50 }, { 500, 50 }, 24, 20);
+//
+//    while (window.isOpen()) {
+//        sf::Event event;
+//        while (window.pollEvent(event)) {
+//            if (event.type == sf::Event::Closed)
+//                window.close();
+//            textBox.handleEvent(event);
+//        }
+//
+//        textBox.update();
+//
+//        window.clear(sf::Color::White);
+//        textBox.draw(window);
+//        window.display();
+//    }
+//    return 0;
+//}

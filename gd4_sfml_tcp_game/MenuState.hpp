@@ -8,6 +8,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <vector>
+#include "TextBox.hpp"
 
 
 class MenuState : public State
@@ -21,5 +22,8 @@ public:
 private:
 	sf::Sprite m_background_sprite;
 	gui::Container m_gui_container;
+
+	TextBox m_text_box;
+	bool m_text_box_Selected;
 };
 
