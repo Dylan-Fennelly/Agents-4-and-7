@@ -18,27 +18,27 @@ namespace
 	const std::vector<AircraftData> Table = InitializeAircraftData();
 }
 
-TextureID ToTextureID(AircraftType type)
-{
-	switch (type)
-	{
-	case AircraftType::kAgentFour:
-		return TextureID::kAgentFour;
-		break;
-	case AircraftType::kZombie:
-		return TextureID::kZombie;
-		break;
-	case AircraftType::kAvenger:
-		return TextureID::kZombie2;
-		break;
-	}
-	return TextureID::kAgentFour;
-}
+//TextureID ToTextureID(AircraftType type)
+//{
+//	switch (type)
+//	{
+//	case AircraftType::kAgent:
+//		return TextureID::kAgentFour;
+//		break;
+//	case AircraftType::kZombie:
+//		return TextureID::kZombie;
+//		break;
+//	case AircraftType::kAvenger:
+//		return TextureID::kZombie2;
+//		break;
+//	}
+//	return TextureID::kAgentFour;
+//}
 
-Aircraft::Aircraft(AircraftType type, const TextureHolder& textures, const FontHolder& fonts)  
+Aircraft::Aircraft(AircraftType type, const TextureHolder& textures, const FontHolder& fonts, TextureID texture)  
 	: Entity(Table[static_cast<int>(type)].m_hitpoints)
 	, m_type(type)
-	, m_sprite(textures.Get(Table[static_cast<int>(type)].m_texture), Table[static_cast<int>(type)].m_texture_rect)
+	, m_sprite(textures.Get(texture), Table[static_cast<int>(type)].m_texture_rect)
 	, m_explosion(textures.Get(TextureID::kExplosion))
 	, m_health_display(nullptr)
 	, m_missile_display(nullptr)
@@ -419,7 +419,7 @@ void Aircraft::CheckProjectileLaunch(sf::Time dt, CommandQueue& commands)
 
 bool Aircraft::IsAllied() const
 {
-	return m_type == AircraftType::kAgentFour;
+	return m_type == AircraftType::kAgent;
 }
 
 void Aircraft::Remove()

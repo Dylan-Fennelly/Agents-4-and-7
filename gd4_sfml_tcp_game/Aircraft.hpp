@@ -15,7 +15,7 @@
 class Aircraft : public Entity
 {
 public:
-	Aircraft(AircraftType type, const TextureHolder& textures, const FontHolder& fonts);
+	Aircraft(AircraftType type, const TextureHolder& textures, const FontHolder& fonts, TextureID texture);
 	unsigned int GetCategory() const override;
 
 	void DisablePickups();

@@ -187,7 +187,6 @@ void GameServer::Tick()
 
         // Determine a random side
         int side = Utility::RandomInt(4);
-
         sf::Vector2f spawnPos;
         switch (side)
         {

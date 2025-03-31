@@ -5,7 +5,13 @@
 enum class TextureID
 {
 	kLandscape,
+	kAgentOne,
+	kAgentTwo,
+	kAgentThree,
 	kAgentFour,
+	kAgentFive,
+	kAgentSix,
+	kAgentSeven,
 	kZombie,
 	kZombie2,
 	kMissile,

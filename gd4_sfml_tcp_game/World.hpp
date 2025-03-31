@@ -110,5 +110,7 @@ private:
 	BloomEffect m_bloom_effect;
 	bool m_networked_world;
 	NetworkNode* m_network_node;
+
+	int texture_id;
 };
 

@@ -134,7 +134,37 @@ void World::RemoveAircraft(int identifier)
 
 Aircraft* World::AddAircraft(int identifier)
 {
-	std::unique_ptr<Aircraft> player(new Aircraft(AircraftType::kAgentFour, m_textures, m_fonts));
+	int texture_id = identifier % 7;
+	TextureID texture;
+	switch (texture_id)
+    {
+	case 1:
+		texture = TextureID::kAgentOne;
+        break;
+	case 2:
+		texture = TextureID::kAgentTwo;
+        break;
+	case 3:
+		texture = TextureID::kAgentThree;
+        break;
+    case 4:
+		texture = TextureID::kAgentFour;
+        break;
+	case 5:
+		texture = TextureID::kAgentFive;
+        break;
+    case 6:
+		texture = TextureID::kAgentSix;
+        break;
+	case 7:
+		texture = TextureID::kAgentSeven;
+		break;
+	default:
+		texture = TextureID::kAgentOne;
+        break;
+    }
+
+	std::unique_ptr<Aircraft> player(new Aircraft(AircraftType::kAgent, m_textures, m_fonts, texture));
 	player->setPosition(m_camera.getCenter());
 	player->SetIdentifier(identifier);
 
@@ -210,7 +240,13 @@ bool World::HasPlayerReachedEnd(sf::Time dt) //Check if there are any enemies le
 void World::LoadTextures()
 {
 	//Most textures have been sourced in DataTables.cpp, unless stated otherwise
+	m_textures.Load(TextureID::kAgentOne, "Media/Textures/AgentOne.png");
+	m_textures.Load(TextureID::kAgentTwo, "Media/Textures/AgentTwo.png");
+	m_textures.Load(TextureID::kAgentThree, "Media/Textures/AgentThree.png");
 	m_textures.Load(TextureID::kAgentFour, "Media/Textures/AgentFour.png");
+	m_textures.Load(TextureID::kAgentFive, "Media/Textures/AgentFive.png");
+	m_textures.Load(TextureID::kAgentSix, "Media/Textures/AgentSix.png");
+	m_textures.Load(TextureID::kAgentSeven, "Media/Textures/AgentSeven.png");
 	m_textures.Load(TextureID::kZombie, "Media/Textures/Zombie.png");
 	m_textures.Load(TextureID::kZombie2, "Media/Textures/Zombie.png");
 	m_textures.Load(TextureID::kLandscape, "Media/Textures/Desert.png");
@@ -349,7 +385,7 @@ void World::AddEnemy(AircraftType type, float x, float y)
 		<< " at position (" << x << ", " << y << ")\n";
 
 	// Create the enemy and set its properties.
-	std::unique_ptr<Aircraft> enemy(new Aircraft(type, m_textures, m_fonts));
+	std::unique_ptr<Aircraft> enemy(new Aircraft(type, m_textures, m_fonts, TextureID::kZombie));
 	enemy->setPosition(x, y);
 	std::cout << "Enemy created at position (" << enemy->getPosition().x << ", " << enemy->getPosition().y << ")\n";
 

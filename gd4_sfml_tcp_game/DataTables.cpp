@@ -7,7 +7,7 @@
 #include "PickupType.hpp"
 #include "Aircraft.hpp"
 #include "ParticleType.hpp"
-
+#include <iostream>
   //Todo: Remove the hard-coded values and replace them with values from a file so that they can be easily changed
 
 std::vector<AircraftData> InitializeAircraftData()
@@ -17,12 +17,14 @@ std::vector<AircraftData> InitializeAircraftData()
     //Modified by Albert
 	//Changed the texture for the player
     //Source - https://kenney.nl/assets/top-down-shooter
-    data[static_cast<int>(AircraftType::kAgentFour)].m_hitpoints = 100;
-    data[static_cast<int>(AircraftType::kAgentFour)].m_speed = 200.f;
-    data[static_cast<int>(AircraftType::kAgentFour)].m_fire_interval = sf::seconds(1);
-    data[static_cast<int>(AircraftType::kAgentFour)].m_texture = TextureID::kAgentFour;
-    data[static_cast<int>(AircraftType::kAgentFour)].m_texture_rect = sf::IntRect(0, 0, 50, 50);
-    data[static_cast<int>(AircraftType::kAgentFour)].m_has_roll_animation = false;
+    data[static_cast<int>(AircraftType::kAgent)].m_hitpoints = 100;
+    data[static_cast<int>(AircraftType::kAgent)].m_speed = 200.f;
+    data[static_cast<int>(AircraftType::kAgent)].m_fire_interval = sf::seconds(1);
+	//Write a switch statement that sets the texture based on a random number between 1 and 7
+    data[static_cast<int>(AircraftType::kAgent)].m_texture = TextureID::kAgentOne;
+
+    data[static_cast<int>(AircraftType::kAgent)].m_texture_rect = sf::IntRect(0, 0, 50, 50);
+    data[static_cast<int>(AircraftType::kAgent)].m_has_roll_animation = false;
 
     //Modified by Albert
     //Changed the texture for the enemy
