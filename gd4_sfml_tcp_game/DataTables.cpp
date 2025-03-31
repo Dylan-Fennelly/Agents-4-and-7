@@ -7,7 +7,7 @@
 #include "PickupType.hpp"
 #include "Aircraft.hpp"
 #include "ParticleType.hpp"
-
+#include <iostream>
   //Todo: Remove the hard-coded values and replace them with values from a file so that they can be easily changed
 
 std::vector<AircraftData> InitializeAircraftData()
@@ -17,18 +17,20 @@ std::vector<AircraftData> InitializeAircraftData()
     //Modified by Albert
 	//Changed the texture for the player
     //Source - https://kenney.nl/assets/top-down-shooter
-    data[static_cast<int>(AircraftType::kAgentFour)].m_hitpoints = 100;
-    data[static_cast<int>(AircraftType::kAgentFour)].m_speed = 200.f;
-    data[static_cast<int>(AircraftType::kAgentFour)].m_fire_interval = sf::seconds(1);
-    data[static_cast<int>(AircraftType::kAgentFour)].m_texture = TextureID::kAgentFour;
-    data[static_cast<int>(AircraftType::kAgentFour)].m_texture_rect = sf::IntRect(0, 0, 50, 50);
-    data[static_cast<int>(AircraftType::kAgentFour)].m_has_roll_animation = false;
+    data[static_cast<int>(AircraftType::kAgent)].m_hitpoints = 30;
+    data[static_cast<int>(AircraftType::kAgent)].m_speed = 100.f;
+    data[static_cast<int>(AircraftType::kAgent)].m_fire_interval = sf::seconds(1.5);
+	//Write a switch statement that sets the texture based on a random number between 1 and 7
+    data[static_cast<int>(AircraftType::kAgent)].m_texture = TextureID::kAgentOne;
+
+    data[static_cast<int>(AircraftType::kAgent)].m_texture_rect = sf::IntRect(0, 0, 50, 50);
+    data[static_cast<int>(AircraftType::kAgent)].m_has_roll_animation = false;
 
     //Modified by Albert
     //Changed the texture for the enemy
     //Source - https://kenney.nl/assets/top-down-shooter
-    data[static_cast<int>(AircraftType::kZombie)].m_hitpoints = 10;
-    data[static_cast<int>(AircraftType::kZombie)].m_speed = 90.f;
+    data[static_cast<int>(AircraftType::kZombie)].m_hitpoints = 5;
+    data[static_cast<int>(AircraftType::kZombie)].m_speed = 200.f;
     data[static_cast<int>(AircraftType::kZombie)].m_fire_interval = sf::Time::Zero;
     data[static_cast<int>(AircraftType::kZombie)].m_texture = TextureID::kZombie;
     data[static_cast<int>(AircraftType::kZombie)].m_texture_rect = sf::IntRect(0, 0, 43, 35);
@@ -36,10 +38,10 @@ std::vector<AircraftData> InitializeAircraftData()
 
     //Modified by Albert
 	//Temporarily changed the texture for the other enemy to add more enemies on-screen
-    data[static_cast<int>(AircraftType::kAvenger)].m_hitpoints = 40;
+    data[static_cast<int>(AircraftType::kAvenger)].m_hitpoints = 25;
     data[static_cast<int>(AircraftType::kAvenger)].m_speed = 40.f;
     data[static_cast<int>(AircraftType::kAvenger)].m_fire_interval = sf::Time::Zero;
-    data[static_cast<int>(AircraftType::kAvenger)].m_texture = TextureID::kZombie;
+    data[static_cast<int>(AircraftType::kAvenger)].m_texture = TextureID::kZombie2;
     data[static_cast<int>(AircraftType::kAvenger)].m_texture_rect = sf::IntRect(0, 0, 43, 35);
     data[static_cast<int>(AircraftType::kAvenger)].m_has_roll_animation = false;
 
@@ -77,7 +79,7 @@ std::vector<PickupData> InitializePickupData()
     data[static_cast<int>(PickupType::kHealth)].m_texture_rect = sf::IntRect(0, 64, 40, 40);
     data[static_cast<int>(PickupType::kHealth)].m_action = [](Aircraft& a)
         {
-            a.Repair(25);
+            a.Repair(10);
         };
 
     //Added by Albert

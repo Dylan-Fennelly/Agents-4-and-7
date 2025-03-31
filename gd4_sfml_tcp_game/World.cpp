@@ -16,7 +16,7 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 	, m_sounds(sounds)
 	, m_scenegraph(ReceiverCategories::kNone)
 	, m_scene_layers()
-	, m_world_bounds(0.f, 0.f, m_camera.getSize().x, 5000.f)
+	, m_world_bounds(0.f, 0.f, m_camera.getSize().x, 1200.f)
 	, m_spawn_position(m_camera.getSize().x / 2.f, m_world_bounds.height - m_camera.getSize().y / 2.f)
 	, m_scrollspeed(0.f)
 	, m_enemySpawnTimer(sf::Time::Zero)
@@ -134,7 +134,46 @@ void World::RemoveAircraft(int identifier)
 
 Aircraft* World::AddAircraft(int identifier)
 {
-	std::unique_ptr<Aircraft> player(new Aircraft(AircraftType::kAgentFour, m_textures, m_fonts));
+	int texture_id = identifier % 7;
+	TextureID texture;
+	std::string name;
+	switch (texture_id)
+    {
+	case 1:
+		texture = TextureID::kAgentOne;
+		name = "Agent One";
+        break;
+	case 2:
+		texture = TextureID::kAgentTwo;
+		name = "Agent Two";
+        break;
+	case 3:
+		texture = TextureID::kAgentThree;
+		name = "Agent Three";
+        break;
+    case 4:
+		texture = TextureID::kAgentFour;
+		name = "Agent Four";
+        break;
+	case 5:
+		texture = TextureID::kAgentFive;
+		name = "Agent Five";
+        break;
+    case 6:
+		texture = TextureID::kAgentSix;
+		name = "Agent Six";
+        break;
+	case 7:
+		texture = TextureID::kAgentSeven;
+		name = "Agent Seven";
+		break;
+	default:
+		texture = TextureID::kAgentOne;
+		name = "Agent One";
+        break;
+    }
+
+	std::unique_ptr<Aircraft> player(new Aircraft(AircraftType::kAgent, m_textures, m_fonts, texture, name));
 	player->setPosition(m_camera.getCenter());
 	player->SetIdentifier(identifier);
 
@@ -210,9 +249,15 @@ bool World::HasPlayerReachedEnd(sf::Time dt) //Check if there are any enemies le
 void World::LoadTextures()
 {
 	//Most textures have been sourced in DataTables.cpp, unless stated otherwise
+	m_textures.Load(TextureID::kAgentOne, "Media/Textures/AgentOne.png");
+	m_textures.Load(TextureID::kAgentTwo, "Media/Textures/AgentTwo.png");
+	m_textures.Load(TextureID::kAgentThree, "Media/Textures/AgentThree.png");
 	m_textures.Load(TextureID::kAgentFour, "Media/Textures/AgentFour.png");
+	m_textures.Load(TextureID::kAgentFive, "Media/Textures/AgentFive.png");
+	m_textures.Load(TextureID::kAgentSix, "Media/Textures/AgentSix.png");
+	m_textures.Load(TextureID::kAgentSeven, "Media/Textures/AgentSeven.png");
 	m_textures.Load(TextureID::kZombie, "Media/Textures/Zombie.png");
-	m_textures.Load(TextureID::kZombie2, "Media/Textures/Zombie.png");
+	m_textures.Load(TextureID::kZombie2, "Media/Textures/BloodyZombie.png");
 	m_textures.Load(TextureID::kLandscape, "Media/Textures/Desert.png");
 	m_textures.Load(TextureID::kBullet, "Media/Textures/Bullet.png");
 	m_textures.Load(TextureID::kMissile, "Media/Textures/Missile.png");
@@ -348,8 +393,18 @@ void World::AddEnemy(AircraftType type, float x, float y)
 	std::cout << "Attempting to spawn enemy of type: " << static_cast<int>(type)
 		<< " at position (" << x << ", " << y << ")\n";
 
+	TextureID texture_id;
+	if (type == AircraftType::kZombie)
+	{
+		texture_id = TextureID::kZombie2;
+	}
+	else if (type == AircraftType::kAvenger)
+	{
+		texture_id = TextureID::kZombie;
+	}
+
 	// Create the enemy and set its properties.
-	std::unique_ptr<Aircraft> enemy(new Aircraft(type, m_textures, m_fonts));
+	std::unique_ptr<Aircraft> enemy(new Aircraft(type, m_textures, m_fonts, texture_id, " "));
 	enemy->setPosition(x, y);
 	std::cout << "Enemy created at position (" << enemy->getPosition().x << ", " << enemy->getPosition().y << ")\n";
 
