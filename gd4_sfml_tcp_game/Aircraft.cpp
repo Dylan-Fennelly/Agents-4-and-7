@@ -58,9 +58,6 @@ Aircraft::Aircraft(AircraftType type, const TextureHolder& textures, const FontH
 	, m_identifier(0)
 	, m_rotation(0.f)
 	, m_name(name)
-
-
-
 {
 	m_explosion.SetFrameSize(sf::Vector2i(100, 100));
 	m_explosion.SetNumFrames(60);
@@ -166,7 +163,7 @@ void Aircraft::ActivateMinigun(sf::Time duration)
 	m_minigun_timer = duration;
 }
 
-//Added by Albert]
+//Added by Albert
 //I inherited this function from Entity to check if the player is invincible, if they are, they take no damage
 void Aircraft::Damage(int points)
 {
@@ -187,12 +184,10 @@ void Aircraft::UpdateTexts()
 		m_health_display->SetString(std::to_string(GetHitPoints()) + "HP");
 	}
 	m_health_display->setPosition(0.f, 50.f);
-	m_health_display->setRotation(-getRotation());
 
 	if (m_name_display)
 	{
 		m_name_display->setPosition(0.f, 70.f);
-		m_name_display->setRotation(-getRotation());
 		if (m_name == "")
 		{
 			m_name_display->SetString("");
@@ -202,6 +197,36 @@ void Aircraft::UpdateTexts()
 			m_name_display->SetString(m_name);
 		}
 	}
+
+	//// Get sprite's world position (ignores rotation)
+	//sf::Vector2f spritePosition = getPosition();
+
+	//if (IsDestroyed())
+	//{
+	//	m_health_display->SetString("");
+	//}
+	//else
+	//{
+	//	m_health_display->SetString(std::to_string(GetHitPoints()) + "HP");
+	//}
+
+	//// Offset the text manually without rotation
+	//m_health_display->setPosition(spritePosition.x, spritePosition.y + 50.f);
+
+	//if (m_name_display)
+	//{
+	//	if (m_name == "")
+	//	{
+	//		m_name_display->SetString("");
+	//	}
+	//	else
+	//	{
+	//		m_name_display->SetString(m_name);
+	//	}
+
+	//	// Offset the name text manually without rotation
+	//	m_name_display->setPosition(spritePosition.x, spritePosition.y + 70.f);
+	//}
 }
 
 float Aircraft::GetMaxSpeed() const
@@ -442,7 +467,7 @@ void Aircraft::CreatePickup(SceneNode& node, const TextureHolder& textures) cons
 void Aircraft::CheckPickupDrop(CommandQueue& commands)
 {
 	//TODO Get rid of the magic number 3 here 
-	if (!IsAllied() && Utility::RandomInt(3) == 0 && !m_spawned_pickup)
+	if (!IsAllied() && Utility::RandomInt(100) <= 10 && !m_spawned_pickup)
 	{
 		commands.Push(m_drop_pickup_command);
 	}

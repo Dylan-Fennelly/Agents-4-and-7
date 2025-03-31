@@ -14,15 +14,15 @@ GameServer::GameServer(sf::Vector2f battlefield_size, sf::RenderTarget& output_t
     , m_client_timeout(sf::seconds(5.f))
     , m_max_connected_players(15)
     , m_connected_players(0)
-    , m_world_height(1000.f)
+    , m_world_height(1100.f)
     , m_battlefield_rect(0.f, m_world_height - battlefield_size.y, battlefield_size.x, battlefield_size.y)
-    , m_battlefield_scrollspeed(-50.f)
+    , m_battlefield_scrollspeed(0.f)
     , m_aircraft_count(0)
     , m_peers(1)
     , m_aircraft_identifier_counter(1)
     , m_waiting_thread_end(false)
     , m_last_spawn_time(sf::Time::Zero)
-    , m_time_for_next_spawn(sf::seconds(5.f))
+    , m_time_for_next_spawn(sf::seconds(0.2f))
 	, m_target(output_target)
 	, m_camera(output_target.getDefaultView())
     , m_player_aircrafts()
@@ -142,7 +142,7 @@ void GameServer::Tick()
     for (const auto& current : m_aircraft_info)
     {
         //As long as one player has not crossed the finish line the game is still live
-        if (Now() >= sf::seconds(30.f))
+        if (Now() >= sf::seconds(900.f))
         {
             all_aircraft_done = true;
             break;
@@ -230,7 +230,7 @@ void GameServer::Tick()
         }
 
         m_last_spawn_time = Now();
-        m_time_for_next_spawn = sf::seconds(0.75f + static_cast<float>(Utility::RandomInt(1250)) / 1000.f);
+        m_time_for_next_spawn = sf::seconds(0.25f + static_cast<float>(Utility::RandomInt(1250)) / 1000.f);
     }
 }
 
@@ -384,9 +384,11 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
         packet >> x;
         packet >> y;
 
+		int random_number = Utility::RandomInt(100);
+        std::cout << "RANDOM: " << Utility::RandomInt(100) << std::endl;
         //Enemy explodes, with a certain probability, drop a pickup
         //To avoid multiple messages only listen to the first peer (host)
-        if (action == GameActions::kEnemyExplode && Utility::RandomInt(3) == 0 && &receiving_peer == m_peers[0].get())
+        if (action == GameActions::kEnemyExplode && random_number <= 10 && &receiving_peer == m_peers[0].get())
         {
             sf::Packet packet;
             packet << static_cast<sf::Int32>(Server::PacketType::kSpawnPickup);

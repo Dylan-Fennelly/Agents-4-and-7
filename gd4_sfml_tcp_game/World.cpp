@@ -16,7 +16,7 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 	, m_sounds(sounds)
 	, m_scenegraph(ReceiverCategories::kNone)
 	, m_scene_layers()
-	, m_world_bounds(0.f, 0.f, m_camera.getSize().x, 5000.f)
+	, m_world_bounds(0.f, 0.f, m_camera.getSize().x, 1200.f)
 	, m_spawn_position(m_camera.getSize().x / 2.f, m_world_bounds.height - m_camera.getSize().y / 2.f)
 	, m_scrollspeed(0.f)
 	, m_enemySpawnTimer(sf::Time::Zero)
@@ -394,7 +394,7 @@ void World::AddEnemy(AircraftType type, float x, float y)
 		<< " at position (" << x << ", " << y << ")\n";
 
 	// Create the enemy and set its properties.
-	std::unique_ptr<Aircraft> enemy(new Aircraft(type, m_textures, m_fonts, TextureID::kZombie, "Shit eater"));
+	std::unique_ptr<Aircraft> enemy(new Aircraft(type, m_textures, m_fonts, TextureID::kZombie, " mm"));
 	enemy->setPosition(x, y);
 	std::cout << "Enemy created at position (" << enemy->getPosition().x << ", " << enemy->getPosition().y << ")\n";
 

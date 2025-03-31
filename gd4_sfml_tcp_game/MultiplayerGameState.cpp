@@ -501,6 +501,7 @@ void MultiplayerGameState::HandlePacket(sf::Int32 packet_type, sf::Packet& packe
 	//Pickup created
 	case Server::PacketType::kSpawnPickup:
 	{
+		std::cout << "RECEIVED SPAWN PICKUP PACKET" << std::endl;
 		sf::Int32 type;
 		sf::Vector2f position;
 		packet >> type >> position.x >> position.y;
