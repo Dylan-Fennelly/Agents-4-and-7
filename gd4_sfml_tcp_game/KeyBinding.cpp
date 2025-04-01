@@ -14,7 +14,7 @@ KeyBinding::KeyBinding(int control_preconfiguration)
 		m_key_map[sf::Keyboard::W] = Action::kMoveUp;
 		m_key_map[sf::Keyboard::S] = Action::kMoveDown;
 		m_key_map[sf::Keyboard::Space] = Action::kBulletFire;
-		m_key_map[sf::Keyboard::M] = Action::kMissileFire;
+		//m_key_map[sf::Keyboard::M] = Action::kMissileFire;
 	}
 	else if (control_preconfiguration == 2)
 	{
@@ -24,7 +24,7 @@ KeyBinding::KeyBinding(int control_preconfiguration)
 		m_key_map[sf::Keyboard::W] = Action::kMoveUp;
 		m_key_map[sf::Keyboard::S] = Action::kMoveDown;
 		m_key_map[sf::Keyboard::F] = Action::kBulletFire;
-		m_key_map[sf::Keyboard::R] = Action::kMissileFire;
+		//m_key_map[sf::Keyboard::R] = Action::kMissileFire;
 	}
 }
 

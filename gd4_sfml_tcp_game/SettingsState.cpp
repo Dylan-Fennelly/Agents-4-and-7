@@ -21,7 +21,7 @@ SettingsState::SettingsState(StateStack& stack, Context context)
 
 		AddButtonLabel(static_cast<int>(Action::kBulletFire), x, 4, "Fire", context);
 
-		AddButtonLabel(static_cast<int>(Action::kMissileFire), x, 5, "Missile", context);
+		//AddButtonLabel(static_cast<int>(Action::kMissileFire), x, 5, "Missile", context);
 
 	}
 
