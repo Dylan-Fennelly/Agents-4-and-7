@@ -14,13 +14,13 @@
 const sf::Time Application::kTimePerFrame = sf::seconds(1.f/60.f);
 
 Application::Application()
-	: m_window(sf::VideoMode(1920, 1080), "Agents 4 & 7", sf::Style::Close)
+	: m_window(sf::VideoMode(1920, 1080), "Agents 4 & 7", sf::Style::Fullscreen)
 	, m_key_binding_1(1), m_key_binding_2(2)
 	, m_stack(State::Context(m_window, m_textures, m_fonts, m_music, m_sound, m_key_binding_1, m_key_binding_2))
 {
 	m_window.setKeyRepeatEnabled(false);
 	m_fonts.Load(Font::kMain, "Media/Fonts/Sansation.ttf");
-	m_textures.Load(TextureID::kTitleScreen, "Media/Textures/TitleScreen.png");
+	m_textures.Load(TextureID::kTitleScreen, "Media/Textures/TitleScreen2.png");
 	m_textures.Load(TextureID::kButtonNormal, "Media/Textures/ButtonNormal.png");
 	m_textures.Load(TextureID::kButtonSelected, "Media/Textures/ButtonSelected.png");
 	m_textures.Load(TextureID::kButtonActivated, "Media/Textures/ButtonPressed.png");

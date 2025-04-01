@@ -7,6 +7,9 @@
 #include "AircraftType.hpp"
 #include <iostream>
 #include "World.hpp"
+#include <fstream>
+#include <ctime>  // For timestamps
+#include <iomanip> // For formatting timestamps
 
 GameServer::GameServer(sf::Vector2f battlefield_size, sf::RenderTarget& output_target)
     : m_thread(&GameServer::ExecutionThread, this)
@@ -271,6 +274,8 @@ void GameServer::HandleIncomingPackets()
     }
 }
 
+
+
 void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving_peer, bool& detected_timeout)
 {
     sf::Int32 packet_type;
@@ -444,6 +449,63 @@ void GameServer::HandleIncomingConnections()
     }
 }
 
+std::vector<PlayerScore> GameServer::ReadHighScores(const std::string& filename)
+{
+    std::vector<PlayerScore> scores;
+    std::ifstream file(filename);
+
+    if (!file)
+    {
+        std::cerr << "Warning: Could not open " << filename << ". Creating a new file." << std::endl;
+        return scores;
+    }
+
+    sf::Int32 id;
+    float time;
+    while (file >> id >> time)
+    {
+        scores.push_back({ id, time });
+    }
+
+    return scores;
+}
+
+void GameServer::WriteHighScores(const std::vector<PlayerScore>& scores, const std::string& filename)
+{
+    std::ofstream file(filename, std::ios::trunc); // Overwrite file
+
+    if (!file)
+    {
+        std::cerr << "Error: Could not open file for writing!" << std::endl;
+        return;
+    }
+
+    for (const auto& score : scores)
+    {
+        file << score.identifier << " " << score.time_survived << "\n";
+    }
+}
+
+void GameServer::UpdateHighScores(sf::Int32 identifier, float time_survived, const std::string& filename)
+{
+    std::vector<PlayerScore> scores = ReadHighScores(filename);
+
+    // Add new score
+    scores.push_back({ identifier, time_survived });
+
+    // Sort by highest time survived
+    std::sort(scores.begin(), scores.end());
+
+    // Keep only top 10
+    if (scores.size() > 10)
+    {
+        scores.resize(10);
+    }
+
+    // Write updated scores back to file
+    WriteHighScores(scores, filename);
+}
+
 void GameServer::HandleDisconnections()
 {
     for (auto itr = m_peers.begin(); itr != m_peers.end();)
@@ -451,10 +513,13 @@ void GameServer::HandleDisconnections()
         if ((*itr)->m_timed_out)
         {
             //Inform everyone of a disconnection, erase
-            for (sf::Int32 identifer : (*itr)->m_aircraft_identifiers)
+            for (sf::Int32 identifier : (*itr)->m_aircraft_identifiers)
             {
-                SendToAll((sf::Packet() << static_cast<sf::Int32>(Server::PacketType::kPlayerDisconnect) << identifer));
-                m_aircraft_info.erase(identifer);
+                SendToAll((sf::Packet() << static_cast<sf::Int32>(Server::PacketType::kPlayerDisconnect) << identifier));
+                m_aircraft_info.erase(identifier);
+				float time_survived = Now().asSeconds();
+                std::cout << "Player " << identifier << " has survived " << time_survived << " seconds" << std::endl;
+                UpdateHighScores(identifier, time_survived, "survival_times.txt");
             }
 
             m_connected_players--;
@@ -470,7 +535,6 @@ void GameServer::HandleDisconnections()
             }
 
             BroadcastMessage("A player has disconnected");
-
         }
         else
         {
@@ -531,15 +595,33 @@ void GameServer::UpdateClientState()
     sf::Packet update_client_state_packet;
     update_client_state_packet << static_cast<sf::Int32>(Server::PacketType::kUpdateClientState);
     update_client_state_packet << static_cast<float>(m_battlefield_rect.top + m_battlefield_rect.height);
-    update_client_state_packet << static_cast<sf::Int32>(m_aircraft_count);
 
+    // Compute active aircraft count instead of total aircraft count
+    sf::Int32 activeAircraftCount = 0;
+    for (const auto& pair : m_aircraft_info)
+    {
+        if (pair.second.m_hitpoints > 0)
+        {
+            activeAircraftCount++;
+        }
+    }
+    update_client_state_packet << activeAircraftCount;
+
+    // Only send updates for aircraft that are still active
     for (const auto& aircraft : m_aircraft_info)
     {
-        update_client_state_packet << aircraft.first << aircraft.second.m_position.x << aircraft.second.m_position.y << aircraft.second.m_hitpoints << aircraft.second.m_rotation;
+        if (aircraft.second.m_hitpoints > 0)
+        {
+            update_client_state_packet << aircraft.first
+                << aircraft.second.m_position.x
+                << aircraft.second.m_position.y
+                << aircraft.second.m_hitpoints
+                << aircraft.second.m_rotation;
+        }
     }
-
     SendToAll(update_client_state_packet);
 }
+
 
 
 //It is essential to set the sockets to non-blocking - m_socket.setBlocking(false)

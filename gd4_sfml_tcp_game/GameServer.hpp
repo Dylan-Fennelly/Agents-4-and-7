@@ -12,6 +12,18 @@
 #include <SFML/Graphics.hpp>
 #include "Aircraft.hpp"
 
+struct PlayerScore
+{
+	sf::Int32 identifier;
+	float time_survived;
+	std::string timestamp; // Store timestamp as a string
+
+	// Sorting order: Higher survival time first
+	bool operator<(const PlayerScore& other) const
+	{
+		return time_survived > other.time_survived;
+	}
+};
 
 class GameServer
 {
@@ -60,6 +72,10 @@ private:
 	void BroadcastMessage(const std::string& message);
 	void SendToAll(sf::Packet& packet);
 	void UpdateClientState();
+
+	std::vector<PlayerScore> ReadHighScores(const std::string& filename);
+	void WriteHighScores(const std::vector<PlayerScore>& scores, const std::string& filename);
+	void UpdateHighScores(sf::Int32 identifier, float time_survived, const std::string& filename);
 
 private:
 	sf::Thread m_thread;
