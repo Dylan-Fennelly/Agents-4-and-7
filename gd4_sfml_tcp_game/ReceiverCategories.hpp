@@ -20,6 +20,3 @@ enum class ReceiverCategories
 	kPlayers = kPlayerAircraft | kAlliedAircraft, 
 	kProjectile = kAlliedProjectile | kEnemyProjectile
 };
-
-// A message would be sent to all aircraft
-//unsigned int all_aircraft = ReceiverCategories::kPlayerAircraft | ReceiverCategories::kAlliedAircraft | ReceiverCategories::kEnemyAircraft

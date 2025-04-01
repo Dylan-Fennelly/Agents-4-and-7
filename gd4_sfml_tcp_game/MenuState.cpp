@@ -1,3 +1,6 @@
+/*Albert Skalinski - D00248346
+  Dylan Fennelly - D00248176*/
+
 #include "MenuState.hpp"
 #include "ResourceHolder.hpp"
 #include "Utility.hpp"
@@ -28,15 +31,6 @@ MenuState::MenuState(StateStack& stack, Context context)
             RequestStackPush(StateID::kCredentialEntryHost);
         });
 
-    //auto join_play_button = std::make_shared<gui::Button>(context);
-    //join_play_button->setPosition(100, 400);
-    //join_play_button->SetText("Join");
-    //join_play_button->SetCallback([this]()
-    //    {
-    //        RequestStackPop();
-    //        RequestStackPush(StateID::kJoinGame);
-    //    });
-
     auto settings_button = std::make_shared<gui::Button>(context);
     settings_button->setPosition(100, 400);
     settings_button->SetText("Settings");
@@ -55,7 +49,6 @@ MenuState::MenuState(StateStack& stack, Context context)
 
     m_gui_container.Pack(play_button);
     m_gui_container.Pack(host_play_button);
-    //m_gui_container.Pack(join_play_button);
     m_gui_container.Pack(settings_button);
     m_gui_container.Pack(exit_button);
 

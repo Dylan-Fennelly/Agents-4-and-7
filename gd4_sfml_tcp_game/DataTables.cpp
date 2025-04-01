@@ -8,7 +8,6 @@
 #include "Aircraft.hpp"
 #include "ParticleType.hpp"
 #include <iostream>
-  //Todo: Remove the hard-coded values and replace them with values from a file so that they can be easily changed
 
 std::vector<AircraftData> InitializeAircraftData()
 {

@@ -1,3 +1,6 @@
+/*Albert Skalinski - D00248346
+  Dylan Fennelly - D00248176*/
+
 #include "SettingsState.hpp"
 #include "ResourceHolder.hpp"
 #include "Utility.hpp"
@@ -8,15 +11,20 @@ SettingsState::SettingsState(StateStack& stack, Context context)
 {
 	m_background_sprite.setTexture(context.textures->Get(TextureID::kTitleScreen));
 
-	//Build key binding buttons and labels
+
 	for (std::size_t x = 0; x < 2; ++x)
 	{
+
 		AddButtonLabel(static_cast<int>(Action::kMoveLeft), x, 0, "Move Left", context);
+
 		AddButtonLabel(static_cast<int>(Action::kMoveRight), x, 1, "Move Right", context);
+
 		AddButtonLabel(static_cast<int>(Action::kMoveUp), x, 2, "Move Up", context);
+
 		AddButtonLabel(static_cast<int>(Action::kMoveDown), x, 3, "Move Down", context);
+
 		AddButtonLabel(static_cast<int>(Action::kBulletFire), x, 4, "Fire", context);
-		AddButtonLabel(static_cast<int>(Action::kMissileFire), x, 5, "Missile", context);
+
 	}
 
 	UpdateLabels();

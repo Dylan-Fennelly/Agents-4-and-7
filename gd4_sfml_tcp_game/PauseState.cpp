@@ -1,8 +1,6 @@
 /*Albert Skalinski - D00248346
   Dylan Fennelly - D00248176*/
 
-  //todo: Rewrite this use buttons not inputs for pause and cancel
-
 #include "PauseState.hpp"
 #include "ResourceHolder.hpp"
 #include <SFML/Graphics/RenderWindow.hpp>
