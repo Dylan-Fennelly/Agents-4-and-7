@@ -18,23 +18,6 @@ namespace
 	const std::vector<AircraftData> Table = InitializeAircraftData();
 }
 
-//TextureID ToTextureID(AircraftType type)
-//{
-//	switch (type)
-//	{
-//	case AircraftType::kAgent:
-//		return TextureID::kAgentFour;
-//		break;
-//	case AircraftType::kZombie:
-//		return TextureID::kZombie;
-//		break;
-//	case AircraftType::kAvenger:
-//		return TextureID::kZombie2;
-//		break;
-//	}
-//	return TextureID::kAgentFour;
-//}
-
 Aircraft::Aircraft(AircraftType type, const TextureHolder& textures, const FontHolder& fonts, TextureID texture, std::string name)  
 	: Entity(Table[static_cast<int>(type)].m_hitpoints)
 	, m_type(type)
@@ -197,36 +180,6 @@ void Aircraft::UpdateTexts()
 			m_name_display->SetString(m_name);
 		}
 	}
-
-	//// Get sprite's world position (ignores rotation)
-	//sf::Vector2f spritePosition = getPosition();
-
-	//if (IsDestroyed())
-	//{
-	//	m_health_display->SetString("");
-	//}
-	//else
-	//{
-	//	m_health_display->SetString(std::to_string(GetHitPoints()) + "HP");
-	//}
-
-	//// Offset the text manually without rotation
-	//m_health_display->setPosition(spritePosition.x, spritePosition.y + 50.f);
-
-	//if (m_name_display)
-	//{
-	//	if (m_name == "")
-	//	{
-	//		m_name_display->SetString("");
-	//	}
-	//	else
-	//	{
-	//		m_name_display->SetString(m_name);
-	//	}
-
-	//	// Offset the name text manually without rotation
-	//	m_name_display->setPosition(spritePosition.x, spritePosition.y + 70.f);
-	//}
 }
 
 float Aircraft::GetMaxSpeed() const
@@ -278,7 +231,6 @@ void Aircraft::CreateProjectile(SceneNode& node, ProjectileType type, float x_of
 
 	//We need to take the players roatation into account so that our bullets have the right rotaation
 	// Get aircraft rotation (in degrees) and convert to radians
-
 
 	float rotation = getRotation();
 	float radians = Utility::ToRadians(rotation);

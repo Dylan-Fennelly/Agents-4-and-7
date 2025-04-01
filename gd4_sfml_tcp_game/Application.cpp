@@ -7,7 +7,6 @@
 #include "PauseState.hpp"
 #include "SettingsState.hpp"
 #include "GameOverState.hpp"
-//#include "ControllerSelectState.hpp"
 #include "MultiplayerGameState.hpp"
 #include "CredentialEntryState.hpp"
 
@@ -81,10 +80,8 @@ void Application::Render()
 
 void Application::RegisterStates()
 {
-	//m_stack.RegisterState<ControllerSelectState>(StateID::kControllerSelect);
 	m_stack.RegisterState<TitleState>(StateID::kTitle);
 	m_stack.RegisterState<MenuState>(StateID::kMenu);
-	//m_stack.RegisterState<GameState>(StateID::kGame);
 	m_stack.RegisterState<MultiplayerGameState>(StateID::kHostGame, true);
 	m_stack.RegisterState<MultiplayerGameState>(StateID::kJoinGame, false);
 	m_stack.RegisterState<PauseState>(StateID::kPause);

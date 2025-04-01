@@ -29,40 +29,12 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 	LoadTextures();
 	BuildScene();
 	m_camera.setCenter(m_spawn_position);
-	//// === Create Player 1 ===
-	//auto player1 = std::make_unique<Aircraft>(AircraftType::kAgentFour, m_textures, m_fonts);
-	//player1->SetCategory(ReceiverCategories::kPlayerAircraft);
-	//player1->setPosition(m_spawn_position.x - 50.f, m_spawn_position.y); // Offset left
-	//m_player_aircrafts.push_back(player1.get());
-	//m_scene_layers[static_cast<int>(SceneLayers::kUpperAir)]->AttachChild(std::move(player1));
-
-	//// === Create Player 2 ===
-	//auto player2 = std::make_unique<Aircraft>(AircraftType::kAgentFour, m_textures, m_fonts);
-	//player2->SetCategory(ReceiverCategories::kAlliedAircraft); //We are using the categorys to control the playert
-	//player2->setPosition(m_spawn_position.x + 50.f, m_spawn_position.y); // Offset right
-	//m_player_aircrafts.push_back(player2.get());
-	//m_scene_layers[static_cast<int>(SceneLayers::kUpperAir)]->AttachChild(std::move(player2));
 }
 
 void World::Update(sf::Time dt)
 {
 	//Scroll the world
 	m_camera.move(0, m_scrollspeed * dt.asSeconds());
-
-	
-	//m_enemySpawnTimer += dt;//Track the time until the next enemy spawn
-	//if (m_enemySpawnTimer >= m_enemySpawnInterval) // Time to spawn a new enemy? 
-	//{												//ToDO:Check if the nesting on this if statement is correct
-	//	if ((m_totalElapsed.getElapsedTime() < sf::seconds(180))) //Spawm enemies for 3 minutes 
-	//	{
-	//		SpawnEnemy();
-	//		m_enemySpawnTimer = sf::Time::Zero;
-	//		// Randomize the next spawn interval (for example, between 1.5 and 2 seconds):
-	//		float nextInterval = 0.75f + static_cast<float>(Utility::RandomInt(1250)) / 1000.f; // 0.75 to 2.0 seconds
-	//		m_enemySpawnInterval = sf::seconds(nextInterval);
-	//	}
-	//	
-	//}
 
 	DestroyEntitiesOutsideView();
 	GuideEnemies(dt); //Guide the enemies towards the players
@@ -75,13 +47,6 @@ void World::Update(sf::Time dt)
 	AdaptPlayerVelocity();
 
 	HandleCollisions();
-	// Remove dead players from m_player_aircrafts
-	//Dylan - This is a lambda function that removes the player from the vector if they are marked for removal it prevents an annoying bug where a pointer to a player that has been destroyed is still in the vector
-	//Chatgpt helped with the structure of this code - I've written too much c# lately and I'm getting rusty with c++
-	/*m_player_aircrafts.erase(
-		std::remove_if(m_player_aircrafts.begin(), m_player_aircrafts.end(),
-			[](Aircraft* player) { return player->IsMarkedForRemoval(); }),
-		m_player_aircrafts.end());*/
 
 	auto first_to_remove = std::remove_if(m_player_aircrafts.begin(), m_player_aircrafts.end(), std::mem_fn(&Aircraft::IsMarkedForRemoval));
 	m_player_aircrafts.erase(first_to_remove, m_player_aircrafts.end());
@@ -348,18 +313,6 @@ void World::AdaptPlayerPosition()
 
 void World::AdaptPlayerVelocity()
 {
-
-	//We needed to adapt this for the player vector
-	//for (auto& player : m_player_aircrafts)
-	//{
-	//	sf::Vector2f velocity = player->GetVelocity();
-	//	//If they are moving diagonally divide by sqrt 2
-	//	if (velocity.x != 0.f && velocity.y != 0.f)
-	//	{
-	//		player->SetVelocity(velocity / std::sqrt(2.f));
-	//	}
-	//}
-
 	for (Aircraft* aircraft : m_player_aircrafts)
 	{
 		sf::Vector2f velocity = aircraft->GetVelocity();

@@ -1,3 +1,6 @@
+/*Albert Skalinski - D00248346
+  Dylan Fennelly - D00248176*/
+
 #include "KeyBinding.hpp"
 
 #include <string>
@@ -14,7 +17,6 @@ KeyBinding::KeyBinding(int control_preconfiguration)
 		m_key_map[sf::Keyboard::W] = Action::kMoveUp;
 		m_key_map[sf::Keyboard::S] = Action::kMoveDown;
 		m_key_map[sf::Keyboard::Space] = Action::kBulletFire;
-		//m_key_map[sf::Keyboard::M] = Action::kMissileFire;
 	}
 	else if (control_preconfiguration == 2)
 	{
@@ -24,7 +26,6 @@ KeyBinding::KeyBinding(int control_preconfiguration)
 		m_key_map[sf::Keyboard::W] = Action::kMoveUp;
 		m_key_map[sf::Keyboard::S] = Action::kMoveDown;
 		m_key_map[sf::Keyboard::F] = Action::kBulletFire;
-		//m_key_map[sf::Keyboard::R] = Action::kMissileFire;
 	}
 }
 

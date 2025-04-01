@@ -1,3 +1,6 @@
+/*Albert Skalinski - D00248346
+  Dylan Fennelly - D00248176*/
+
 #include "State.hpp"
 #include "StateID.hpp"
 #include "StateStack.hpp"

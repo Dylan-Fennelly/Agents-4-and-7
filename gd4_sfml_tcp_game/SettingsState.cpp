@@ -1,3 +1,6 @@
+/*Albert Skalinski - D00248346
+  Dylan Fennelly - D00248176*/
+
 #include "SettingsState.hpp"
 #include "ResourceHolder.hpp"
 #include "Utility.hpp"
@@ -20,9 +23,6 @@ SettingsState::SettingsState(StateStack& stack, Context context)
 		AddButtonLabel(static_cast<int>(Action::kMoveDown), x, 3, "Move Down", context);
 
 		AddButtonLabel(static_cast<int>(Action::kBulletFire), x, 4, "Fire", context);
-
-		//AddButtonLabel(static_cast<int>(Action::kMissileFire), x, 5, "Missile", context);
-
 	}
 
 	UpdateLabels();

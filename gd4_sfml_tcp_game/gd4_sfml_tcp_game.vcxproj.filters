@@ -305,12 +305,6 @@
     <ClInclude Include="SoundNode.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ControllerType.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ButtonFunction.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="NetworkProtocol.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

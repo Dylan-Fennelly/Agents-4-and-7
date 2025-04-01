@@ -1,3 +1,6 @@
+/*Albert Skalinski - D00248346
+  Dylan Fennelly - D00248176*/
+
 #include "MultiplayerGameState.hpp"
 #include "MusicPlayer.hpp"
 #include "Utility.hpp"
@@ -153,12 +156,6 @@ bool MultiplayerGameState::Update(sf::Time dt)
 			{
 				++itr;
 			}
-		}
-
-
-		if (!found_local_plane && m_game_started)
-		{
-		//	RequestStackPush(StateID::kGameOver);
 		}
 
 		//Only handle the realtime input if the window has focus and the game is unpaused
@@ -532,9 +529,6 @@ void MultiplayerGameState::HandlePacket(sf::Int32 packet_type, sf::Packet& packe
 		packet >> current_world_position >> aircraft_count;
 
 		float current_view_position = m_world.GetViewBounds().top + m_world.GetViewBounds().height;
-
-		//Set the world's scroll compensation according to whether the view is behind or ahead
-		//m_world.SetWorldScrollCompensation(current_view_position / current_world_position);
 
 		for (sf::Int32 i = 0; i < aircraft_count; ++i)
 		{

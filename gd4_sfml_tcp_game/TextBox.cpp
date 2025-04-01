@@ -1,3 +1,6 @@
+/*Albert Skalinski - D00248346
+  Dylan Fennelly - D00248176*/
+
 #include "TextBox.hpp"
 #include <iostream>
 
@@ -217,6 +220,5 @@ void TextBox::updateHighlight()
 		tempText.setString(inputText.substr(0, start));
 
 		highlight.setPosition(text.getPosition().x + tempText.getLocalBounds().width, text.getPosition().y);
-        //highlight.setPosition(text.getPosition().x + sf::Text(inputText.substr(0, start), text.getFont(), text.getCharacterSize()).getLocalBounds().width, text.getPosition().y);
     }
 }
