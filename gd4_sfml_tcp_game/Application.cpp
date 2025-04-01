@@ -20,7 +20,7 @@ Application::Application()
 {
 	m_window.setKeyRepeatEnabled(false);
 	m_fonts.Load(Font::kMain, "Media/Fonts/Sansation.ttf");
-	m_textures.Load(TextureID::kTitleScreen, "Media/Textures/TitleScreen.png");
+	m_textures.Load(TextureID::kTitleScreen, "Media/Textures/TitleScreen2.png");
 	m_textures.Load(TextureID::kButtonNormal, "Media/Textures/ButtonNormal.png");
 	m_textures.Load(TextureID::kButtonSelected, "Media/Textures/ButtonSelected.png");
 	m_textures.Load(TextureID::kButtonActivated, "Media/Textures/ButtonPressed.png");
