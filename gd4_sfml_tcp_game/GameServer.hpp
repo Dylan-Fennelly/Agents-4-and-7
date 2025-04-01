@@ -33,7 +33,7 @@ class GameServer
 public:
 	explicit GameServer(sf::Vector2f battlefield_size, sf::RenderTarget& target);
 	~GameServer();
-	void NotifyPlayerSpawn(sf::Int32 aircraft_identifier);
+	void NotifyPlayerSpawn(sf::Int32 aircraft_identifier,std::string clientName);
 	void NotifyPlayerRealtimeChange(sf::Int32 aircraft_identifier, sf::Int32 action, bool action_enabled);
 	void NotifyPlayerEvent(sf::Int32 aircraft_identifier, sf::Int32 action);
 	sf::FloatRect GetViewBounds() const;
@@ -47,6 +47,7 @@ private:
 		std::vector<sf::Int32> m_aircraft_identifiers;
 		bool m_ready;
 		bool m_timed_out;
+		std::string m_name;
 	};
 
 	struct AircraftInfo

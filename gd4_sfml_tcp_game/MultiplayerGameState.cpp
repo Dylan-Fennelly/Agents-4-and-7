@@ -32,6 +32,16 @@ sf::IpAddress GetAddressFromFile()
 	return local_address;
 
 }
+std::string GetClientName()
+{
+	std::ifstream input("username.txt");
+	std::string name;
+	if (input >> name)
+	{
+		return name;
+	}
+	return "DefaultPlayer";
+}
 
 MultiplayerGameState::MultiplayerGameState(StateStack& stack, Context context, bool is_host)
 	:State(stack, context)
@@ -87,6 +97,12 @@ MultiplayerGameState::MultiplayerGameState(StateStack& stack, Context context, b
 	if (m_socket.connect(ip, SERVER_PORT, sf::seconds(5.f)) == sf::TcpSocket::Done)
 	{
 		m_connected = true;
+
+		std::string name = GetClientName();
+		sf::Packet packet;
+		packet << static_cast<sf::Int32>(Client::PacketType::kClientName);
+		packet << name;
+		m_socket.send(packet);
 	}
 	else
 	{
@@ -376,8 +392,9 @@ void MultiplayerGameState::HandlePacket(sf::Int32 packet_type, sf::Packet& packe
 	{
 		sf::Int32 aircraft_identifier;
 		sf::Vector2f aircraft_position;
-		packet >> aircraft_identifier >> aircraft_position.x >> aircraft_position.y;
-		Aircraft* aircraft = m_world.AddAircraft(aircraft_identifier);
+		std::string name;
+		packet >> aircraft_identifier >> aircraft_position.x >> aircraft_position.y >> name;
+		Aircraft* aircraft = m_world.AddAircraft(aircraft_identifier,name);
 		aircraft->setPosition(aircraft_position);
 		m_players[aircraft_identifier].reset(new Player(&m_socket, aircraft_identifier, GetContext().keys1));
 		std::cout << "Spawned self with identifier: " << aircraft_identifier << std::endl;
@@ -390,9 +407,10 @@ void MultiplayerGameState::HandlePacket(sf::Int32 packet_type, sf::Packet& packe
 	{
 		sf::Int32 aircraft_identifier;
 		sf::Vector2f aircraft_position;
-		packet >> aircraft_identifier >> aircraft_position.x >> aircraft_position.y;
+		std::string name;
+		packet >> aircraft_identifier >> aircraft_position.x >> aircraft_position.y >> name;
 
-		Aircraft* aircraft = m_world.AddAircraft(aircraft_identifier);
+		Aircraft* aircraft = m_world.AddAircraft(aircraft_identifier,name);
 		aircraft->setPosition(aircraft_position);
 		m_players[aircraft_identifier].reset(new Player(&m_socket, aircraft_identifier, nullptr));
 		std::cout << "Player connected with identifier: " << aircraft_identifier << std::endl;
@@ -424,9 +442,10 @@ void MultiplayerGameState::HandlePacket(sf::Int32 packet_type, sf::Packet& packe
 			sf::Int32 hitpoints;
 			sf::Int32 missile_ammo;
 			sf::Vector2f aircraft_position;
-			packet >> aircraft_identifier >> aircraft_position.x >> aircraft_position.y >> hitpoints >> missile_ammo;
+			std::string name;
+			packet >> aircraft_identifier >> aircraft_position.x >> aircraft_position.y >> hitpoints >> missile_ammo >> name;
 
-			Aircraft* aircraft = m_world.AddAircraft(aircraft_identifier);
+			Aircraft* aircraft = m_world.AddAircraft(aircraft_identifier,name);
 			aircraft->setPosition(aircraft_position);
 			aircraft->SetHitpoints(hitpoints);
 
@@ -449,16 +468,16 @@ void MultiplayerGameState::HandlePacket(sf::Int32 packet_type, sf::Packet& packe
 	}
 	break;
 
-	case Server::PacketType::kAcceptCoopPartner:
-	{
-		sf::Int32 aircraft_identifier;
-		packet >> aircraft_identifier;
+	//case Server::PacketType::kAcceptCoopPartner:
+	//{
+	//	sf::Int32 aircraft_identifier;
+	//	packet >> aircraft_identifier;
 
-		m_world.AddAircraft(aircraft_identifier);
-		m_players[aircraft_identifier].reset(new Player(&m_socket, aircraft_identifier, GetContext().keys2));
-		m_local_player_identifiers.emplace_back(aircraft_identifier);
-	}
-	break;
+	//	m_world.AddAircraft(aircraft_identifier);
+	//	m_players[aircraft_identifier].reset(new Player(&m_socket, aircraft_identifier, GetContext().keys2));
+	//	m_local_player_identifiers.emplace_back(aircraft_identifier);
+	//}
+	/*break;*/
 
 	//Player event, like missile fired occurs
 	case Server::PacketType::kPlayerEvent:

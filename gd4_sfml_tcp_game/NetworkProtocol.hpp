@@ -9,7 +9,6 @@ namespace Server
 	enum class PacketType
 	{
 		kBroadcastMessage, //Takes a std::string and sends to all clients, they show on their screens for a number of seconds
-
 		kInitialState, //This takes two float values, the world height and the initial scrolling in it, then an sf::Int32 with the number of aircraft, then for each aircraft its identifier and its position, health and missiles
 		kPlayerEvent, //This takes two sf::Int32 variables, the aircraft identifier and the action identified as in Action.hpp, this is used to tell everyone that plane x has an triggered some action
 		kPlayerRealtimeChange, //Same as PlayerEvent for real time actions
@@ -35,7 +34,8 @@ namespace Client
 		kRequestCoopPartner, //No parameters. It is sent when the user presses Return to request a local partner. The server will AcceptCoopPartner 
 		kStateUpdate, //sf::Int32 with number of local aircraft, for each aircraft send sf::Int32 identifier, two floats for position, health and ammo 
 		kGameEvent, //This is for explosions
-		kQuit
+		kQuit,
+		kClientName
 	};
 }
 

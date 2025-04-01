@@ -11,6 +11,7 @@ SettingsState::SettingsState(StateStack& stack, Context context)
 {
 	m_background_sprite.setTexture(context.textures->Get(TextureID::kTitleScreen));
 
+
 	for (std::size_t x = 0; x < 2; ++x)
 	{
 
@@ -23,6 +24,7 @@ SettingsState::SettingsState(StateStack& stack, Context context)
 		AddButtonLabel(static_cast<int>(Action::kMoveDown), x, 3, "Move Down", context);
 
 		AddButtonLabel(static_cast<int>(Action::kBulletFire), x, 4, "Fire", context);
+
 	}
 
 	UpdateLabels();

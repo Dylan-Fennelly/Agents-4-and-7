@@ -97,7 +97,7 @@ void World::RemoveAircraft(int identifier)
 	}
 }
 
-Aircraft* World::AddAircraft(int identifier)
+Aircraft* World::AddAircraft(int identifier,std::string clientName)
 {
 	int texture_id = identifier % 7;
 	TextureID texture;
@@ -138,7 +138,7 @@ Aircraft* World::AddAircraft(int identifier)
         break;
     }
 
-	std::unique_ptr<Aircraft> player(new Aircraft(AircraftType::kAgent, m_textures, m_fonts, texture, name));
+	std::unique_ptr<Aircraft> player(new Aircraft(AircraftType::kAgent, m_textures, m_fonts, texture, clientName));
 	player->setPosition(m_camera.getCenter());
 	player->SetIdentifier(identifier);
 
