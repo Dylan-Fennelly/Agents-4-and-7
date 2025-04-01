@@ -41,12 +41,12 @@ GameServer::~GameServer()
     m_thread.wait();
 }
 
-void GameServer::NotifyPlayerSpawn(sf::Int32 aircraft_identifier)
+void GameServer::NotifyPlayerSpawn(sf::Int32 aircraft_identifier, std::string clientName)
 {
     sf::Packet packet;
     //First thing in every packets is what type of packet it is
     packet << static_cast<sf::Int32>(Server::PacketType::kPlayerConnect);
-    packet << aircraft_identifier << m_aircraft_info[aircraft_identifier].m_position.x << m_aircraft_info[aircraft_identifier].m_position.y;
+    packet << aircraft_identifier << m_aircraft_info[aircraft_identifier].m_position.x << m_aircraft_info[aircraft_identifier].m_position.y << clientName;
     SendToAll(packet);
 }
 
@@ -415,6 +415,29 @@ void GameServer::HandleIncomingConnections()
 
     if (m_listener_socket.accept(m_peers[m_connected_players]->m_socket) == sf::TcpListener::Done)
     {
+        // Try to receive the client's name packet right away.
+        sf::Packet namePacket;
+        // Wait briefly (or try multiple times) for the client to send its name.
+        // (A more robust solution might involve a timeout or a separate handshake.)
+        if (m_peers[m_connected_players]->m_socket.receive(namePacket) == sf::Socket::Done)
+        {
+            sf::Int32 packetType;
+            namePacket >> packetType;
+            if (packetType == static_cast<sf::Int32>(Client::PacketType::kClientName))
+            {
+                std::string clientName;
+                namePacket >> clientName;
+                m_peers[m_connected_players]->m_name = clientName;
+                std::cout << "Received client name: " << clientName << std::endl;
+            }
+        }
+        else
+        {
+            // Fallback if no name received, or wait a bit longer as needed.
+            m_peers[m_connected_players]->m_name = "DefaultPlayer";
+        }
+
+
         //Order the new client to spawn its player 1
         m_aircraft_info[m_aircraft_identifier_counter].m_position = sf::Vector2f(m_battlefield_rect.width / 2, m_battlefield_rect.top + m_battlefield_rect.height / 2);
         m_aircraft_info[m_aircraft_identifier_counter].m_hitpoints = 100;
@@ -424,12 +447,13 @@ void GameServer::HandleIncomingConnections()
         packet << m_aircraft_identifier_counter;
         packet << m_aircraft_info[m_aircraft_identifier_counter].m_position.x;
         packet << m_aircraft_info[m_aircraft_identifier_counter].m_position.y;
+		packet << m_peers[m_connected_players]->m_name;
 
         m_peers[m_connected_players]->m_aircraft_identifiers.emplace_back(m_aircraft_identifier_counter);
 
-        BroadcastMessage("New player");
+        BroadcastMessage("Player:" + m_peers[m_connected_players]->m_name + " has joined");
         InformWorldState(m_peers[m_connected_players]->m_socket);
-        NotifyPlayerSpawn(m_aircraft_identifier_counter++);
+        NotifyPlayerSpawn(m_aircraft_identifier_counter++, m_peers[m_connected_players]->m_name);
 
         m_peers[m_connected_players]->m_socket.send(packet);
         m_peers[m_connected_players]->m_ready = true;
@@ -557,7 +581,7 @@ void GameServer::InformWorldState(sf::TcpSocket& socket)
         {
             for (sf::Int32 identifier : m_peers[i]->m_aircraft_identifiers)
             {
-                packet << identifier << m_aircraft_info[identifier].m_position.x << m_aircraft_info[identifier].m_position.y << m_aircraft_info[identifier].m_hitpoints << m_aircraft_info[identifier].m_rotation;
+				packet << identifier << m_aircraft_info[identifier].m_position.x << m_aircraft_info[identifier].m_position.y << m_aircraft_info[identifier].m_hitpoints << m_aircraft_info[identifier].m_rotation << m_peers[i]->m_name;
             }
         }
     }
