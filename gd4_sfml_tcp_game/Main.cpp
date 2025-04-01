@@ -1,12 +1,12 @@
-/*Albert Skalinski - D00248346
-  Dylan Fennelly - D00248176*/
+/* Albert Skalinski - D00248346
+   Dylan Fennelly - D00248176 */
 
 #include <SFML/Graphics.hpp>
 #include "ResourceIdentifiers.hpp"
-#include <iostream>
+#include <windows.h>  // Required for WinMain
 #include "Application.hpp"
 
-int main()
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	try
 	{
@@ -15,6 +15,8 @@ int main()
 	}
 	catch (std::runtime_error& e)
 	{
-		std::cout << e.what() << std::endl;
+		MessageBoxA(nullptr, e.what(), "Application Error", MB_OK | MB_ICONERROR);
 	}
+
+	return 0;
 }
