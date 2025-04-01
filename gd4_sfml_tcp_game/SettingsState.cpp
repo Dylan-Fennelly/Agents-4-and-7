@@ -12,7 +12,7 @@ SettingsState::SettingsState(StateStack& stack, Context context)
 	m_background_sprite.setTexture(context.textures->Get(TextureID::kTitleScreen));
 
 
-	for (std::size_t x = 0; x < 2; ++x)
+	for (std::size_t x = 0; x < 1; ++x)
 	{
 
 		AddButtonLabel(static_cast<int>(Action::kMoveLeft), x, 0, "Move Left", context);
@@ -53,20 +53,15 @@ bool SettingsState::HandleEvent(const sf::Event& event)
 	bool is_key_binding = false;
 
 	//Iterate through all of the key binding buttons to see if they are being presssed, waiting for the user to enter a key
-	for (std::size_t action = 0; action < 2 * (static_cast<int>(Action::kActionCount)); ++action)
+	for (std::size_t action = 0; action < static_cast<int>(Action::kActionCount); ++action)
 	{
 		if (m_binding_buttons[action]->IsActive())
 		{
 			is_key_binding = true;
 			if (event.type == sf::Event::KeyReleased)
 			{
-				// Player 1
-				if (action < static_cast<int>(Action::kActionCount))
-					GetContext().keys1->AssignKey(static_cast<Action>(action), event.key.code);
 
-				// Player 2
-				else
-					GetContext().keys2->AssignKey(static_cast<Action>(action - static_cast<int>(Action::kActionCount)), event.key.code);
+					GetContext().keys1->AssignKey(static_cast<Action>(action), event.key.code);
 
 				m_binding_buttons[action]->Deactivate();
 			}
@@ -94,19 +89,14 @@ void SettingsState::UpdateLabels()
 
 		// Get keys of both players
 		sf::Keyboard::Key key1 = GetContext().keys1->GetAssignedKey(action);
-		sf::Keyboard::Key key2 = GetContext().keys2->GetAssignedKey(action);
 
 		// Assign both key strings to labels
 		m_binding_labels[i]->SetText(Utility::toString(key1));
-		m_binding_labels[i + static_cast<int>(Action::kActionCount)]->SetText(Utility::toString(key2));
 	}
 }
 
 void SettingsState::AddButtonLabel(std::size_t index, std::size_t x, std::size_t y, const std::string& text, Context context)
 {
-	// For x==0, start at index 0, otherwise start at half of array
-	index += static_cast<int>(Action::kActionCount) * x;
-
 	m_binding_buttons[index] = std::make_shared<gui::Button>(context);
 	m_binding_buttons[index]->setPosition(400.f * x + 80.f, 50.f * y + 300.f);
 	m_binding_buttons[index]->SetText(text);
