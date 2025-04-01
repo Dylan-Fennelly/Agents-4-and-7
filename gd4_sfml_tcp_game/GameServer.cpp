@@ -8,6 +8,8 @@
 #include <iostream>
 #include "World.hpp"
 #include <fstream>
+#include <ctime>  // For timestamps
+#include <iomanip> // For formatting timestamps
 
 GameServer::GameServer(sf::Vector2f battlefield_size, sf::RenderTarget& output_target)
     : m_thread(&GameServer::ExecutionThread, this)
@@ -272,6 +274,8 @@ void GameServer::HandleIncomingPackets()
     }
 }
 
+
+
 void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving_peer, bool& detected_timeout)
 {
     sf::Int32 packet_type;
@@ -445,16 +449,61 @@ void GameServer::HandleIncomingConnections()
     }
 }
 
-void GameServer::LogSurvivalTime(sf::Int32 identifier, float time_survived)
+std::vector<PlayerScore> GameServer::ReadHighScores(const std::string& filename)
 {
-    std::ofstream log_file("survival_times.txt", std::ios::app); // Open file in append mode
-    if (!log_file)
+    std::vector<PlayerScore> scores;
+    std::ifstream file(filename);
+
+    if (!file)
     {
-        std::cerr << "Error: Could not open log file for writing!" << std::endl;
+        std::cerr << "Warning: Could not open " << filename << ". Creating a new file." << std::endl;
+        return scores;
+    }
+
+    sf::Int32 id;
+    float time;
+    while (file >> id >> time)
+    {
+        scores.push_back({ id, time });
+    }
+
+    return scores;
+}
+
+void GameServer::WriteHighScores(const std::vector<PlayerScore>& scores, const std::string& filename)
+{
+    std::ofstream file(filename, std::ios::trunc); // Overwrite file
+
+    if (!file)
+    {
+        std::cerr << "Error: Could not open file for writing!" << std::endl;
         return;
     }
 
-    log_file << "Player " << identifier << " survived " << time_survived << " seconds\n";
+    for (const auto& score : scores)
+    {
+        file << score.identifier << " " << score.time_survived << "\n";
+    }
+}
+
+void GameServer::UpdateHighScores(sf::Int32 identifier, float time_survived, const std::string& filename)
+{
+    std::vector<PlayerScore> scores = ReadHighScores(filename);
+
+    // Add new score
+    scores.push_back({ identifier, time_survived });
+
+    // Sort by highest time survived
+    std::sort(scores.begin(), scores.end());
+
+    // Keep only top 10
+    if (scores.size() > 10)
+    {
+        scores.resize(10);
+    }
+
+    // Write updated scores back to file
+    WriteHighScores(scores, filename);
 }
 
 void GameServer::HandleDisconnections()
@@ -470,7 +519,7 @@ void GameServer::HandleDisconnections()
                 m_aircraft_info.erase(identifier);
 				float time_survived = Now().asSeconds();
                 std::cout << "Player " << identifier << " has survived " << time_survived << " seconds" << std::endl;
-                LogSurvivalTime(identifier, time_survived);
+                UpdateHighScores(identifier, time_survived, "survival_times.txt");
             }
 
             m_connected_players--;

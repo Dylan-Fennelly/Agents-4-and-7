@@ -1,1 +1,1 @@
-Player 1 survived 16.0832 seconds
+1 13.5634
