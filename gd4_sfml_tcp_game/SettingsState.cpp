@@ -8,14 +8,22 @@ SettingsState::SettingsState(StateStack& stack, Context context)
 {
 	m_background_sprite.setTexture(context.textures->Get(TextureID::kTitleScreen));
 
-	//Build key binding buttons and labels
+	for (std::size_t x = 0; x < 2; ++x)
+	{
 
-		AddButtonLabel(static_cast<int>(Action::kMoveLeft), 0, 0, "Move Left", context);
-		AddButtonLabel(static_cast<int>(Action::kMoveRight), 0, 1, "Move Right", context);
-		AddButtonLabel(static_cast<int>(Action::kMoveUp), 0, 2, "Move Up", context);
-		AddButtonLabel(static_cast<int>(Action::kMoveDown), 0, 3, "Move Down", context);
-		AddButtonLabel(static_cast<int>(Action::kBulletFire), 0, 4, "Fire", context);
+		AddButtonLabel(static_cast<int>(Action::kMoveLeft), x, 0, "Move Left", context);
 
+		AddButtonLabel(static_cast<int>(Action::kMoveRight), x, 1, "Move Right", context);
+
+		AddButtonLabel(static_cast<int>(Action::kMoveUp), x, 2, "Move Up", context);
+
+		AddButtonLabel(static_cast<int>(Action::kMoveDown), x, 3, "Move Down", context);
+
+		AddButtonLabel(static_cast<int>(Action::kBulletFire), x, 4, "Fire", context);
+
+		AddButtonLabel(static_cast<int>(Action::kMissileFire), x, 5, "Missile", context);
+
+	}
 
 	UpdateLabels();
 
