@@ -181,14 +181,12 @@
     <ClInclude Include="Application.hpp" />
     <ClInclude Include="BloomEffect.hpp" />
     <ClInclude Include="Button.hpp" />
-    <ClInclude Include="ButtonFunction.hpp" />
     <ClInclude Include="ButtonType.hpp" />
     <ClInclude Include="Command.hpp" />
     <ClInclude Include="CommandQueue.hpp" />
     <ClInclude Include="Component.hpp" />
     <ClInclude Include="Constants.hpp" />
     <ClInclude Include="Container.hpp" />
-    <ClInclude Include="ControllerType.hpp" />
     <ClInclude Include="CredentialEntryState.hpp" />
     <ClInclude Include="DataTables.hpp" />
     <ClInclude Include="EmitterNode.hpp" />

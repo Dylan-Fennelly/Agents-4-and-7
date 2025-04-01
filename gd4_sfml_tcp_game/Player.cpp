@@ -1,3 +1,6 @@
+/*Albert Skalinski - D00248346
+  Dylan Fennelly - D00248176*/
+
 #include "Player.hpp"
 #include "CommandQueue.hpp"
 #include "Aircraft.hpp"
@@ -59,35 +62,18 @@ struct AircraftRotator
         }
         if (aircraft.GetIdentifier() == aircraft_id)
         {
-           // std::cout << "Rotating Aircraft" << std::endl;
-            //std::cout << "Target Position: " << target.x << ", " << target.y << std::endl;
             sf::Vector2f mouse_world = window->mapPixelToCoords(target,camera);
-			//std::cout << "Mouse World: " << mouse_world.x << ", " << mouse_world.y << std::endl;
 
             // Convert mouse position from window coordinates to world coordinates
             sf::Vector2f aircraft_position = aircraft.getPosition();
             // these are world coordinates we need to convert them to window coordinates
-           // sf::Vector2i aircraft_position_ScreenPos = window->mapCoordsToPixel(aircraft_position);
-         //   std::cout << "aircraft_position: " << aircraft_position.x << ", " << aircraft_position.y << std::endl;
             sf::Vector2f direction = sf::Vector2f(mouse_world) - sf::Vector2f(aircraft_position);
-          //  std::cout << "Direction: " << direction.x << ", " << direction.y << std::endl;
-
 
                 // Calculate angle in radians and convert it to degrees
                 float angle = std::atan2(direction.y, direction.x) * 180.f / 3.14159265f;
                 angle += 90.f;
                 aircraft.SetRotation(angle);
 				std::cout << "Angle: " << angle << std::endl;
-                // Send rotation update to server
-                //if (m_socket)
-                //{
-                //    sf::Packet packet;
-                //    packet << static_cast<sf::Int32>(Client::PacketType::kRotationUpdate);
-                //    packet << aircraft_id;
-                //    packet << angle;
-                //    m_socket->send(packet);
-                //}
-            
         }
     }
 
@@ -135,7 +121,6 @@ Player::Player(sf::TcpSocket* socket, sf::Int32 identifier, const KeyBinding* bi
     }
 
 }
-
 
 void Player::HandleEvent(const sf::Event& event, CommandQueue& commands, sf::RenderWindow& window, sf::View camera)
 {
@@ -274,5 +259,3 @@ void Player::InitializeActions()
     m_action_binding[Action::kBulletFire].action = DerivedAction<Aircraft>(AircraftFireTrigger(m_identifier));
 
 }
-    //m_action_binding[Action::kMissileFire].action = DerivedAction<Aircraft>(AircraftMissileTrigger(m_identifier));
-
