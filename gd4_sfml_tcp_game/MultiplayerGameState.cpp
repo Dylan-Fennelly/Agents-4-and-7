@@ -131,19 +131,19 @@ bool MultiplayerGameState::Update(sf::Time dt)
 
 		//Remove players whose aircraft were destroyed
 		bool found_local_plane = false;
+		// Update loop that cleans up dead players
 		for (auto itr = m_players.begin(); itr != m_players.end();)
 		{
-			//Check if there are no more local planes for remote clients
-			if (std::find(m_local_player_identifiers.begin(), m_local_player_identifiers.end(), itr->first) != m_local_player_identifiers.end())
+			Aircraft* aircraft = m_world.GetAircraft(itr->first);
+			// Check if the aircraft has been destroyed or is otherwise invalid
+			if (!aircraft) // You could also check an "isDead" flag if available
 			{
-				found_local_plane = true;
-			}
-
-			if (!m_world.GetAircraft(itr->first))
-			{
+				// Remove the player's identifier from the local identifiers container
+				m_local_player_identifiers.erase(
+					std::remove(m_local_player_identifiers.begin(), m_local_player_identifiers.end(), itr->first),
+					m_local_player_identifiers.end()
+				);
 				itr = m_players.erase(itr);
-
-				//No more players left : Mission failed
 				if (m_players.empty())
 				{
 					RequestStackPush(StateID::kGameOver);
@@ -155,9 +155,10 @@ bool MultiplayerGameState::Update(sf::Time dt)
 			}
 		}
 
+
 		if (!found_local_plane && m_game_started)
 		{
-			RequestStackPush(StateID::kGameOver);
+		//	RequestStackPush(StateID::kGameOver);
 		}
 
 		//Only handle the realtime input if the window has focus and the game is unpaused
@@ -222,17 +223,32 @@ bool MultiplayerGameState::Update(sf::Time dt)
 		}
 
 		//Regular position updates
+		// Regular position updates (only send updates for active players)
 		if (m_tick_clock.getElapsedTime() > sf::seconds(1.f / 20.f))
 		{
 			sf::Packet position_update_packet;
 			position_update_packet << static_cast<sf::Int32>(Client::PacketType::kStateUpdate);
-			position_update_packet << static_cast<sf::Int32>(m_local_player_identifiers.size());
+
+			// Count only active aircraft from the local players
+			sf::Int32 activeCount = 0;
+			for (sf::Int32 identifier : m_local_player_identifiers)
+			{
+				if (Aircraft* aircraft = m_world.GetAircraft(identifier))
+				{
+					activeCount++;
+				}
+			}
+			position_update_packet << activeCount;
 
 			for (sf::Int32 identifier : m_local_player_identifiers)
 			{
 				if (Aircraft* aircraft = m_world.GetAircraft(identifier))
 				{
-					position_update_packet << identifier << aircraft->getPosition().x << aircraft->getPosition().y << static_cast<sf::Int32>(aircraft->GetHitPoints()) << aircraft->GetRotation();
+					position_update_packet << identifier
+						<< aircraft->getPosition().x
+						<< aircraft->getPosition().y
+						<< static_cast<sf::Int32>(aircraft->GetHitPoints())
+						<< aircraft->GetRotation();
 				}
 			}
 			m_socket.send(position_update_packet);

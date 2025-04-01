@@ -595,15 +595,33 @@ void GameServer::UpdateClientState()
     sf::Packet update_client_state_packet;
     update_client_state_packet << static_cast<sf::Int32>(Server::PacketType::kUpdateClientState);
     update_client_state_packet << static_cast<float>(m_battlefield_rect.top + m_battlefield_rect.height);
-    update_client_state_packet << static_cast<sf::Int32>(m_aircraft_count);
 
+    // Compute active aircraft count instead of total aircraft count
+    sf::Int32 activeAircraftCount = 0;
+    for (const auto& pair : m_aircraft_info)
+    {
+        if (pair.second.m_hitpoints > 0)
+        {
+            activeAircraftCount++;
+        }
+    }
+    update_client_state_packet << activeAircraftCount;
+
+    // Only send updates for aircraft that are still active
     for (const auto& aircraft : m_aircraft_info)
     {
-        update_client_state_packet << aircraft.first << aircraft.second.m_position.x << aircraft.second.m_position.y << aircraft.second.m_hitpoints << aircraft.second.m_rotation;
+        if (aircraft.second.m_hitpoints > 0)
+        {
+            update_client_state_packet << aircraft.first
+                << aircraft.second.m_position.x
+                << aircraft.second.m_position.y
+                << aircraft.second.m_hitpoints
+                << aircraft.second.m_rotation;
+        }
     }
-
     SendToAll(update_client_state_packet);
 }
+
 
 
 //It is essential to set the sockets to non-blocking - m_socket.setBlocking(false)
